@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 
 class BusCard extends StatelessWidget {
   final MBus bus;
@@ -60,10 +61,11 @@ class BusCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            _getBusTypeName(bus.type),
+                            BusHelper.getBusTypeName(bus.type),
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.grey[600],
+                              color: Colors.grey[700],
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ],
@@ -78,7 +80,13 @@ class BusCard extends StatelessWidget {
               const SizedBox(height: 12),
               Row(
                 children: [
-                  Expanded(
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Colors.blue),
+                    ),
                     child: _buildInfoItem(
                       Icons.event_seat,
                       '${bus.seatCount} ghế',
@@ -130,9 +138,9 @@ class BusCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 16, color: Colors.grey[600]),
+        Icon(icon, size: 16, color: Colors.blue),
         const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 14)),
+        Text(text, style: const TextStyle(fontSize: 14, color: Colors.blue)),
       ],
     );
   }
@@ -172,16 +180,5 @@ class BusCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getBusTypeName(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return 'Limousine';
-      case BusType.sleeper:
-        return 'Giường nằm';
-      case BusType.seater:
-        return 'Ghế ngồi';
-    }
   }
 }

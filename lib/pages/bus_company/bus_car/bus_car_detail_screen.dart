@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/models/MBus.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 
 class BusCarDetailScreen extends StatefulWidget {
   final MBus bus;
@@ -18,25 +19,24 @@ class _BusCarDetailScreenState extends State<BusCarDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(
-          child: Text(
-            'Chi tiết xe',
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
+        title: Text(
+          'Chi tiết xe',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.go('/home-bus-company'),
+          onPressed: () => context.pop(),
         ),
         backgroundColor: Colors.orange,
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),
             onPressed: () {
-              context.go('/home-bus-company/bus-car-edit', extra: widget.bus);
+              context.push('/home-bus-company/bus-car-edit', extra: widget.bus);
             },
           ),
         ],
@@ -110,14 +110,14 @@ class _BusCarDetailScreenState extends State<BusCarDetailScreen> {
             _buildInfoRow(
               Icons.category,
               'Loại xe',
-              _getBusTypeName(widget.bus.type),
+              BusHelper.getBusTypeName(widget.bus.type),
             ),
             const SizedBox(height: 12),
             _buildInfoRow(
               Icons.info,
               'Trạng thái',
-              _getStatusName(widget.bus.status),
-              color: _getStatusColor(widget.bus.status),
+              BusHelper.getStatusName(widget.bus.status),
+              color: BusHelper.getStatusColor(widget.bus.status),
             ),
           ],
         ),
@@ -487,7 +487,7 @@ class _BusCarDetailScreenState extends State<BusCarDetailScreen> {
                   : widget.bus.type == BusType.seater
                   ? Colors.green
                   : Colors.purple,
-              _getBusTypeName(widget.bus.type),
+              BusHelper.getBusTypeName(widget.bus.type),
             ),
           ],
         ),
@@ -548,38 +548,5 @@ class _BusCarDetailScreenState extends State<BusCarDetailScreen> {
         ),
       ),
     );
-  }
-
-  String _getBusTypeName(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return 'Limousine';
-      case BusType.sleeper:
-        return 'Giường nằm';
-      case BusType.seater:
-        return 'Ghế ngồi';
-    }
-  }
-
-  Color _getStatusColor(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return Colors.green;
-      case BusStatus.maintenance:
-        return Colors.orange;
-      case BusStatus.inactive:
-        return Colors.red;
-    }
-  }
-
-  String _getStatusName(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return 'Hoạt động';
-      case BusStatus.maintenance:
-        return 'Bảo trì';
-      case BusStatus.inactive:
-        return 'Ngưng hoạt động';
-    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/models/MBus.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import 'package:bus_ticket_app/core/bus/cubit/bus_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 
 class BusCarEditScreen extends StatefulWidget {
   final MBus bus;
@@ -53,17 +55,16 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Chỉnh Sửa Xe',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
+        title: Text(
+          'Chỉnh Sửa Xe',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            context.go('/home-bus-company');
+            context.pop();
           },
         ),
         backgroundColor: Colors.orange,
@@ -108,7 +109,7 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
               BlocBuilder<UserCubit, UserState>(
                 builder: (context, userState) {
                   if (userState is UserLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return buildSkeletonLoading();
                   }
 
                   if (userState is! UserLoaded) {
@@ -270,12 +271,18 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
                                             child: Row(
                                               children: [
                                                 Icon(
-                                                  _getBusTypeIcon(type),
+                                                  BusHelper.getBusTypeIcon(
+                                                    type,
+                                                  ),
                                                   size: 20,
                                                   color: Colors.orange,
                                                 ),
                                                 const SizedBox(width: 8),
-                                                Text(_getBusTypeName(type)),
+                                                Text(
+                                                  BusHelper.getBusTypeName(
+                                                    type,
+                                                  ),
+                                                ),
                                               ],
                                             ),
                                           );
@@ -352,7 +359,9 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            _getSeatCountInfo(_selectedBusType),
+                                            BusHelper.getSeatCountInfo(
+                                              _selectedBusType,
+                                            ),
                                             style: const TextStyle(
                                               fontSize: 13,
                                               color: Colors.blue,
@@ -382,14 +391,21 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
                                             child: Row(
                                               children: [
                                                 Icon(
-                                                  _getStatusIcon(status),
+                                                  BusHelper.getStatusIcon(
+                                                    status,
+                                                  ),
                                                   size: 20,
-                                                  color: _getStatusColor(
+                                                  color:
+                                                      BusHelper.getStatusColor(
+                                                        status,
+                                                      ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Text(
+                                                  BusHelper.getStatusName(
                                                     status,
                                                   ),
                                                 ),
-                                                const SizedBox(width: 8),
-                                                Text(_getStatusName(status)),
                                               ],
                                             ),
                                           );
@@ -495,72 +511,6 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
       );
 
       context.read<BusCubit>().updateBus(widget.bus.id!, updatedBus);
-    }
-  }
-
-  IconData _getBusTypeIcon(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return Icons.airline_seat_flat;
-      case BusType.sleeper:
-        return Icons.hotel;
-      case BusType.seater:
-        return Icons.event_seat;
-    }
-  }
-
-  String _getBusTypeName(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return 'Limousine';
-      case BusType.sleeper:
-        return 'Giường nằm';
-      case BusType.seater:
-        return 'Ghế ngồi';
-    }
-  }
-
-  String _getSeatCountInfo(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return 'Xe Limousine cao cấp, 16 chỗ ngồi';
-      case BusType.sleeper:
-        return 'Xe giường nằm: 22-40 giường tùy loại';
-      case BusType.seater:
-        return 'Xe ghế ngồi: 16-45 chỗ tùy loại';
-    }
-  }
-
-  IconData _getStatusIcon(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return Icons.check_circle;
-      case BusStatus.maintenance:
-        return Icons.build;
-      case BusStatus.inactive:
-        return Icons.cancel;
-    }
-  }
-
-  Color _getStatusColor(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return Colors.green;
-      case BusStatus.maintenance:
-        return Colors.orange;
-      case BusStatus.inactive:
-        return Colors.red;
-    }
-  }
-
-  String _getStatusName(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return 'Hoạt động';
-      case BusStatus.maintenance:
-        return 'Bảo trì';
-      case BusStatus.inactive:
-        return 'Ngưng hoạt động';
     }
   }
 }

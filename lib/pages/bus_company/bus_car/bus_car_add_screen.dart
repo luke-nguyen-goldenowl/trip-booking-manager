@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/models/MBus.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 
 class BusCarAddScreen extends StatefulWidget {
   const BusCarAddScreen({super.key});
@@ -57,17 +59,16 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            'Thêm Xe Mới',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
+        title: Text(
+          'Thêm Xe Mới',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           color: Colors.white,
           onPressed: () {
-            context.go('/home-bus-company');
+            context.pop();
           },
         ),
         backgroundColor: Colors.orange,
@@ -112,7 +113,7 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
               BlocBuilder<UserCubit, UserState>(
                 builder: (context, userState) {
                   if (userState is UserLoading) {
-                    return const Center(child: CircularProgressIndicator());
+                    return buildSkeletonLoading();
                   }
                   if (userState is! UserLoaded) {
                     return Center(
@@ -269,12 +270,14 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
                                           child: Row(
                                             children: [
                                               Icon(
-                                                _getBusTypeIcon(type),
+                                                BusHelper.getBusTypeIcon(type),
                                                 size: 20,
                                                 color: Colors.orange,
                                               ),
                                               const SizedBox(width: 8),
-                                              Text(_getBusTypeName(type)),
+                                              Text(
+                                                BusHelper.getBusTypeName(type),
+                                              ),
                                             ],
                                           ),
                                         );
@@ -366,7 +369,7 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
                                         const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            _getSeatCountInfo(
+                                            BusHelper.getSeatCountInfo(
                                               _selectedBusType!,
                                             ),
                                             style: const TextStyle(
@@ -398,12 +401,16 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
                                           child: Row(
                                             children: [
                                               Icon(
-                                                _getStatusIcon(status),
+                                                BusHelper.getStatusIcon(status),
                                                 size: 20,
-                                                color: _getStatusColor(status),
+                                                color: BusHelper.getStatusColor(
+                                                  status,
+                                                ),
                                               ),
                                               const SizedBox(width: 8),
-                                              Text(_getStatusName(status)),
+                                              Text(
+                                                BusHelper.getStatusName(status),
+                                              ),
                                             ],
                                           ),
                                         );
@@ -536,72 +543,6 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
         companyId: companyId,
       );
       context.read<BusCubit>().createBus(bus);
-    }
-  }
-
-  String _getBusTypeName(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return 'Limousine';
-      case BusType.sleeper:
-        return 'Giường nằm';
-      case BusType.seater:
-        return 'Ghế ngồi';
-    }
-  }
-
-  IconData _getBusTypeIcon(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return Icons.airline_seat_individual_suite;
-      case BusType.sleeper:
-        return Icons.bed;
-      case BusType.seater:
-        return Icons.airline_seat_recline_normal;
-    }
-  }
-
-  String _getSeatCountInfo(BusType type) {
-    switch (type) {
-      case BusType.sleeper:
-        return 'Xe giường nằm có: 40, 34, 24, 22 chỗ';
-      case BusType.seater:
-        return 'Xe ghế ngồi có: 45, 29, 16 chỗ';
-      case BusType.limousine:
-        return 'Limousine có: 16 chỗ';
-    }
-  }
-
-  String _getStatusName(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return 'Hoạt động';
-      case BusStatus.maintenance:
-        return 'Bảo trì';
-      case BusStatus.inactive:
-        return 'Ngưng hoạt động';
-    }
-  }
-
-  IconData _getStatusIcon(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return Icons.check_circle;
-      case BusStatus.maintenance:
-        return Icons.build_circle;
-      case BusStatus.inactive:
-        return Icons.cancel;
-    }
-  }
-
-  Color _getStatusColor(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return Colors.green;
-      case BusStatus.maintenance:
-        return Colors.orange;
-      case BusStatus.inactive:
-        return Colors.red;
     }
   }
 }

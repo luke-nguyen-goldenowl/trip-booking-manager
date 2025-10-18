@@ -9,6 +9,7 @@ import 'package:bus_ticket_app/widgets/bus_card.dart';
 import 'package:bus_ticket_app/models/MBus.dart';
 import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
+import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 
 class BusCarScreen extends StatefulWidget {
   const BusCarScreen({super.key});
@@ -126,9 +127,10 @@ class _BusCarScreenState extends State<BusCarScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.go('/home-bus-company/bus-car-add');
+          context.push('/home-bus-company/bus-car-add');
         },
         backgroundColor: Colors.orange,
+        shape: CircleBorder(),
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
@@ -233,8 +235,8 @@ class _BusCarScreenState extends State<BusCarScreen> {
                           ),
                           ...BusType.values.map((type) {
                             return _buildFilterChip(
-                              label: _getBusTypeName(type),
-                              icon: _getBusTypeIcon(type),
+                              label: BusHelper.getBusTypeName(type),
+                              icon: BusHelper.getBusTypeIcon(type),
                               isSelected: _selectedBusType == type,
                               onSelected: () {
                                 setState(() {
@@ -270,8 +272,8 @@ class _BusCarScreenState extends State<BusCarScreen> {
                           ),
                           ...BusStatus.values.map((status) {
                             return _buildFilterChip(
-                              label: _getStatusName(status),
-                              color: _getStatusColor(status),
+                              label: BusHelper.getStatusName(status),
+                              color: BusHelper.getStatusColor(status),
                               isSelected: _selectedBusStatus == status,
                               onSelected: () {
                                 setState(() {
@@ -389,10 +391,10 @@ class _BusCarScreenState extends State<BusCarScreen> {
             return BusCard(
               bus: bus,
               onView: () {
-                context.go('/home-bus-company/bus-car-detail', extra: bus);
+                context.push('/home-bus-company/bus-car-detail', extra: bus);
               },
               onEdit: () {
-                context.go('/home-bus-company/bus-car-edit', extra: bus);
+                context.push('/home-bus-company/bus-car-edit', extra: bus);
               },
               onDelete: () async {
                 final confirmed = await DialogHelper.showDeleteConfirmation(
@@ -433,49 +435,5 @@ class _BusCarScreenState extends State<BusCarScreen> {
         ],
       ),
     );
-  }
-
-  IconData _getBusTypeIcon(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return Icons.airline_seat_flat;
-      case BusType.sleeper:
-        return Icons.hotel;
-      case BusType.seater:
-        return Icons.event_seat;
-    }
-  }
-
-  String _getBusTypeName(BusType type) {
-    switch (type) {
-      case BusType.limousine:
-        return 'Limousine';
-      case BusType.sleeper:
-        return 'Giường nằm';
-      case BusType.seater:
-        return 'Ghế ngồi';
-    }
-  }
-
-  Color _getStatusColor(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return Colors.green;
-      case BusStatus.maintenance:
-        return Colors.orange;
-      case BusStatus.inactive:
-        return Colors.red;
-    }
-  }
-
-  String _getStatusName(BusStatus status) {
-    switch (status) {
-      case BusStatus.active:
-        return 'Hoạt động';
-      case BusStatus.maintenance:
-        return 'Bảo trì';
-      case BusStatus.inactive:
-        return 'Ngưng';
-    }
   }
 }
