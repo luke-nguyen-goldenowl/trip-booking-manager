@@ -48,4 +48,20 @@ class BusCubit extends Cubit<BusState> {
       emit(BusError(e.toString()));
     }
   }
+
+  Future<bool> checkDuplicateLicensePlate(
+    String busNumber,
+    int companyId,
+  ) async {
+    try {
+      final buses = await _busService.getBusesByCompany(companyId);
+      return buses.any(
+        (bus) =>
+            bus.busNumber?.trim().toUpperCase() ==
+            busNumber.trim().toUpperCase(),
+      );
+    } catch (e) {
+      return false;
+    }
+  }
 }

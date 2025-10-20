@@ -59,490 +59,435 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           'Thêm Xe Mới',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          color: Colors.white,
-          onPressed: () {
-            context.pop();
-          },
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => context.pop(),
         ),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.orange[300],
       ),
       body: BlocConsumer<BusCubit, BusState>(
-        listener: (context, busState) {
-          if (busState is BusLoaded) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.white),
-                    SizedBox(width: 12),
-                    Text('Thêm xe thành công!'),
-                  ],
-                ),
-                backgroundColor: Colors.green,
-                duration: Duration(seconds: 2),
-              ),
-            );
-          }
-
-          if (busState is BusError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Row(
-                  children: [
-                    const Icon(Icons.error, color: Colors.white),
-                    const SizedBox(width: 12),
-                    Text("Thêm xe thất bại"),
-                  ],
-                ),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 2),
-              ),
-            );
-          }
-        },
-        builder: (context, busState) {
-          return Stack(
-            children: [
-              BlocBuilder<UserCubit, UserState>(
-                builder: (context, userState) {
-                  if (userState is UserLoading) {
-                    return buildSkeletonLoading();
-                  }
-                  if (userState is! UserLoaded) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(height: 20),
-                          ElevatedButton(
-                            onPressed: () {
-                              FirebaseAuth.instance.signOut();
-                            },
-                            child: const Text('Đăng xuất'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  final user = userState.user;
-
-                  return Form(
-                    key: _formKey,
-                    child: ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: Colors.blue.withOpacity(0.3),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              CircleAvatar(
-                                radius: 20,
-                                backgroundImage:
-                                    user.avatarUrl != null &&
-                                            user.avatarUrl!.isNotEmpty
-                                        ? NetworkImage(user.avatarUrl!)
-                                        : const AssetImage(
-                                              'assets/images/user.png',
-                                            )
-                                            as ImageProvider,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      user.fullName ?? 'Người dùng',
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Text(
-                                      user.email ?? '',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey[600],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  user.role ?? '',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        Card(
-                          elevation: 2,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Thông tin cơ bản',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF00424B),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                TextFormField(
-                                  controller: _licensePlateController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Biển số xe *',
-                                    prefixIcon: const Icon(
-                                      Icons.confirmation_number,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey[50],
-                                  ),
-                                  textCapitalization:
-                                      TextCapitalization.characters,
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Vui lòng nhập biển số xe';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 16),
-
-                                DropdownButtonFormField<BusType>(
-                                  value: _selectedBusType,
-                                  decoration: InputDecoration(
-                                    labelText: 'Loại xe *',
-                                    prefixIcon: const Icon(
-                                      Icons.directions_bus,
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey[50],
-                                  ),
-                                  items:
-                                      BusType.values.map((type) {
-                                        return DropdownMenuItem(
-                                          value: type,
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                BusHelper.getBusTypeIcon(type),
-                                                size: 20,
-                                                color: Colors.orange,
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                BusHelper.getBusTypeName(type),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        _selectedBusType = value;
-                                        _selectedSeatCount = null;
-                                      });
-                                    }
-                                  },
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return 'Vui lòng chọn loại xe';
-                                    }
-                                    return null;
-                                  },
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                DropdownButtonFormField<int>(
-                                  value: _selectedSeatCount,
-                                  decoration: InputDecoration(
-                                    labelText: 'Số chỗ ngồi *',
-                                    prefixIcon: const Icon(Icons.event_seat),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey[50],
-                                    helperText:
-                                        _selectedBusType == null
-                                            ? 'Vui lòng chọn loại xe trước'
-                                            : null,
-                                    helperStyle: const TextStyle(
-                                      color: Colors.orange,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  items:
-                                      _getAvailableSeatCounts().map((count) {
-                                        return DropdownMenuItem(
-                                          value: count,
-                                          child: Text('$count chỗ'),
-                                        );
-                                      }).toList(),
-                                  onChanged:
-                                      _selectedBusType == null
-                                          ? null
-                                          : (value) {
-                                            if (value != null) {
-                                              setState(() {
-                                                _selectedSeatCount = value;
-                                              });
-                                            }
-                                          },
-                                  validator: (value) {
-                                    if (value == null) {
-                                      return 'Vui lòng chọn số chỗ ngồi';
-                                    }
-                                    return null;
-                                  },
-                                  disabledHint: Text(
-                                    'Chọn loại xe trước',
-                                    style: TextStyle(color: Colors.grey[400]),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-
-                                if (_selectedBusType != null)
-                                  Container(
-                                    padding: const EdgeInsets.all(12),
-                                    decoration: BoxDecoration(
-                                      color: Colors.blue.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(
-                                        color: Colors.blue.withOpacity(0.3),
-                                      ),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.info_outline,
-                                          color: Colors.blue,
-                                          size: 20,
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            BusHelper.getSeatCountInfo(
-                                              _selectedBusType!,
-                                            ),
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.blue,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                const SizedBox(height: 16),
-
-                                DropdownButtonFormField<BusStatus>(
-                                  value: _selectedStatus,
-                                  decoration: InputDecoration(
-                                    labelText: 'Trạng thái *',
-                                    prefixIcon: const Icon(Icons.info),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey[50],
-                                  ),
-                                  items:
-                                      BusStatus.values.map((status) {
-                                        return DropdownMenuItem(
-                                          value: status,
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                BusHelper.getStatusIcon(status),
-                                                size: 20,
-                                                color: BusHelper.getStatusColor(
-                                                  status,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                BusHelper.getStatusName(status),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }).toList(),
-                                  onChanged: (value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        _selectedStatus = value;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: OutlinedButton(
-                                onPressed:
-                                    busState is BusLoading
-                                        ? null
-                                        : () {
-                                          _licensePlateController.clear();
-                                          setState(() {
-                                            _selectedBusType = null;
-                                            _selectedSeatCount = null;
-                                            _selectedStatus = BusStatus.active;
-                                          });
-                                        },
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  side: const BorderSide(color: Colors.grey),
-                                ),
-                                child: const Text(
-                                  'Hủy',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed:
-                                    busState is BusLoading
-                                        ? null
-                                        : () => _submitForm(user.id),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.orange,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child:
-                                    busState is BusLoading
-                                        ? const SizedBox(
-                                          height: 20,
-                                          width: 20,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: Colors.white,
-                                          ),
-                                        )
-                                        : const Text(
-                                          'Thêm xe',
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-              if (busState is BusLoading)
-                Container(
-                  color: Colors.black.withOpacity(0.3),
-                  child: const Center(
-                    child: Card(
-                      child: Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text(
-                              'Đang thêm xe...',
-                              style: TextStyle(fontSize: 16),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          );
-        },
+        listener: _handleBusStateChanges,
+        builder: (context, busState) => _buildBody(busState),
       ),
     );
   }
 
-  void _submitForm(int companyId) {
-    if (_formKey.currentState!.validate()) {
-      final bus = MBus(
-        busNumber: _licensePlateController.text.trim(),
-        type: _selectedBusType!,
-        seatCount: _selectedSeatCount!,
-        status: _selectedStatus,
-        companyId: companyId,
+  void _handleBusStateChanges(BuildContext context, BusState state) {
+    if (state is BusLoaded) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Text('Thêm xe thành công!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
       );
-      context.read<BusCubit>().createBus(bus);
     }
+
+    if (state is BusError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text(state.message)),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  Widget _buildBody(BusState busState) {
+    return Stack(
+      children: [
+        BlocBuilder<UserCubit, UserState>(
+          builder: (context, userState) {
+            if (userState is UserLoading) {
+              return buildSkeletonLoading();
+            }
+            if (userState is! UserLoaded) {
+              return _buildErrorState();
+            }
+            return _buildForm(userState.user, busState);
+          },
+        ),
+        if (busState is BusLoading) _buildLoadingOverlay(),
+      ],
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () {
+              FirebaseAuth.instance.signOut();
+            },
+            child: const Text('Đăng xuất'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildForm(user, BusState busState) {
+    return Form(
+      key: _formKey,
+      child: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          _buildBasicInfoCard(),
+          const SizedBox(height: 24),
+          _buildActionButtons(user.id, busState),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBasicInfoCard() {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.directions_bus, color: Colors.orange),
+                const SizedBox(width: 8),
+                const Text(
+                  'Thông tin cơ bản',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF00424B),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildLicensePlateField(),
+            const SizedBox(height: 16),
+            _buildBusTypeDropdown(),
+            const SizedBox(height: 16),
+            _buildSeatCountDropdown(),
+            const SizedBox(height: 16),
+            if (_selectedBusType != null) _buildSeatCountInfo(),
+            if (_selectedBusType != null) const SizedBox(height: 16),
+            _buildStatusDropdown(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLicensePlateField() {
+    return TextFormField(
+      controller: _licensePlateController,
+      decoration: InputDecoration(
+        labelText: 'Biển số xe *',
+        prefixIcon: const Icon(Icons.confirmation_number),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey[50],
+      ),
+      textCapitalization: TextCapitalization.characters,
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Vui lòng nhập biển số xe';
+        }
+        return null;
+      },
+      onChanged: (value) {
+        setState(() {
+          _licensePlateController.value = TextEditingValue(
+            text: value.toUpperCase(),
+            selection: _licensePlateController.selection,
+          );
+        });
+      },
+    );
+  }
+
+  Widget _buildBusTypeDropdown() {
+    return DropdownButtonFormField<BusType>(
+      value: _selectedBusType,
+      decoration: InputDecoration(
+        labelText: 'Loại xe *',
+        prefixIcon: const Icon(Icons.directions_bus),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey[50],
+      ),
+      items:
+          BusType.values.map((type) {
+            return DropdownMenuItem(
+              value: type,
+              child: Row(
+                children: [
+                  Icon(
+                    BusHelper.getBusTypeIcon(type),
+                    size: 20,
+                    color: Colors.orange,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(BusHelper.getBusTypeName(type)),
+                ],
+              ),
+            );
+          }).toList(),
+      onChanged: (value) {
+        if (value != null) {
+          setState(() {
+            _selectedBusType = value;
+            _selectedSeatCount = null;
+          });
+        }
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Vui lòng chọn loại xe';
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _buildSeatCountDropdown() {
+    return DropdownButtonFormField<int>(
+      value: _selectedSeatCount,
+      decoration: InputDecoration(
+        labelText: 'Số chỗ ngồi *',
+        prefixIcon: const Icon(Icons.event_seat),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey[50],
+        helperText:
+            _selectedBusType == null ? 'Vui lòng chọn loại xe trước' : null,
+        helperStyle: const TextStyle(color: Colors.orange, fontSize: 12),
+      ),
+      items:
+          _getAvailableSeatCounts().map((count) {
+            return DropdownMenuItem(value: count, child: Text('$count chỗ'));
+          }).toList(),
+      onChanged:
+          _selectedBusType == null
+              ? null
+              : (value) {
+                if (value != null) {
+                  setState(() {
+                    _selectedSeatCount = value;
+                  });
+                }
+              },
+      validator: (value) {
+        if (value == null) {
+          return 'Vui lòng chọn số chỗ ngồi';
+        }
+        return null;
+      },
+      disabledHint: Text(
+        'Chọn loại xe trước',
+        style: TextStyle(color: Colors.grey[400]),
+      ),
+    );
+  }
+
+  Widget _buildSeatCountInfo() {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline, color: Colors.blue, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              BusHelper.getSeatCountInfo(_selectedBusType!),
+              style: const TextStyle(fontSize: 13, color: Colors.blue),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatusDropdown() {
+    return DropdownButtonFormField<BusStatus>(
+      value: _selectedStatus,
+      decoration: InputDecoration(
+        labelText: 'Trạng thái *',
+        prefixIcon: const Icon(Icons.info),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey[50],
+      ),
+      items:
+          BusStatus.values.map((status) {
+            return DropdownMenuItem(
+              value: status,
+              child: Row(
+                children: [
+                  Icon(
+                    BusHelper.getStatusIcon(status),
+                    size: 20,
+                    color: BusHelper.getStatusColor(status),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(BusHelper.getStatusName(status)),
+                ],
+              ),
+            );
+          }).toList(),
+      onChanged: (value) {
+        if (value != null) {
+          setState(() {
+            _selectedStatus = value;
+          });
+        }
+      },
+    );
+  }
+
+  Widget _buildActionButtons(int companyId, BusState busState) {
+    final isLoading = busState is BusLoading;
+
+    return Row(
+      children: [
+        Expanded(
+          child: OutlinedButton(
+            onPressed: isLoading ? null : _resetForm,
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              side: const BorderSide(color: Colors.grey),
+            ),
+            child: const Text('Hủy', style: TextStyle(fontSize: 16)),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: ElevatedButton(
+            onPressed: isLoading ? null : () => _submitForm(companyId),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child:
+                isLoading
+                    ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                    : const Text(
+                      'Thêm xe',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoadingOverlay() {
+    return Container(
+      color: Colors.black.withOpacity(0.3),
+      child: const Center(
+        child: Card(
+          child: Padding(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text('Đang thêm xe...', style: TextStyle(fontSize: 16)),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _resetForm() {
+    _licensePlateController.clear();
+    setState(() {
+      _selectedBusType = null;
+      _selectedSeatCount = null;
+      _selectedStatus = BusStatus.active;
+    });
+  }
+
+  void _submitForm(int companyId) async {
+    if (!_formKey.currentState!.validate()) return;
+    final busNumber = _licensePlateController.text.trim();
+    final isDuplicate = await context
+        .read<BusCubit>()
+        .checkDuplicateLicensePlate(busNumber, companyId);
+    if (isDuplicate) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text('Biển số xe đã tồn tại. Vui lòng kiểm tra lại.'),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    final bus = MBus(
+      busNumber: _licensePlateController.text.trim(),
+      type: _selectedBusType!,
+      seatCount: _selectedSeatCount!,
+      status: _selectedStatus,
+      companyId: companyId,
+    );
+    if (!mounted) return;
+    context.read<BusCubit>().createBus(bus);
   }
 }

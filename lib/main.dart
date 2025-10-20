@@ -15,6 +15,8 @@ import 'package:bus_ticket_app/pages/admin/home.dart';
 import 'package:bus_ticket_app/pages/bus_company/home.dart';
 import 'package:bus_ticket_app/core/bus/cubit/bus_cubit.dart';
 import 'package:bus_ticket_app/core/bus/bus_service.dart';
+import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
+import 'package:bus_ticket_app/core/bus_route/bus_route_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +34,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (context) => UserCubit(UserService())),
         BlocProvider(create: (context) => BusCubit(BusService())),
+        BlocProvider(create: (context) => BusRouteCubit(BusRouteService())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

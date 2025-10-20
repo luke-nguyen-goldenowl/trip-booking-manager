@@ -1,4 +1,5 @@
 import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/models/MRoute.dart';
 import 'package:flutter/material.dart';
 
 class BusHelper {
@@ -65,6 +66,34 @@ class BusHelper {
         return 'Xe ghế ngồi có: 45, 29, 16 chỗ';
       case BusType.limousine:
         return 'Limousine có: 16 chỗ';
+    }
+  }
+
+  static String getRouteStatusName(BusRouteStatus status) {
+    switch (status) {
+      case BusRouteStatus.active:
+        return 'Hoạt động';
+      case BusRouteStatus.inactive:
+        return 'Ngưng';
+    }
+  }
+
+  static Color getRouteStatusColor(BusRouteStatus status) {
+    switch (status) {
+      case BusRouteStatus.active:
+        return Colors.green;
+      case BusRouteStatus.inactive:
+        return Colors.red;
+    }
+  }
+
+  static String getRouteType(int distance) {
+    if (distance < 100) {
+      return 'Tuyến ngắn';
+    } else if (distance < 300) {
+      return 'Tuyến trung bình';
+    } else {
+      return 'Tuyến dài';
     }
   }
 }
