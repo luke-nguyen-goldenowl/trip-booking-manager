@@ -1,0 +1,69 @@
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:bus_ticket_app/utils/helper/validation_email.dart';
+import 'package:bus_ticket_app/models/MUser.dart' as user_model;
+import 'package:bus_ticket_app/core/user/user_service.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class LoginService {
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
+  UserService userService = UserService();
+  final SupabaseClient _supabase = Supabase.instance.client;
+
+  Future<Map<String, dynamic>?> loginWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
+    if (email.isEmpty || password.isEmpty) {
+      return {'error': 'Vui lòng nhập email và mật khẩu'};
+    }
+
+    if (!isValidEmail(email)) {
+      return {'error': 'Vui lòng nhập email hợp lệ'};
+    }
+
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password.trim(),
+      );
+
+      user_model.MUser? user = await userService.getUserInfo(email.trim());
+
+      return {'success': true, 'user': user};
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      return {'error': e.message ?? 'Có lỗi xảy ra'};
+    } catch (e) {
+      return {'error': 'Có lỗi xảy ra: ${e.toString()}'};
+    }
+  }
+
+  Future<firebase_auth.UserCredential?> signInWithGoogle() async {
+    try {
+      final googleUser = await GoogleSignIn().signIn();
+      final googleAuth = await googleUser?.authentication;
+      final credential = firebase_auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+      final userCredential = await _auth.signInWithCredential(credential);
+      final String? email = userCredential.user?.email;
+      final String? name = userCredential.user?.displayName;
+      final response = await _supabase
+          .from('user')
+          .select()
+          .eq('email', email!);
+      if (response.isEmpty) {
+        await _supabase.from('user').insert({
+          'email': email,
+          'full_name': name,
+          'role': 'Khách hàng',
+          'created_at': DateTime.now().toIso8601String(),
+        });
+      }
+      return userCredential;
+    } catch (e) {
+      throw Exception('Đăng nhập thất bại');
+    }
+  }
+}
