@@ -455,14 +455,14 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
     });
   }
 
-  void _submitForm(int companyId) async {
-    if (!_formKey.currentState!.validate()) return;
+  Future<bool> _checkValidation(int companyId) async {
+    if (!_formKey.currentState!.validate()) return false;
     final busNumber = _licensePlateController.text.trim();
     final isDuplicate = await context
         .read<BusCubit>()
         .checkDuplicateLicensePlate(busNumber, companyId);
     if (isDuplicate) {
-      if (!mounted) return;
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -478,8 +478,14 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
           duration: Duration(seconds: 2),
         ),
       );
-      return;
+      return false;
     }
+    return true;
+  }
+
+  void _submitForm(int companyId) async {
+    final isValid = await _checkValidation(companyId);
+    if (!isValid) return;
     final bus = MBus(
       busNumber: _licensePlateController.text.trim(),
       type: _selectedBusType!,

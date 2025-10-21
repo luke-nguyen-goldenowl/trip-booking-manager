@@ -672,9 +672,10 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
     });
   }
 
-  void _submitForm(int companyId) async {
-    if (!_formKey.currentState!.validate()) return;
-
+  Future<bool> _checkValidation(int companyId) async {
+    if (!_formKey.currentState!.validate()) {
+      return false;
+    }
     if (_selectedDeparture == null || _selectedDestination == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -682,7 +683,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
           backgroundColor: Colors.red,
         ),
       );
-      return;
+      return false;
     }
 
     if (_selectedDeparture == _selectedDestination) {
@@ -692,7 +693,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
           backgroundColor: Colors.red,
         ),
       );
-      return;
+      return false;
     }
 
     final departureName = _selectedDeparture!.name.trim();
@@ -701,7 +702,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
         .read<BusRouteCubit>()
         .checkDuplicateRouteName(departureName, destinationName, companyId);
     if (isDuplicateRoute) {
-      if (!mounted) return;
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Row(
@@ -717,8 +718,14 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
           duration: Duration(seconds: 2),
         ),
       );
-      return;
+      return false;
     }
+    return true;
+  }
+
+  void _submitForm(int companyId) async {
+    final isValid = await _checkValidation(companyId);
+    if (!isValid) return;
     final route = MRoute(
       companyId: companyId,
       departure: _selectedDeparture!.name,

@@ -452,31 +452,40 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
     );
   }
 
-  void _submitForm(int companyId) async {
-    if (!_formKey.currentState!.validate()) return;
-    final busNumber = _licensePlateController.text.trim();
-    final isDuplicate = await context
-        .read<BusCubit>()
-        .checkDuplicateLicensePlate(busNumber, companyId);
-    if (isDuplicate) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.error, color: Colors.white),
-              SizedBox(width: 12),
-              Expanded(
-                child: Text('Biển số xe đã tồn tại. Vui lòng kiểm tra lại.'),
-              ),
-            ],
+  Future<bool> _checkValidation(int companyId) async {
+    if (!_formKey.currentState!.validate()) return false;
+    if (_licensePlateController.text != widget.bus.busNumber) {
+      final busNumber = _licensePlateController.text.trim();
+      final isDuplicate = await context
+          .read<BusCubit>()
+          .checkDuplicateLicensePlate(busNumber, companyId);
+      if (isDuplicate) {
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text('Biển số xe đã tồn tại. Vui lòng kiểm tra lại.'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
           ),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 2),
-        ),
-      );
-      return;
+        );
+        return false;
+      }
+      return true;
     }
+    return true;
+  }
+
+  void _submitForm(int companyId) async {
+    final isValid = await _checkValidation(companyId);
+    if (!isValid) return;
     final updatedBus = MBus(
       id: widget.bus.id,
       busNumber: _licensePlateController.text.trim(),
@@ -489,39 +498,3 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
     context.read<BusCubit>().updateBus(widget.bus.id!, updatedBus);
   }
 }
-
-//   if (!_formKey.currentState!.validate()) return;
-//     final busNumber = _licensePlateController.text.trim();
-//     final isDuplicate = await context
-//         .read<BusCubit>()
-//         .checkDuplicateLicensePlate(busNumber, companyId);
-//     if (isDuplicate) {
-//       if (!mounted) return;
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         const SnackBar(
-//           content: Row(
-//             children: [
-//               Icon(Icons.error, color: Colors.white),
-//               SizedBox(width: 12),
-//               Expanded(
-//                 child: Text('Biển số xe đã tồn tại. Vui lòng kiểm tra lại.'),
-//               ),
-//             ],
-//           ),
-//           backgroundColor: Colors.red,
-//           duration: Duration(seconds: 2),
-//         ),
-//       );
-//       return;
-//     }
-//     final bus = MBus(
-//       busNumber: _licensePlateController.text.trim(),
-//       type: _selectedBusType!,
-//       seatCount: _selectedSeatCount!,
-//       status: _selectedStatus,
-//       companyId: companyId,
-//     );
-//     if (!mounted) return;
-//     context.read<BusCubit>().createBus(bus);
-//   }
-// }

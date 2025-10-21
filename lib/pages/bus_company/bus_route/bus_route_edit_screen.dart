@@ -78,50 +78,6 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
     }
   }
 
-  void _swapLocations() {
-    setState(() {
-      final temp = _selectedDeparture;
-      _selectedDeparture = _selectedDestination;
-      _selectedDestination = temp;
-    });
-  }
-
-  void _submitForm(int companyId) {
-    if (!_formKey.currentState!.validate()) return;
-
-    if (_selectedDeparture == null || _selectedDestination == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Vui lòng chọn điểm đi và điểm đến'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    if (_selectedDeparture == _selectedDestination) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Điểm đi và điểm đến không được giống nhau'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    final updatedRoute = MRoute(
-      id: widget.route.id,
-      companyId: companyId,
-      departure: _selectedDeparture!.name,
-      destination: _selectedDestination!.name,
-      distance: int.parse(_distanceController.text.trim()),
-      price: int.parse(_priceController.text.trim()),
-      status: _selectedStatus,
-    );
-
-    context.read<BusRouteCubit>().updateRoute(widget.route.id!, updatedRoute);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -598,6 +554,85 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
         ),
       ),
     );
+  }
+
+  void _swapLocations() {
+    setState(() {
+      final temp = _selectedDeparture;
+      _selectedDeparture = _selectedDestination;
+      _selectedDestination = temp;
+    });
+  }
+
+  Future<bool> _checkValidation(int companyId) async {
+    if (!_formKey.currentState!.validate()) {
+      return false;
+    }
+    if (_selectedDeparture == null || _selectedDestination == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng chọn điểm đi và điểm đến'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+
+    if (_selectedDeparture == _selectedDestination) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Điểm đi và điểm đến không được giống nhau'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return false;
+    }
+    if (_selectedDeparture?.name != widget.route.departure ||
+        _selectedDestination?.name != widget.route.destination) {
+      final departureName = _selectedDeparture!.name.trim();
+      final destinationName = _selectedDestination!.name.trim();
+      final isDuplicateRoute = await context
+          .read<BusRouteCubit>()
+          .checkDuplicateRouteName(departureName, destinationName, companyId);
+      if (isDuplicateRoute) {
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                Icon(Icons.error, color: Colors.white),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text('Tuyến đường đã tồn tại. Vui lòng kiểm tra lại.'),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return false;
+      }
+      return true;
+    }
+    return true;
+  }
+
+  void _submitForm(int companyId) async {
+    final isValid = await _checkValidation(companyId);
+    if (!isValid) return;
+
+    final updatedRoute = MRoute(
+      id: widget.route.id,
+      companyId: companyId,
+      departure: _selectedDeparture!.name,
+      destination: _selectedDestination!.name,
+      distance: int.parse(_distanceController.text.trim()),
+      price: int.parse(_priceController.text.trim()),
+      status: _selectedStatus,
+    );
+    if (!mounted) return;
+    context.read<BusRouteCubit>().updateRoute(widget.route.id!, updatedRoute);
   }
 
   Future<void> _showProvinceDialog({
