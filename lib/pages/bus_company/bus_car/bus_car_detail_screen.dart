@@ -31,7 +31,7 @@ class _BusCarDetailScreenState extends State<BusCarDetailScreen> {
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        backgroundColor: Colors.orange,
+        backgroundColor: Colors.orange[300],
         actions: [
           IconButton(
             icon: const Icon(Icons.edit, color: Colors.white),

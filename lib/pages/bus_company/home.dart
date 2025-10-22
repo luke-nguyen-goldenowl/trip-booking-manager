@@ -3,7 +3,7 @@ import 'package:bus_ticket_app/pages/bus_company/home_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/profile_screen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_screen.dart';
-import 'package:bus_ticket_app/pages/bus_company/bus_route_screen.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_route/bus_route_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_trip_screen.dart';
 
 class HomeBusCompanyScreen extends StatefulWidget {

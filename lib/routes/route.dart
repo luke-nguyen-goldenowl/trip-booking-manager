@@ -14,6 +14,10 @@ import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_edit_screen.dar
 import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_detail_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_screen.dart';
 import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_route/bus_route_add_screen.dart';
+import 'package:bus_ticket_app/models/MRoute.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_route/bus_route_detail_screen.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_route/bus_route_edit_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -69,6 +73,24 @@ final GoRouter router = GoRouter(
       builder: (context, state) {
         final bus = state.extra as MBus;
         return BusCarDetailScreen(bus: bus);
+      },
+    ),
+    GoRoute(
+      path: '/home-bus-company/bus-route-add',
+      builder: (context, state) => const BusRouteAddScreen(),
+    ),
+    GoRoute(
+      path: '/home-bus-company/bus-route-detail',
+      builder: (context, state) {
+        final route = state.extra as MRoute;
+        return BusRouteDetailScreen(route: route);
+      },
+    ),
+    GoRoute(
+      path: '/home-bus-company/bus-route-edit',
+      builder: (context, state) {
+        final route = state.extra as MRoute;
+        return BusRouteEditScreen(route: route);
       },
     ),
   ],

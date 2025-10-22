@@ -1,39 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bus_ticket_app/core/bus/cubit/bus_cubit.dart';
-import 'package:bus_ticket_app/core/bus/cubit/bus_state.dart';
+import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
+import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
-import 'package:bus_ticket_app/widgets/bus_card.dart';
-import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/widgets/bus_route_card.dart';
+import 'package:bus_ticket_app/models/MRoute.dart';
 import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 
-class BusCarScreen extends StatefulWidget {
-  const BusCarScreen({super.key});
+class BusRouteScreen extends StatefulWidget {
+  const BusRouteScreen({super.key});
 
   @override
-  State<BusCarScreen> createState() => _BusCarScreenState();
+  State<BusRouteScreen> createState() => _BusRouteScreenState();
 }
 
-class _BusCarScreenState extends State<BusCarScreen> {
+class _BusRouteScreenState extends State<BusRouteScreen> {
   final TextEditingController _searchController = TextEditingController();
-  BusType? _selectedBusType;
-  BusStatus? _selectedBusStatus;
+  BusRouteStatus? _selectedStatus;
   bool _isFilterExpanded = false;
+
   @override
   void initState() {
     super.initState();
-    _loadBuses();
+    _loadRoutes();
   }
 
-  void _loadBuses() {
+  void _loadRoutes() {
     final userState = context.read<UserCubit>().state;
     if (userState is UserLoaded) {
       final companyId = userState.user.id;
-      context.read<BusCubit>().loadBuses(companyId);
+      context.read<BusRouteCubit>().loadRoutes(companyId);
     }
   }
 
@@ -46,55 +46,23 @@ class _BusCarScreenState extends State<BusCarScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocConsumer<BusCubit, BusState>(
-        listener: _handleBusStateChanges,
-        builder: (context, state) => _buildBody(state),
+      body: BlocConsumer<BusRouteCubit, BusRouteState>(
+        listener: _handleRouteStateChanges,
+        builder: (context, routeState) => _buildBody(routeState),
       ),
       floatingActionButton: FloatingActionButton(
+        shape: CircleBorder(),
         onPressed: () {
-          context.push('/home-bus-company/bus-car-add');
+          context.push('/home-bus-company/bus-route-add');
         },
         backgroundColor: Colors.orange[300],
-        shape: CircleBorder(),
         child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
-  void _handleBusStateChanges(BuildContext context, BusState state) {
-    if (state is BusError) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.error, color: Colors.white),
-              const SizedBox(width: 12),
-              Expanded(child: Text(state.message)),
-            ],
-          ),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
-    if (state is BusDeleted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Row(
-            children: [
-              Icon(Icons.check_circle, color: Colors.white),
-              SizedBox(width: 12),
-              Text('Xóa xe thành công!'),
-            ],
-          ),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
-      );
-    }
-  }
-
-  Widget _buildBody(BusState state) {
+  Widget _buildBody(BusRouteState routeState) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -104,7 +72,7 @@ class _BusCarScreenState extends State<BusCarScreen> {
             onChanged: (value) => setState(() {}),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(
-              hintText: 'Tìm kiếm biển số xe...',
+              hintText: 'Tìm kiếm điểm đi, điểm đến...',
               hintStyle: const TextStyle(color: Colors.white70),
               prefixIcon: const Icon(Icons.search, color: Colors.white),
               suffixIcon:
@@ -132,15 +100,47 @@ class _BusCarScreenState extends State<BusCarScreen> {
           _buildFilterSection(),
 
           const SizedBox(height: 10),
-          Expanded(child: _buildBusListContent(state)),
+
+          Expanded(child: _buildRouteListContent(routeState)),
         ],
       ),
     );
   }
 
+  void _handleRouteStateChanges(BuildContext context, BusRouteState state) {
+    if (state is BusRouteError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.error, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text(state.message)),
+            ],
+          ),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+    if (state is BusRouteDeleted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Row(
+            children: [
+              Icon(Icons.check_circle, color: Colors.white),
+              SizedBox(width: 12),
+              Text('Xóa tuyến đường thành công!'),
+            ],
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   Widget _buildFilterSection() {
-    final hasActiveFilter =
-        _selectedBusType != null || _selectedBusStatus != null;
+    final hasActiveFilter = _selectedStatus != null;
 
     return Card(
       elevation: 2,
@@ -169,7 +169,7 @@ class _BusCarScreenState extends State<BusCarScreen> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
-                        color: hasActiveFilter ? Colors.orange : Colors.black87,
+                        color: hasActiveFilter ? Colors.orange : Colors.black,
                       ),
                     ),
                   ),
@@ -183,9 +183,9 @@ class _BusCarScreenState extends State<BusCarScreen> {
                         color: Colors.orange,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(
-                        '${(_selectedBusType != null ? 1 : 0) + (_selectedBusStatus != null ? 1 : 0)}',
-                        style: const TextStyle(
+                      child: const Text(
+                        '1',
+                        style: TextStyle(
                           color: Colors.white,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
@@ -214,43 +214,6 @@ class _BusCarScreenState extends State<BusCarScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Loại xe',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF00424B),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          _buildFilterChip(
-                            label: 'Tất cả',
-                            isSelected: _selectedBusType == null,
-                            onSelected: () {
-                              setState(() {
-                                _selectedBusType = null;
-                              });
-                            },
-                          ),
-                          ...BusType.values.map((type) {
-                            return _buildFilterChip(
-                              label: BusHelper.getBusTypeName(type),
-                              icon: BusHelper.getBusTypeIcon(type),
-                              isSelected: _selectedBusType == type,
-                              onSelected: () {
-                                setState(() {
-                                  _selectedBusType = type;
-                                });
-                              },
-                            );
-                          }),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      const Text(
                         'Trạng thái',
                         style: TextStyle(
                           fontSize: 14,
@@ -264,21 +227,21 @@ class _BusCarScreenState extends State<BusCarScreen> {
                         children: [
                           _buildFilterChip(
                             label: 'Tất cả',
-                            isSelected: _selectedBusStatus == null,
+                            isSelected: _selectedStatus == null,
                             onSelected: () {
                               setState(() {
-                                _selectedBusStatus = null;
+                                _selectedStatus = null;
                               });
                             },
                           ),
-                          ...BusStatus.values.map((status) {
+                          ...BusRouteStatus.values.map((status) {
                             return _buildFilterChip(
-                              label: BusHelper.getStatusName(status),
-                              color: BusHelper.getStatusColor(status),
-                              isSelected: _selectedBusStatus == status,
+                              label: BusHelper.getRouteStatusName(status),
+                              color: BusHelper.getRouteStatusColor(status),
+                              isSelected: _selectedStatus == status,
                               onSelected: () {
                                 setState(() {
-                                  _selectedBusStatus = status;
+                                  _selectedStatus = status;
                                 });
                               },
                             );
@@ -297,26 +260,12 @@ class _BusCarScreenState extends State<BusCarScreen> {
 
   Widget _buildFilterChip({
     required String label,
-    IconData? icon,
     Color? color,
     required bool isSelected,
     required VoidCallback onSelected,
   }) {
     return FilterChip(
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected ? Colors.white : (color ?? Colors.orange),
-            ),
-            const SizedBox(width: 4),
-          ],
-          Text(label),
-        ],
-      ),
+      label: Text(label),
       selected: isSelected,
       onSelected: (_) => onSelected(),
       selectedColor: color ?? Colors.orange,
@@ -335,44 +284,43 @@ class _BusCarScreenState extends State<BusCarScreen> {
     );
   }
 
-  Widget _buildBusListContent(BusState state) {
-    if (state is BusLoading) {
+  Widget _buildRouteListContent(BusRouteState state) {
+    if (state is BusRouteLoading) {
       return buildSkeletonLoading();
     }
-    if (state is BusLoaded || state is BusDeleted) {
-      final buses =
-          state is BusLoaded ? state.buses : (state as BusDeleted).buses;
 
-      final filteredBuses =
-          buses.where((bus) {
+    if (state is BusRouteLoaded || state is BusRouteDeleted) {
+      final routes =
+          state is BusRouteLoaded
+              ? state.buses
+              : (state as BusRouteDeleted).buses;
+
+      final filteredRoutes =
+          routes.where((route) {
             final searchQuery = _searchController.text.toLowerCase();
             final matchesSearch =
                 searchQuery.isEmpty ||
-                (bus.busNumber?.toLowerCase().contains(searchQuery) ?? false);
-
-            final matchesBusType =
-                _selectedBusType == null || bus.type == _selectedBusType;
+                (route.departure?.toLowerCase().contains(searchQuery) ??
+                    false) ||
+                (route.destination?.toLowerCase().contains(searchQuery) ??
+                    false);
 
             final matchesStatus =
-                _selectedBusStatus == null || bus.status == _selectedBusStatus;
+                _selectedStatus == null || route.status == _selectedStatus;
 
-            return matchesSearch && matchesBusType && matchesStatus;
+            return matchesSearch && matchesStatus;
           }).toList();
 
-      if (filteredBuses.isEmpty) {
+      if (filteredRoutes.isEmpty) {
         return Center(
           child: SingleChildScrollView(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
-                  Icons.directions_bus_outlined,
-                  size: 64,
-                  color: Colors.grey,
-                ),
+                const Icon(Icons.route_outlined, size: 64, color: Colors.grey),
                 const SizedBox(height: 16),
                 const Text(
-                  'Không tìm thấy xe phù hợp',
+                  'Không tìm thấy tuyến đường phù hợp',
                   style: TextStyle(fontSize: 18, color: Colors.grey),
                 ),
               ],
@@ -383,31 +331,34 @@ class _BusCarScreenState extends State<BusCarScreen> {
 
       return RefreshIndicator(
         onRefresh: () async {
-          _loadBuses();
+          _loadRoutes();
         },
         child: ListView.builder(
-          itemCount: filteredBuses.length,
+          itemCount: filteredRoutes.length,
           itemBuilder: (context, index) {
-            final bus = filteredBuses[index];
-            return BusCard(
-              bus: bus,
+            final route = filteredRoutes[index];
+            return BusRouteCard(
+              route: route,
               onView: () {
-                context.push('/home-bus-company/bus-car-detail', extra: bus);
+                context.push(
+                  '/home-bus-company/bus-route-detail',
+                  extra: route,
+                );
               },
               onEdit: () {
-                context.push('/home-bus-company/bus-car-edit', extra: bus);
+                context.push('/home-bus-company/bus-route-edit', extra: route);
               },
               onDelete: () async {
                 final confirmed = await DialogHelper.showDeleteConfirmation(
                   context,
-                  itemName: 'xe ${bus.busNumber}',
-                  itemType: 'xe',
+                  itemName: 'tuyến ${route.departure} → ${route.destination}',
+                  itemType: 'tuyến đường',
                 );
                 if (confirmed && mounted) {
                   final userState = context.read<UserCubit>().state;
-                  if (userState is UserLoaded && bus.id != null) {
-                    context.read<BusCubit>().deleteBus(
-                      bus.id!,
+                  if (userState is UserLoaded && route.id != null) {
+                    context.read<BusRouteCubit>().deleteRoute(
+                      route.id!,
                       userState.user.id,
                     );
                   }
@@ -418,23 +369,6 @@ class _BusCarScreenState extends State<BusCarScreen> {
         ),
       );
     }
-
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.directions_bus_outlined,
-            size: 64,
-            color: Colors.grey,
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            'Chưa có dữ liệu',
-            style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-        ],
-      ),
-    );
+    return const SizedBox.shrink();
   }
 }
