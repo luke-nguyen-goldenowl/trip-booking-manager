@@ -43,7 +43,7 @@ class LogoutButton extends StatelessWidget {
           if (shouldLogout == true) {
             await FirebaseAuth.instance.signOut();
             if (context.mounted) {
-              context.go('/');
+              context.go('/getstarted');
             }
           }
         },

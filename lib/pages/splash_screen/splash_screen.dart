@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bus_ticket_app/core/preference/preference_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,9 +13,19 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
+    _navigateAfterSplash();
+  }
+
+  Future<void> _navigateAfterSplash() async {
+    await Future.delayed(const Duration(seconds: 3));
+    if (!mounted) return;
+    final hasSeenOnboarding = await PreferenceService.hasSeenOnboarding();
+    if (!mounted) return;
+    if (hasSeenOnboarding) {
+      context.go('/getstarted');
+    } else {
       context.go('/onboarding');
-    });
+    }
   }
 
   @override
