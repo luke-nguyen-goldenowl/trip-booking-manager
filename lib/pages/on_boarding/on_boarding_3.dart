@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OnBoarding3Page extends StatelessWidget {
-  const OnBoarding3Page({Key? key}) : super(key: key);
+  const OnBoarding3Page({super.key});
 
   @override
   Widget build(BuildContext context) {

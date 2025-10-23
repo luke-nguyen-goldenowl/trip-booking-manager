@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/models/bus_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 

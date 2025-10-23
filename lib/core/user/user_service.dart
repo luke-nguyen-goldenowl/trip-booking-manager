@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:bus_ticket_app/models/MUser.dart' as user_model;
+import 'package:bus_ticket_app/models/user_model.dart' as user_model;
 import 'dart:typed_data';
 
 class UserService {

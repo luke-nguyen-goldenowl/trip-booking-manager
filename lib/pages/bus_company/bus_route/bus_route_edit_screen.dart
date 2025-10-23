@@ -7,8 +7,10 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:bus_ticket_app/core/province/province_service.dart';
-import 'package:bus_ticket_app/models/MRoute.dart';
-import 'package:bus_ticket_app/models/MProvince.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
+import 'package:bus_ticket_app/models/province_model.dart';
+import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
+import 'package:diacritic/diacritic.dart';
 
 class BusRouteEditScreen extends StatefulWidget {
   final MRoute route;
@@ -22,7 +24,6 @@ class BusRouteEditScreen extends StatefulWidget {
 class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final _distanceController = TextEditingController();
-  final _priceController = TextEditingController();
   final _provinceService = ProvinceService();
 
   Province? _selectedDeparture;
@@ -36,15 +37,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
     super.initState();
     _selectedStatus = widget.route.status;
     _distanceController.text = widget.route.distance?.toString() ?? '';
-    _priceController.text = widget.route.price?.toString() ?? '';
     _loadProvinces();
-  }
-
-  @override
-  void dispose() {
-    _distanceController.dispose();
-    _priceController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadProvinces() async {
@@ -89,7 +82,20 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
+          onPressed: () async {
+            final confirmed = await DialogHelper.showConfirmation(
+              context,
+              title: 'Huỷ thay đổi',
+              message:
+                  'Bạn có chắc muốn huỷ thay đổi và quay lại trang trước không?',
+              icon: Icons.cancel,
+              iconColor: Colors.red,
+              confirmColor: Colors.red,
+            );
+            if (confirmed && mounted) {
+              context.pop();
+            }
+          },
         ),
         backgroundColor: Colors.orange[300],
       ),
@@ -375,42 +381,6 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _priceController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
-                labelText: 'Giá vé',
-                hintText: 'Nhập giá vé',
-                prefixIcon: const Icon(
-                  Icons.attach_money,
-                  color: Colors.orange,
-                ),
-                suffixText: 'đ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.orange, width: 2),
-                ),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Vui lòng nhập giá vé';
-                }
-                final price = int.tryParse(value);
-                if (price == null || price <= 0) {
-                  return 'Giá vé phải lớn hơn 0';
-                }
-                return null;
-              },
-            ),
           ],
         ),
       ),
@@ -628,7 +598,6 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
       departure: _selectedDeparture!.name,
       destination: _selectedDestination!.name,
       distance: int.parse(_distanceController.text.trim()),
-      price: int.parse(_priceController.text.trim()),
       status: _selectedStatus,
     );
     if (!mounted) return;
@@ -666,13 +635,15 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
                       onChanged: (value) {
                         setState(() {
                           filteredProvinces =
-                              _provinces
-                                  .where(
-                                    (p) => p.name.toLowerCase().contains(
-                                      value.toLowerCase(),
-                                    ),
-                                  )
-                                  .toList();
+                              _provinces.where((p) {
+                                final normalizedName = removeDiacritics(
+                                  p.name.toLowerCase(),
+                                );
+                                final normalizedQuery = removeDiacritics(
+                                  value.toLowerCase(),
+                                );
+                                return normalizedName.contains(normalizedQuery);
+                              }).toList();
                         });
                       },
                     ),

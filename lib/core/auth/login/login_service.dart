@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:bus_ticket_app/utils/helper/validation_email.dart';
-import 'package:bus_ticket_app/models/MUser.dart' as user_model;
+import 'package:bus_ticket_app/models/user_model.dart' as user_model;
 import 'package:bus_ticket_app/core/user/user_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

@@ -6,10 +6,11 @@ import 'package:bus_ticket_app/core/bus/cubit/bus_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:bus_ticket_app/widgets/bus_card.dart';
-import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/models/bus_model.dart';
 import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
+import 'package:bus_ticket_app/utils/helper/upper_case_helper.dart';
 
 class BusCarScreen extends StatefulWidget {
   const BusCarScreen({super.key});
@@ -101,6 +102,7 @@ class _BusCarScreenState extends State<BusCarScreen> {
         children: [
           TextField(
             controller: _searchController,
+            inputFormatters: [UpperCaseTextFormatter()],
             onChanged: (value) => setState(() {}),
             style: const TextStyle(color: Colors.white),
             decoration: InputDecoration(

@@ -1,0 +1,63 @@
+{
+  "busType": "sleeper",
+  "seatCount": 40,
+  "rows": 7,
+  "columns": 3,
+  "description": "Xe giường nằm 40 chỗ - 2 tầng",
+  "seats": [
+    {"id": "T1-A1", "row": 0, "column": 0, "floor": "lower", "isBooked": false},
+    {"id": "T1-A2", "row": 0, "column": 1, "floor": "lower", "isBooked": false},
+    {"id": "T1-A3", "row": 0, "column": 2, "floor": "lower", "isBooked": false},
+
+    {"id": "T1-B1", "row": 1, "column": 0, "floor": "lower", "isBooked": false},
+    {"id": "T1-B2", "row": 1, "column": 1, "floor": "lower", "isBooked": false},
+    {"id": "T1-B3", "row": 1, "column": 2, "floor": "lower", "isBooked": false},
+
+    {"id": "T1-C1", "row": 2, "column": 0, "floor": "lower", "isBooked": false},
+    {"id": "T1-C2", "row": 2, "column": 1, "floor": "lower", "isBooked": false},
+    {"id": "T1-C3", "row": 2, "column": 2, "floor": "lower", "isBooked": false},
+
+    {"id": "T1-D1", "row": 3, "column": 0, "floor": "lower", "isBooked": false},
+    {"id": "T1-D2", "row": 3, "column": 1, "floor": "lower", "isBooked": false},
+    {"id": "T1-D3", "row": 3, "column": 2, "floor": "lower", "isBooked": false},
+
+    {"id": "T1-E1", "row": 4, "column": 0, "floor": "lower", "isBooked": false},
+    {"id": "T1-E2", "row": 4, "column": 1, "floor": "lower", "isBooked": false},
+    {"id": "T1-E3", "row": 4, "column": 2, "floor": "lower", "isBooked": false},
+
+    {"id": "T1-F1", "row": 5, "column": 0, "floor": "lower", "isBooked": false},
+    {"id": "T1-F2", "row": 5, "column": 1, "floor": "lower", "isBooked": false},
+    {"id": "T1-F3", "row": 5, "column": 2, "floor": "lower", "isBooked": false},
+
+    {"id": "T1-G1", "row": 6, "column": 0, "floor": "lower", "isBooked": false},
+    {"id": "T1-G2", "row": 6, "column": 1, "floor": "lower", "isBooked": false},
+
+    {"id": "T2-A1", "row": 0, "column": 0, "floor": "upper", "isBooked": false},
+    {"id": "T2-A2", "row": 0, "column": 1, "floor": "upper", "isBooked": false},
+    {"id": "T2-A3", "row": 0, "column": 2, "floor": "upper", "isBooked": false},
+
+    {"id": "T2-B1", "row": 1, "column": 0, "floor": "upper", "isBooked": false},
+    {"id": "T2-B2", "row": 1, "column": 1, "floor": "upper", "isBooked": false},
+    {"id": "T2-B3", "row": 1, "column": 2, "floor": "upper", "isBooked": false},
+
+    {"id": "T2-C1", "row": 2, "column": 0, "floor": "upper", "isBooked": false},
+    {"id": "T2-C2", "row": 2, "column": 1, "floor": "upper", "isBooked": false},
+    {"id": "T2-C3", "row": 2, "column": 2, "floor": "upper", "isBooked": false},
+
+    {"id": "T2-D1", "row": 3, "column": 0, "floor": "upper", "isBooked": false},
+    {"id": "T2-D2", "row": 3, "column": 1, "floor": "upper", "isBooked": false},
+    {"id": "T2-D3", "row": 3, "column": 2, "floor": "upper", "isBooked": false},
+
+    {"id": "T2-E1", "row": 4, "column": 0, "floor": "upper", "isBooked": false},
+    {"id": "T2-E2", "row": 4, "column": 1, "floor": "upper", "isBooked": false},
+    {"id": "T2-E3", "row": 4, "column": 2, "floor": "upper", "isBooked": false},
+
+    {"id": "T2-F1", "row": 5, "column": 0, "floor": "upper", "isBooked": false},
+    {"id": "T2-F2", "row": 5, "column": 1, "floor": "upper", "isBooked": false},
+    {"id": "T2-F3", "row": 5, "column": 2, "floor": "upper", "isBooked": false},
+   
+    {"id": "T2-G1", "row": 6, "column": 0, "floor": "upper", "isBooked": false},
+    {"id": "T2-G2", "row": 6, "column": 1, "floor": "upper", "isBooked": false}
+  
+  ]
+}

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/core/auth/forgot_password/forgot_password_service.dart';
+import 'package:flutter/services.dart';
+import 'package:bus_ticket_app/utils/helper/lower_case_helper.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
-  const ForgotPasswordScreen({Key? key}) : super(key: key);
+  const ForgotPasswordScreen({super.key});
 
   @override
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
@@ -96,6 +98,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               hint: 'Nhập địa chỉ email của bạn',
                               icon: Icons.email,
                               keyboardType: TextInputType.emailAddress,
+                              inputFormatters: [LowerCaseTextFormatter()],
                             ),
                             const SizedBox(height: 32),
 
@@ -159,6 +162,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,6 +180,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           controller: controller,
           keyboardType: keyboardType,
           validator: validator,
+          inputFormatters: inputFormatters,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,

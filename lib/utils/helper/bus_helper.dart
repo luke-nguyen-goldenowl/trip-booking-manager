@@ -1,5 +1,6 @@
-import 'package:bus_ticket_app/models/MBus.dart';
-import 'package:bus_ticket_app/models/MRoute.dart';
+import 'package:bus_ticket_app/models/bus_model.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
+import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:flutter/material.dart';
 
 class BusHelper {
@@ -94,6 +95,64 @@ class BusHelper {
       return 'Tuyến trung bình';
     } else {
       return 'Tuyến dài';
+    }
+  }
+
+  static String getTripStatusName(BusTripStatus status) {
+    switch (status) {
+      case BusTripStatus.scheduled:
+        return 'Lên lịch';
+      case BusTripStatus.completed:
+        return 'Hoàn thành';
+    }
+  }
+
+  static IconData getTripStatusIcon(BusTripStatus status) {
+    switch (status) {
+      case BusTripStatus.scheduled:
+        return Icons.schedule;
+      case BusTripStatus.completed:
+        return Icons.check_circle;
+    }
+  }
+
+  static Color getTripStatusColor(BusTripStatus status) {
+    switch (status) {
+      case BusTripStatus.scheduled:
+        return Colors.blue;
+      case BusTripStatus.completed:
+        return Colors.green;
+    }
+  }
+
+  static String getSeatLayoutFile(int seatCount, BusType busType) {
+    if (busType == BusType.limousine) {
+      return 'limousine_16.json';
+    } else if (busType == BusType.sleeper) {
+      return 'sleeper_$seatCount.json';
+    } else {
+      return 'seater_$seatCount.json';
+    }
+  }
+
+  static String getSeatLayoutFilebyCount(int seatCount) {
+    switch (seatCount) {
+      case 16:
+        return 'limousine_16.json';
+      case 22:
+        return 'sleeper_22.json';
+      case 24:
+        return 'sleeper_24.json';
+      case 29:
+        return 'seater_29.json';
+      case 34:
+        return 'sleeper_34.json';
+      case 40:
+        return 'sleeper_40.json';
+      case 45:
+        return 'seater_45.json';
+      default:
+        return 'seater_16.json';
     }
   }
 }

@@ -6,7 +6,6 @@ class MRoute {
   final String? departure;
   final String? destination;
   final int? distance;
-  final int? price;
   final BusRouteStatus status;
   MRoute({
     this.id,
@@ -14,7 +13,6 @@ class MRoute {
     this.departure,
     this.destination,
     this.distance,
-    this.price,
     required this.status,
   });
 
@@ -24,7 +22,6 @@ class MRoute {
     String? departure,
     String? destination,
     int? distance,
-    int? price,
     BusRouteStatus? status,
   }) {
     return MRoute(
@@ -33,7 +30,6 @@ class MRoute {
       departure: departure ?? this.departure,
       destination: destination ?? this.destination,
       distance: distance ?? this.distance,
-      price: price ?? this.price,
       status: status ?? this.status,
     );
   }
@@ -44,7 +40,6 @@ class MRoute {
       'departure': departure,
       'destination': destination,
       'distance_km': distance,
-      'base_price': price,
       'status': status.value,
     };
   }
@@ -68,7 +63,6 @@ class MRoute {
       destination:
           map['destination'] != null ? map['destination'] as String : null,
       distance: map['distance_km'] != null ? map['distance_km'] as int : null,
-      price: map['base_price'] != null ? map['base_price'] as int : null,
       status: _parseBusRouteStatus(map['status']),
     );
   }
@@ -80,7 +74,7 @@ class MRoute {
 
   @override
   String toString() {
-    return 'MRoute(id: $id, companyId: $companyId, departure: $departure, destination: $destination, distance: $distance, price: $price, status: $status)';
+    return 'MRoute(id: $id, companyId: $companyId, departure: $departure, destination: $destination, distance: $distance, status: $status)';
   }
 
   @override
@@ -92,7 +86,6 @@ class MRoute {
         other.departure == departure &&
         other.destination == destination &&
         other.distance == distance &&
-        other.price == price &&
         other.status == status;
   }
 
@@ -103,7 +96,6 @@ class MRoute {
         departure.hashCode ^
         destination.hashCode ^
         distance.hashCode ^
-        price.hashCode ^
         status.hashCode;
   }
 }

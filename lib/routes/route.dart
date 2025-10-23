@@ -9,15 +9,18 @@ import 'package:bus_ticket_app/pages/user/home.dart';
 import 'package:bus_ticket_app/pages/admin/home.dart';
 import 'package:bus_ticket_app/pages/bus_company/home.dart';
 import 'package:bus_ticket_app/main.dart';
+import 'package:bus_ticket_app/models/bus_model.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_add_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_edit_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_detail_screen.dart';
-import 'package:bus_ticket_app/pages/bus_company/bus_car/bus_car_screen.dart';
-import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_route/bus_route_add_screen.dart';
-import 'package:bus_ticket_app/models/MRoute.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_route/bus_route_detail_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_route/bus_route_edit_screen.dart';
+import 'package:bus_ticket_app/models/trip_model.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_add_screen.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_detail_screen.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_edit_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -54,10 +57,6 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const HomeBusCompanyScreen(),
     ),
     GoRoute(
-      path: '/home-bus-company/bus-car',
-      builder: (context, state) => const BusCarScreen(),
-    ),
-    GoRoute(
       path: '/home-bus-company/bus-car-add',
       builder: (context, state) => const BusCarAddScreen(),
     ),
@@ -91,6 +90,24 @@ final GoRouter router = GoRouter(
       builder: (context, state) {
         final route = state.extra as MRoute;
         return BusRouteEditScreen(route: route);
+      },
+    ),
+    GoRoute(
+      path: '/home-bus-company/bus-trip-add',
+      builder: (context, state) => const BusTripAddScreen(),
+    ),
+    GoRoute(
+      path: '/home-bus-company/bus-trip-detail',
+      builder: (context, state) {
+        final trip = state.extra as MTrip;
+        return BusTripDetailScreen(trip: trip);
+      },
+    ),
+    GoRoute(
+      path: '/home-bus-company/bus-trip-edit',
+      builder: (context, state) {
+        final trip = state.extra as MTrip;
+        return BusTripEditScreen(trip: trip);
       },
     ),
   ],

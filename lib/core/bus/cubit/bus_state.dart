@@ -1,4 +1,4 @@
-import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/models/bus_model.dart';
 
 abstract class BusState {}
 

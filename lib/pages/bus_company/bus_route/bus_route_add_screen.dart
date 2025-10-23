@@ -7,9 +7,10 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:bus_ticket_app/core/province/province_service.dart';
-import 'package:bus_ticket_app/models/MRoute.dart';
-import 'package:bus_ticket_app/models/MProvince.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
+import 'package:bus_ticket_app/models/province_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:diacritic/diacritic.dart';
 
 class BusRouteAddScreen extends StatefulWidget {
   const BusRouteAddScreen({super.key});
@@ -21,7 +22,6 @@ class BusRouteAddScreen extends StatefulWidget {
 class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
   final _formKey = GlobalKey<FormState>();
   final _distanceController = TextEditingController();
-  final _priceController = TextEditingController();
   final _provinceService = ProvinceService();
 
   Province? _selectedDeparture;
@@ -34,13 +34,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
   void initState() {
     super.initState();
     _loadProvinces();
-  }
-
-  @override
-  void dispose() {
-    _distanceController.dispose();
-    _priceController.dispose();
-    super.dispose();
   }
 
   Future<void> _loadProvinces() async {
@@ -304,13 +297,13 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
         return StatefulBuilder(
           builder: (context, setDialogState) {
             final filteredProvinces =
-                _provinces
-                    .where(
-                      (p) => p.name.toLowerCase().contains(
-                        searchQuery.toLowerCase(),
-                      ),
-                    )
-                    .toList();
+                _provinces.where((p) {
+                  final normalizedName = removeDiacritics(p.name.toLowerCase());
+                  final normalizedQuery = removeDiacritics(
+                    searchQuery.toLowerCase(),
+                  );
+                  return normalizedName.contains(normalizedQuery);
+                }).toList();
             return AlertDialog(
               title: const Text('Chọn tỉnh/thành phố'),
               content: SizedBox(
@@ -419,57 +412,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                 }
                 return null;
               },
-            ),
-
-            const SizedBox(height: 16),
-
-            TextFormField(
-              controller: _priceController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: InputDecoration(
-                labelText: 'Giá vé',
-                prefixIcon: const Icon(Icons.attach_money),
-                suffixText: 'VNĐ',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-              ),
-              validator: (value) {
-                if (value?.trim().isEmpty ?? true) {
-                  return 'Vui lòng nhập giá vé';
-                }
-                final price = int.tryParse(value!);
-                if (price == null || price <= 0) {
-                  return 'Giá vé phải lớn hơn 0';
-                }
-                return null;
-              },
-            ),
-
-            const SizedBox(height: 12),
-
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.withOpacity(0.3)),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.info_outline, color: Colors.blue, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Đây là giá vé cơ bản. Giá thực tế có thể thay đổi theo loại xe và thời gian.',
-                      style: TextStyle(fontSize: 13, color: Colors.blue[700]),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ],
         ),
@@ -664,7 +606,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
 
   void _resetForm() {
     _distanceController.clear();
-    _priceController.clear();
     setState(() {
       _selectedDeparture = null;
       _selectedDestination = null;
@@ -731,7 +672,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
       departure: _selectedDeparture!.name,
       destination: _selectedDestination!.name,
       distance: int.parse(_distanceController.text.trim()),
-      price: int.parse(_priceController.text.trim()),
       status: _selectedStatus,
     );
     if (!mounted) return;
