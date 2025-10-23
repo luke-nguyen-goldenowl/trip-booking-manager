@@ -85,9 +85,9 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
           onPressed: () async {
             final confirmed = await DialogHelper.showConfirmation(
               context,
-              title: 'Huỷ thay đổi',
+              title: 'Thông Báo',
               message:
-                  'Bạn có chắc muốn huỷ thay đổi và quay lại trang trước không?',
+                  'Bạn chắn chắn với sự thay đổi và muốn quay lại trang trước?',
               icon: Icons.cancel,
               iconColor: Colors.red,
               confirmColor: Colors.red,
