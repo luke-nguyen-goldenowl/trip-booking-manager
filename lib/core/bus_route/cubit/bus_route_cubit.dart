@@ -18,6 +18,16 @@ class BusRouteCubit extends Cubit<BusRouteState> {
     }
   }
 
+  Future<void> loadAllRoutes() async {
+    try {
+      emit(BusRouteLoading());
+      final routes = await _busRouteService.getAllRoutes();
+      emit(BusRouteLoaded(routes));
+    } catch (e) {
+      emit(BusRouteError(e.toString()));
+    }
+  }
+
   Future<void> createRoute(MRoute route) async {
     try {
       emit(BusRouteLoading());

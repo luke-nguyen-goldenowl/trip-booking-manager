@@ -24,54 +24,28 @@ class _HomeUserScreenState extends State<HomeUserScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(
-          child: Text(
-            _getTitle(),
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
+    return SafeArea(
+      child: Scaffold(
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: CurvedNavigationBar(
+          backgroundColor: Colors.transparent,
+          color: Color(0xFF004049),
+          buttonBackgroundColor: Color(0xFF004049),
+          height: 60,
+          index: _selectedIndex,
+          items: const [
+            Icon(Icons.home, size: 25, color: Colors.white),
+            Icon(Icons.confirmation_number, size: 30, color: Colors.white),
+            Icon(Icons.favorite, size: 30, color: Colors.white),
+            Icon(Icons.person, size: 25, color: Colors.white),
+          ],
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
         ),
-        backgroundColor: Colors.blue,
-      ),
-      body: _screens[_selectedIndex],
-      bottomNavigationBar: CurvedNavigationBar(
-        backgroundColor: Colors.transparent,
-        color: Colors.blue,
-        buttonBackgroundColor: Colors.blue,
-        height: 60,
-        index: _selectedIndex,
-        items: const [
-          Icon(Icons.home, size: 25, color: Colors.white),
-          Icon(Icons.confirmation_number, size: 30, color: Colors.white),
-          Icon(Icons.favorite, size: 30, color: Colors.white),
-          Icon(Icons.person, size: 25, color: Colors.white),
-        ],
-        onTap: (index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
       ),
     );
-  }
-
-  String _getTitle() {
-    switch (_selectedIndex) {
-      case 0:
-        return 'Trang Chủ';
-      case 1:
-        return 'Vé Của Tôi';
-      case 2:
-        return 'Yêu Thích';
-      case 3:
-        return 'Tài Khoản';
-      default:
-        return 'Trang Chủ';
-    }
   }
 }

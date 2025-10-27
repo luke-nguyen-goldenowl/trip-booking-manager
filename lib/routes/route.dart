@@ -21,6 +21,7 @@ import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_add_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_detail_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_edit_screen.dart';
+import 'package:bus_ticket_app/pages/user/trip_search_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -108,6 +109,13 @@ final GoRouter router = GoRouter(
       builder: (context, state) {
         final trip = state.extra as MTrip;
         return BusTripEditScreen(trip: trip);
+      },
+    ),
+    GoRoute(
+      path: '/user/trip-search',
+      builder: (context, state) {
+        final searchParams = state.extra as Map<String, dynamic>;
+        return TripSearchScreen(searchParams: searchParams);
       },
     ),
   ],
