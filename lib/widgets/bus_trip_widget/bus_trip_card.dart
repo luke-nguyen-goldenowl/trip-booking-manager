@@ -256,7 +256,7 @@ class BusTripCard extends StatelessWidget {
                 border: Border.all(color: Colors.green.withOpacity(0.3)),
               ),
               child: Text(
-                FormatHelper.formatCurrency(trip.price?.toDouble() ?? 0.0),
+                "${FormatHelper.formatCurrency(trip.price?.toDouble() ?? 0.0)} VND",
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
