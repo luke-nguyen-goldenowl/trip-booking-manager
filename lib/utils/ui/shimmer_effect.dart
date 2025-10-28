@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ShimmerEffect extends StatefulWidget {
-  const ShimmerEffect({Key? key}) : super(key: key);
+  const ShimmerEffect({super.key});
 
   @override
   State<ShimmerEffect> createState() => _ShimmerEffectState();

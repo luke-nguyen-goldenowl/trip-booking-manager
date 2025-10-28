@@ -6,10 +6,11 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:bus_ticket_app/widgets/bus_route_card.dart';
-import 'package:bus_ticket_app/models/MRoute.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
+import 'package:diacritic/diacritic.dart';
 
 class BusRouteScreen extends StatefulWidget {
   const BusRouteScreen({super.key});
@@ -292,18 +293,24 @@ class _BusRouteScreenState extends State<BusRouteScreen> {
     if (state is BusRouteLoaded || state is BusRouteDeleted) {
       final routes =
           state is BusRouteLoaded
-              ? state.buses
-              : (state as BusRouteDeleted).buses;
+              ? state.routes
+              : (state as BusRouteDeleted).routes;
 
       final filteredRoutes =
           routes.where((route) {
             final searchQuery = _searchController.text.toLowerCase();
+            final normalizedQuery = removeDiacritics(searchQuery);
+
             final matchesSearch =
                 searchQuery.isEmpty ||
-                (route.departure?.toLowerCase().contains(searchQuery) ??
-                    false) ||
-                (route.destination?.toLowerCase().contains(searchQuery) ??
-                    false);
+                (route.departure != null &&
+                    removeDiacritics(
+                      route.departure!.toLowerCase(),
+                    ).contains(normalizedQuery)) ||
+                (route.destination != null &&
+                    removeDiacritics(
+                      route.destination!.toLowerCase(),
+                    ).contains(normalizedQuery));
 
             final matchesStatus =
                 _selectedStatus == null || route.status == _selectedStatus;

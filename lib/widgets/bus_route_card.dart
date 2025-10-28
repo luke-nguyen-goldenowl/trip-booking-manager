@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bus_ticket_app/models/MRoute.dart';
-import 'package:bus_ticket_app/utils/helper/format_currency.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 
 class BusRouteCard extends StatelessWidget {
@@ -60,11 +59,6 @@ class BusRouteCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildInfo(
-                    Icons.price_change,
-                    'Giá vé',
-                    FormatHelper.formatCurrency((route.price ?? 0).toDouble()),
-                  ),
-                  _buildInfo(
                     Icons.route,
                     'Khoảng cách',
                     '${route.distance ?? 0} km',
@@ -76,6 +70,7 @@ class BusRouteCard extends StatelessWidget {
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
                 children: [
                   Container(
                     decoration: BoxDecoration(
@@ -85,7 +80,7 @@ class BusRouteCard extends StatelessWidget {
                     ),
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 5,
+                      vertical: 4,
                     ),
                     child: Row(
                       children: [
@@ -105,7 +100,7 @@ class BusRouteCard extends StatelessWidget {
                   Row(
                     children: [
                       if (onView != null) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         IconButton(
                           onPressed: onView,
                           icon: const Icon(Icons.visibility),
@@ -117,7 +112,7 @@ class BusRouteCard extends StatelessWidget {
                         ),
                       ],
                       if (onEdit != null) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         IconButton(
                           onPressed: onEdit,
                           icon: const Icon(Icons.edit),
@@ -129,7 +124,7 @@ class BusRouteCard extends StatelessWidget {
                         ),
                       ],
                       if (onDelete != null) ...[
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 4),
                         IconButton(
                           onPressed: onDelete,
                           icon: const Icon(Icons.delete),

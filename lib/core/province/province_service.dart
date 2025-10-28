@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:bus_ticket_app/models/MProvince.dart';
+import 'package:bus_ticket_app/models/province_model.dart';
 import 'package:bus_ticket_app/constants/api_province.dart';
 
 class ProvinceService {

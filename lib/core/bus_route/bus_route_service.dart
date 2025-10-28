@@ -1,5 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:bus_ticket_app/models/MRoute.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
 
 class BusRouteService {
   final SupabaseClient _supabase = Supabase.instance.client;

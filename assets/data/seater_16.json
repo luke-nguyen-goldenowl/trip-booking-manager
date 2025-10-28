@@ -1,0 +1,28 @@
+{
+  "busType": "seater",
+  "seatCount": 16,
+  "rows": 4,
+  "columns": 5,
+  "description": "Xe ghế ngồi 16 chỗ - 5 dãy (dãy 3 là lối đi)",
+  "seats": [
+    {"id": "A1", "row": 0, "column": 0, "isBooked": false},
+    {"id": "A2", "row": 0, "column": 1, "isBooked": false},
+    {"id": "A3", "row": 0, "column": 3, "isBooked": false},
+    {"id": "A4", "row": 0, "column": 4, "isBooked": false},
+
+    {"id": "B1", "row": 1, "column": 0, "isBooked": false},
+    {"id": "B2", "row": 1, "column": 1, "isBooked": false},
+    {"id": "B3", "row": 1, "column": 3, "isBooked": false},
+    {"id": "B4", "row": 1, "column": 4, "isBooked": false},
+
+    {"id": "C1", "row": 2, "column": 0, "isBooked": false},
+    {"id": "C2", "row": 2, "column": 1, "isBooked": false},
+    {"id": "C3", "row": 2, "column": 3, "isBooked": false},
+    {"id": "C4", "row": 2, "column": 4, "isBooked": false},
+
+    {"id": "D1", "row": 3, "column": 0, "isBooked": false},
+    {"id": "D2", "row": 3, "column": 1, "isBooked": false},
+    {"id": "D3", "row": 3, "column": 3, "isBooked": false},
+    {"id": "D4", "row": 3, "column": 4, "isBooked": false}
+  ]
+}

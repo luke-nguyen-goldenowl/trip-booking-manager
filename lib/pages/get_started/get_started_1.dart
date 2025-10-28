@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/widgets/login_button.dart';
+import 'package:bus_ticket_app/core/auth/login/login_service.dart';
 
-class GetStartedV1 extends StatelessWidget {
+class GetStartedV1 extends StatefulWidget {
   const GetStartedV1({super.key});
 
   static final List<SocialLoginOption> _socialLoginOptions = [
@@ -44,6 +45,12 @@ class GetStartedV1 extends StatelessWidget {
     ),
   ];
 
+  @override
+  State<GetStartedV1> createState() => _GetStartedV1State();
+}
+
+class _GetStartedV1State extends State<GetStartedV1> {
+  final _auth = LoginService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,9 +150,9 @@ class GetStartedV1 extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children:
-                        _socialLoginOptions.asMap().entries.map<Widget>((
-                          entry,
-                        ) {
+                        GetStartedV1._socialLoginOptions.asMap().entries.map<
+                          Widget
+                        >((entry) {
                           int index = entry.key;
                           SocialLoginOption option = entry.value;
                           return Expanded(
@@ -157,7 +164,31 @@ class GetStartedV1 extends StatelessWidget {
                                 option: option,
                                 onPressed: () {
                                   if (index == 0) {
-                                    //Google
+                                    _auth
+                                        .signInWithGoogle()
+                                        .then((user) {
+                                          if (user != null) {
+                                            SnackBar(
+                                              content: Text(
+                                                'Chào mừng ${user.user?.displayName}!',
+                                              ),
+                                              backgroundColor: Colors.green,
+                                            );
+                                            context.go('/home-user');
+                                          }
+                                        })
+                                        .catchError((error) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Đăng nhập Google thất bại: $error',
+                                              ),
+                                              backgroundColor: Colors.red,
+                                            ),
+                                          );
+                                        });
                                   } else if (index == 1) {
                                     //Facebook
                                   } else if (index == 2) {

@@ -3,9 +3,10 @@ import 'package:bus_ticket_app/pages/on_boarding/on_boarding_1.dart';
 import 'package:bus_ticket_app/pages/on_boarding/on_boarding_2.dart';
 import 'package:bus_ticket_app/pages/on_boarding/on_boarding_3.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bus_ticket_app/core/preference/preference_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -21,6 +22,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
+  Future<void> _completeOnboarding() async {
+    await PreferenceService.setHasSeenOnboarding(true);
+
+    if (!mounted) return;
+    context.go('/getstarted');
+  }
+
   void _nextPage() {
     if (_currentIndex < 2) {
       _pageController.nextPage(
@@ -28,7 +36,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      context.go('/getstarted');
+      _completeOnboarding();
     }
   }
 
@@ -54,7 +62,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     const SizedBox(width: 60),
                     TextButton(
                       onPressed: () {
-                        context.go('/getstarted');
+                        _completeOnboarding();
                       },
                       child: const Text(
                         'Bỏ qua',

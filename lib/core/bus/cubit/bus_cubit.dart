@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/models/bus_model.dart';
 import 'package:bus_ticket_app/core/bus/bus_service.dart';
 import 'package:bus_ticket_app/core/bus/cubit/bus_state.dart';
 

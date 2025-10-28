@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OnBoarding2Page extends StatelessWidget {
-  const OnBoarding2Page({Key? key}) : super(key: key);
+  const OnBoarding2Page({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,4 +1,4 @@
-import 'package:bus_ticket_app/models/MUser.dart';
+import 'package:bus_ticket_app/models/user_model.dart';
 
 class RouteHelper {
   static String getHomeRouteByRole(MUser user) {

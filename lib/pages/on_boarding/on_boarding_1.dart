@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OnBoarding1Page extends StatelessWidget {
-  const OnBoarding1Page({Key? key}) : super(key: key);
+  const OnBoarding1Page({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +11,7 @@ class OnBoarding1Page extends StatelessWidget {
         child: Column(
           children: [
             const Text(
-              'Nhận vé xe buýt từ bất cứ nơi nào mà không gặp rắc rối',
+              'Nhận vé xe khách từ bất cứ nơi nào mà không gặp rắc rối',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,

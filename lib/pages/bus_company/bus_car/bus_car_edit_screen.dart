@@ -1,6 +1,6 @@
 import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:flutter/material.dart';
-import 'package:bus_ticket_app/models/MBus.dart';
+import 'package:bus_ticket_app/models/bus_model.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/core/bus/cubit/bus_cubit.dart';
 import 'package:bus_ticket_app/core/bus/cubit/bus_state.dart';
@@ -8,6 +8,7 @@ import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
+import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
 
 class BusCarEditScreen extends StatefulWidget {
   final MBus bus;
@@ -62,7 +63,20 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
+          onPressed: () async {
+            final confirmed = await DialogHelper.showConfirmation(
+              context,
+              title: 'Huỷ thay đổi',
+              message:
+                  'Bạn có chắc muốn huỷ thay đổi và quay lại trang trước không?',
+              icon: Icons.cancel,
+              iconColor: Colors.red,
+              confirmColor: Colors.red,
+            );
+            if (confirmed && mounted) {
+              context.pop();
+            }
+          },
         ),
         backgroundColor: Colors.orange[300],
       ),

@@ -9,7 +9,7 @@ import 'package:bus_ticket_app/routes/route.dart';
 import 'package:bus_ticket_app/pages/get_started/get_started_1.dart';
 import 'package:bus_ticket_app/core/user/user_service.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
-import 'package:bus_ticket_app/models/MUser.dart' as user_model;
+import 'package:bus_ticket_app/models/user_model.dart' as user_model;
 import 'package:bus_ticket_app/pages/user/home.dart';
 import 'package:bus_ticket_app/pages/admin/home.dart';
 import 'package:bus_ticket_app/pages/bus_company/home.dart';
@@ -17,6 +17,8 @@ import 'package:bus_ticket_app/core/bus/cubit/bus_cubit.dart';
 import 'package:bus_ticket_app/core/bus/bus_service.dart';
 import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/core/bus_route/bus_route_service.dart';
+import 'package:bus_ticket_app/core/bus_trip/cubit/bus_trip_cubit.dart';
+import 'package:bus_ticket_app/core/bus_trip/bus_trip_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => UserCubit(UserService())),
         BlocProvider(create: (context) => BusCubit(BusService())),
         BlocProvider(create: (context) => BusRouteCubit(BusRouteService())),
+        BlocProvider(create: (context) => BusTripCubit(BusTripService())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

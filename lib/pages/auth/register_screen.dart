@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter/services.dart';
 import 'package:bus_ticket_app/core/auth/register/sign_up_service.dart';
+import 'package:bus_ticket_app/utils/helper/lower_case_helper.dart';
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({Key? key}) : super(key: key);
+  const RegisterScreen({super.key});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -90,6 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: 'Nhập địa chỉ email của bạn',
                     icon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
+                    inputFormatters: [LowerCaseTextFormatter()],
                   ),
                   const SizedBox(height: 16),
                   _buildInputField(
@@ -357,6 +360,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     TextInputType? keyboardType,
     bool obscureText = false,
     Widget? suffixIcon,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -374,6 +378,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
+          inputFormatters: inputFormatters,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,
@@ -419,7 +424,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     try {
       String? errorMessage = await _auth.signUpWithEmailAndPassword(
-        _emailController.text.trim(),
+        _emailController.text.trim().toLowerCase(),
         _passwordController.text.trim(),
         _confirmPasswordController.text.trim(),
         _phoneController.text.trim(),

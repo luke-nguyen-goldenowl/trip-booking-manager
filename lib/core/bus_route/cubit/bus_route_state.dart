@@ -1,4 +1,4 @@
-import 'package:bus_ticket_app/models/MRoute.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
 
 abstract class BusRouteState {}
 
@@ -7,13 +7,13 @@ class BusRouteInitial extends BusRouteState {}
 class BusRouteLoading extends BusRouteState {}
 
 class BusRouteLoaded extends BusRouteState {
-  final List<MRoute> buses;
-  BusRouteLoaded(this.buses);
+  final List<MRoute> routes;
+  BusRouteLoaded(this.routes);
 }
 
 class BusRouteDeleted extends BusRouteState {
-  final List<MRoute> buses;
-  BusRouteDeleted(this.buses);
+  final List<MRoute> routes;
+  BusRouteDeleted(this.routes);
 }
 
 class BusRouteError extends BusRouteState {

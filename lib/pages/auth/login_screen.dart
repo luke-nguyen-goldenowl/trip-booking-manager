@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/core/auth/login/login_service.dart';
-import 'package:bus_ticket_app/models/MUser.dart' as user_model;
+import 'package:bus_ticket_app/models/user_model.dart' as user_model;
+import 'package:flutter/services.dart';
+import 'package:bus_ticket_app/utils/helper/lower_case_helper.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -76,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     hint: 'Nhập địa chỉ email của bạn',
                     icon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
+                    inputFormatters: [LowerCaseTextFormatter()],
                   ),
                   const SizedBox(height: 20),
                   _buildInputField(
@@ -241,6 +244,7 @@ class _LoginScreenState extends State<LoginScreen> {
     bool obscureText = false,
     Widget? suffixIcon,
     String? Function(String?)? validator,
+    List<TextInputFormatter>? inputFormatters,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,6 +263,7 @@ class _LoginScreenState extends State<LoginScreen> {
           keyboardType: keyboardType,
           obscureText: obscureText,
           validator: validator,
+          inputFormatters: inputFormatters,
           style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,
