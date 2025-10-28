@@ -19,11 +19,13 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/core/bus_route/bus_route_service.dart';
 import 'package:bus_ticket_app/core/bus_trip/cubit/bus_trip_cubit.dart';
 import 'package:bus_ticket_app/core/bus_trip/bus_trip_service.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initializeSupabase();
+  await initializeDateFormatting('vi', null);
   runApp(const MyApp());
 }
 

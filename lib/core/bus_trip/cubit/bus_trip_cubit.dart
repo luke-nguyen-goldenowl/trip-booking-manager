@@ -18,6 +18,16 @@ class BusTripCubit extends Cubit<BusTripState> {
     }
   }
 
+  Future<void> loadAllTrips() async {
+    try {
+      emit(BusTripLoading());
+      final trips = await _busTripService.getAllTrips();
+      emit(BusTripLoaded(trips));
+    } catch (e) {
+      emit(BusTripError(e.toString()));
+    }
+  }
+
   Future<void> createTrip(MTrip trip) async {
     try {
       emit(BusTripLoading());
@@ -72,6 +82,16 @@ class BusTripCubit extends Cubit<BusTripState> {
     } catch (e) {
       emit(BusTripError(e.toString()));
       return false;
+    }
+  }
+
+  Future<void> getRandomTrips(int limit) async {
+    try {
+      emit(BusTripLoading());
+      final trips = await _busTripService.getRandomTrips(limit);
+      emit(BusTripLoaded(trips));
+    } catch (e) {
+      emit(BusTripError(e.toString()));
     }
   }
 }

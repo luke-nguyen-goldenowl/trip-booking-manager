@@ -14,6 +14,14 @@ class BusRouteService {
         .toList();
   }
 
+  Future<List<MRoute>> getAllRoutes() async {
+    final response = await _supabase.from('routes').select() as List<dynamic>;
+
+    return response
+        .map((e) => MRoute.fromMap(e as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<void> createRoute(MRoute route) async {
     await _supabase.from('routes').insert(route.toMap());
   }

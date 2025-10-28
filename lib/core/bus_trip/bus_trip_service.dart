@@ -80,4 +80,30 @@ class BusTripService {
       throw Exception('Không thể kiểm tra lịch xe');
     }
   }
+
+  Future<List<MTrip>> getRandomTrips(int limit) async {
+    try {
+      final response = await _supabase
+          .from('trips')
+          .select(
+            'id, status, route_id, bus_id,company_id, departure_time, arrival_time,price, routes:route_id(id, departure, destination), buses:bus_id(id, company_id, bus_number, type, seat_count, user:company_id(full_name, email, phone)))',
+          )
+          .eq('status', 'scheduled')
+          .gt('departure_time', DateTime.now().toIso8601String())
+          .limit(limit);
+      return (response as List).map((trip) => MTrip.fromMap(trip)).toList();
+    } catch (e) {
+      return [];
+    }
+  }
+
+  Future<List<MTrip>> getAllTrips() async {
+    try {
+      final response = await _supabase.from('trips').select();
+
+      return (response as List).map((trip) => MTrip.fromMap(trip)).toList();
+    } catch (e) {
+      throw Exception('Không thể tải danh sách chuyến đi');
+    }
+  }
 }

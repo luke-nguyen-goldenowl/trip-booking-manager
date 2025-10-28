@@ -18,6 +18,16 @@ class BusCubit extends Cubit<BusState> {
     }
   }
 
+  Future<void> loadAllBuses() async {
+    try {
+      emit(BusLoading());
+      final buses = await _busService.getAllBuses();
+      emit(BusLoaded(buses));
+    } catch (e) {
+      emit(BusError(e.toString()));
+    }
+  }
+
   Future<void> createBus(MBus bus) async {
     try {
       emit(BusLoading());

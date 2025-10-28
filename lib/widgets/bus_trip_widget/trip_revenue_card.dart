@@ -75,7 +75,7 @@ class TripRevenueCard extends StatelessWidget {
         Expanded(
           child: _buildStatBox(
             'Doanh thu',
-            FormatHelper.formatCurrency(totalRevenue.toDouble()),
+            "${FormatHelper.formatCurrency(totalRevenue.toDouble())} VNĐ",
             Icons.attach_money,
             Colors.green,
           ),

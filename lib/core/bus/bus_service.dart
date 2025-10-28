@@ -17,6 +17,16 @@ class BusService {
     }
   }
 
+  Future<List<MBus>> getAllBuses() async {
+    try {
+      final response = await _supabase.from('buses').select();
+
+      return (response as List).map((bus) => MBus.fromMap(bus)).toList();
+    } catch (e) {
+      throw Exception('Không thể tải danh sách xe');
+    }
+  }
+
   Future<MBus> createBus(MBus bus) async {
     try {
       final response =
