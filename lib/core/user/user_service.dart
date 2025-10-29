@@ -10,6 +10,12 @@ class UserService {
     return user_model.MUser.fromMap(response);
   }
 
+  Future<user_model.MUser?> getUserbyId(int id) async {
+    final response =
+        await _supabase.from('user').select().eq('id', id).single();
+    return user_model.MUser.fromMap(response);
+  }
+
   Future<void> updateUserProfile(
     String email,
     Map<String, dynamic> data,

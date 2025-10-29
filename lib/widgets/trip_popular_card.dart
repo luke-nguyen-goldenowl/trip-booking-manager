@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/models/bus_model.dart';
 import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/utils/helper/format_helper.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 import 'package:bus_ticket_app/core/bus/cubit/bus_cubit.dart';
 import 'package:bus_ticket_app/core/bus/cubit/bus_state.dart';
+import 'package:go_router/go_router.dart';
 
 class PopularTripCard extends StatelessWidget {
   final MTrip trip;
@@ -23,6 +25,17 @@ class PopularTripCard extends StatelessWidget {
     }
   }
 
+  MBus _getBus(List<MBus> buses, int busId) {
+    try {
+      return buses.firstWhere(
+        (bus) => bus.id == busId,
+        orElse: () => MBus(type: BusType.seater, status: BusStatus.active),
+      );
+    } catch (e) {
+      return MBus(type: BusType.seater, status: BusStatus.active);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final duration =
@@ -35,9 +48,17 @@ class PopularTripCard extends StatelessWidget {
           builder: (context, busState) {
             final routes =
                 routeState is BusRouteLoaded ? routeState.routes : <MRoute>[];
+            final buses = busState is BusLoaded ? busState.buses : <MBus>[];
             final route = _getRoute(routes, trip.routeId ?? 0);
+            final bus = _getBus(buses, trip.busId ?? 0);
             return GestureDetector(
-              onTap: () => {},
+              onTap:
+                  () => {
+                    context.push(
+                      '/user/trip-detail',
+                      extra: {'trip': trip, 'route': route, 'bus': bus},
+                    ),
+                  },
               child: Container(
                 width: 280,
                 margin: const EdgeInsets.only(right: 16),

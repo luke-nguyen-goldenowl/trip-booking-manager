@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
 import 'package:bus_ticket_app/utils/helper/seat_layout_helper.dart';
 import 'package:bus_ticket_app/utils/helper/format_helper.dart';
+import 'package:go_router/go_router.dart';
 
 class TripCardSearch extends StatelessWidget {
   const TripCardSearch({super.key, required this.trip});
@@ -70,7 +71,12 @@ class TripCardSearch extends StatelessWidget {
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(16),
-                  onTap: () {},
+                  onTap: () {
+                    context.push(
+                      '/user/trip-detail',
+                      extra: {'trip': trip, 'route': route, 'bus': bus},
+                    );
+                  },
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -179,24 +185,6 @@ class TripCardSearch extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Row(
-                          children: [
-                            Text(
-                              'Còn ${SeatLayoutHelper.countAvailableSeats(trip.seatLayout)} ghế trống',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color:
-                                    SeatLayoutHelper.countAvailableSeats(
-                                              trip.seatLayout,
-                                            ) >
-                                            5
-                                        ? Colors.green
-                                        : Colors.orange,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
                         const Divider(height: 1),
                         const SizedBox(height: 16),
                         Row(
@@ -234,6 +222,20 @@ class TripCardSearch extends StatelessWidget {
                                     ),
                                   ),
                                   const SizedBox(height: 2),
+                                  Text(
+                                    'Còn ${SeatLayoutHelper.countAvailableSeats(trip.seatLayout)} ghế trống',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color:
+                                          SeatLayoutHelper.countAvailableSeats(
+                                                    trip.seatLayout,
+                                                  ) >
+                                                  5
+                                              ? Colors.green
+                                              : Colors.orange,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
