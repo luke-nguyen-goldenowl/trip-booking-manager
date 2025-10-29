@@ -389,6 +389,13 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
                       backgroundColor: Colors.green,
                     ),
                   );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Giá trị không được để trống!'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
                 }
               },
               child: const Text('Lưu'),
