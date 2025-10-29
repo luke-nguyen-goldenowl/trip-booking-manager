@@ -1,5 +1,5 @@
+import 'package:bus_ticket_app/utils/helper/vietnamese_format_unit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
@@ -29,6 +29,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
   BusRouteStatus _selectedStatus = BusRouteStatus.active;
   List<Province> _provinces = [];
   bool _isLoadingProvinces = true;
+  int? distance;
 
   @override
   void initState() {
@@ -391,7 +392,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
             TextFormField(
               controller: _distanceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [VietnameseThousandsFormatter()],
               decoration: InputDecoration(
                 labelText: 'Khoảng cách',
                 prefixIcon: const Icon(Icons.straighten),
@@ -406,8 +407,10 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                 if (value?.trim().isEmpty ?? true) {
                   return 'Vui lòng nhập khoảng cách';
                 }
-                final distance = int.tryParse(value!);
-                if (distance == null || distance <= 0) {
+                distance = int.tryParse(
+                  value!.replaceAll(RegExp(r'[^0-9]'), ''),
+                );
+                if (distance == null || distance! <= 0) {
                   return 'Khoảng cách phải lớn hơn 0';
                 }
                 return null;
@@ -671,7 +674,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
       companyId: companyId,
       departure: _selectedDeparture!.name,
       destination: _selectedDestination!.name,
-      distance: int.parse(_distanceController.text.trim()),
+      distance: distance!,
       status: _selectedStatus,
     );
     if (!mounted) return;

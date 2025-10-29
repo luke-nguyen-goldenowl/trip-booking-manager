@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/utils/helper/vietnamese_format_unit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:convert';
@@ -37,6 +38,7 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
   List<MRoute> _activeRoutes = [];
   List<MBus> _activeBuses = [];
   final _priceController = TextEditingController();
+  int? price;
 
   @override
   void initState() {
@@ -186,7 +188,7 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
             TextFormField(
               controller: _priceController,
               keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              inputFormatters: [VietnameseThousandsFormatter()],
               decoration: InputDecoration(
                 labelText: 'Giá vé',
                 prefixIcon: const Icon(Icons.attach_money),
@@ -199,10 +201,10 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
               ),
               validator: (value) {
                 if (value?.trim().isEmpty ?? true) {
-                  return 'Vui lòng nhập giá vé';
+                  return 'Vui lòng nhập khoảng cách';
                 }
-                final price = int.tryParse(value!);
-                if (price == null || price <= 0) {
+                price = int.tryParse(value!.replaceAll(RegExp(r'[^0-9]'), ''));
+                if (price == null || price! <= 0) {
                   return 'Giá vé phải lớn hơn 0';
                 }
                 return null;
@@ -675,7 +677,7 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
         arrivalTime: arrivalDateTime,
         status: _selectedStatus,
         seatLayout: seatLayout,
-        price: int.parse(_priceController.text.trim()),
+        price: price!,
       );
       if (!mounted) return;
       await context.read<BusTripCubit>().createTrip(trip);
