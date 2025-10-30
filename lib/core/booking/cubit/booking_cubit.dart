@@ -22,4 +22,24 @@ class BookingCubit extends Cubit<BookingState> {
       emit(BookingError('Lỗi: $e'));
     }
   }
+
+  Future<void> getBookingbyUserId(int userId) async {
+    try {
+      emit(BookingLoading());
+      final bookings = await _bookingService.getBookingbyUserId(userId);
+      emit(BookingListLoaded(bookings));
+    } catch (e) {
+      emit(BookingError('Lỗi: $e'));
+    }
+  }
+
+  Future<void> cancelBooking(int bookingId) async {
+    try {
+      emit(BookingLoading());
+      await _bookingService.cancelBooking(bookingId);
+      emit(BookingInitial());
+    } catch (e) {
+      emit(BookingError('Lỗi: $e'));
+    }
+  }
 }

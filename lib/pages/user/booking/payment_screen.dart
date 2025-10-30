@@ -242,7 +242,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
       createdAt: DateTime.now(),
       isMailSended: false,
     );
-    debugPrint('Creating booking: $booking');
     context.read<BookingCubit>().createBooking(booking);
   }
 

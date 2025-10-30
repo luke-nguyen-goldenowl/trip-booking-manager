@@ -25,6 +25,29 @@ class DialogHelper {
     return result ?? false;
   }
 
+  static Future<bool> showCancelledConfirmation(
+    BuildContext context, {
+    required String itemName,
+    String? itemType,
+  }) async {
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return ConfirmationDialog(
+          title: 'Huỷ ${itemType ?? 'vé'}',
+          message:
+              'Bạn có chắc chắn muốn huỷ vé $itemName?\n\nHành động này không thể hoàn tác.',
+          confirmText: 'Huỷ',
+          cancelText: 'Đóng',
+          isDangerous: true,
+          icon: Icons.delete_outline,
+        );
+      },
+    );
+    return result ?? false;
+  }
+
   static Future<bool> showConfirmation(
     BuildContext context, {
     required String title,

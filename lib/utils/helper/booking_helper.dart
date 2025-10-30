@@ -20,7 +20,7 @@ class BookingHelper {
     switch (status.toLowerCase()) {
       case 'confirmed':
         return 'Đã xác nhận';
-      case 'paid':
+      case 'completed':
         return 'Đã thanh toán';
       case 'pending':
         return 'Chờ xử lý';
@@ -37,10 +37,6 @@ class BookingHelper {
         return 'Tiền mặt';
       case 'momo':
         return 'Ví MoMo';
-      case 'vnpay':
-        return 'VNPay';
-      case 'bank_transfer':
-        return 'Chuyển khoản';
       default:
         return method;
     }

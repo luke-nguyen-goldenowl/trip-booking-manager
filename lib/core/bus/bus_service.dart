@@ -27,6 +27,17 @@ class BusService {
     }
   }
 
+  Future<MBus?> getBusById(int busId) async {
+    try {
+      final response =
+          await _supabase.from('buses').select().eq('id', busId).single();
+
+      return MBus.fromMap(response);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<MBus> createBus(MBus bus) async {
     try {
       final response =

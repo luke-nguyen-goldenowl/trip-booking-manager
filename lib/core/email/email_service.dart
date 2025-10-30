@@ -216,3 +216,183 @@ Email này được gửi tự động, vui lòng không trả lời.
     plainTextFallback: plainText,
   );
 }
+
+Future<void> sendBookingCancellationEmail({
+  required String toEmail,
+  required String userName,
+  required String bookingCode,
+  required String departure,
+  required String destination,
+  required String departureTime,
+  required String seats,
+  required int totalPrice,
+  String? createdAt,
+  String? companyLogo,
+  String? companyName,
+  String? companyPhone,
+  String? licensePlate,
+  String? paymentMethod,
+}) async {
+  final htmlBody = '''
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Huỷ vé thành công</title>
+</head>
+<body style="margin:0; padding:0; font-family:Arial,sans-serif; background-color:#f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f4; padding:20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color:white; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#dc3545 0%,#b71c1c 100%); padding:40px 30px; text-align:center;">
+              <h1 style="color:white; margin:0; font-size:28px;">❌ HUỶ VÉ THÀNH CÔNG</h1>
+              <p style="color:white; margin:10px 0 0 0; font-size:16px;">Vé của bạn đã được huỷ thành công!</p>
+            </td>
+          </tr>
+          <!-- Content -->
+          <tr>
+            <td style="padding:30px;">
+              <p style="font-size:16px; color:#333; margin:0 0 20px 0;">
+                Xin chào <strong style="color:#dc3545;">$userName</strong>,
+              </p>
+              <p style="font-size:14px; color:#666; margin:0 0 20px 0;">
+                Chúng tôi xác nhận bạn đã huỷ vé thành công. Dưới đây là thông tin chi tiết về vé đã huỷ:
+              </p>
+              <!-- Info Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f8d7da; border-radius:8px; margin:20px 0;">
+                <tr>
+                  <td style="padding:20px;">
+                    <h3 style="margin:0 0 15px 0; color:#dc3545; font-size:18px;">Thông tin vé đã huỷ</h3>
+                    <table width="100%" cellpadding="8" cellspacing="0">
+                      <tr style="border-bottom:1px solid #e0e0e0;">
+                        <td style="color:#666; font-weight:bold;">Mã đặt vé:</td>
+                        <td style="text-align:right; color:#dc3545; font-weight:bold; font-size:16px;">$bookingCode</td>
+                      </tr>
+                      <tr style="border-bottom:1px solid #e0e0e0;">
+                        <td style="color:#666; font-weight:bold;">Thời gian đặt vé:</td>
+                        <td style="text-align:right; color:#333;">$createdAt</td>
+                      </tr>
+                      <tr style="border-bottom:1px solid #e0e0e0;">
+                        <td style="color:#666; font-weight:bold;">Tuyến đường:</td>
+                        <td style="text-align:right; color:#333;">$departure → $destination</td>
+                      </tr>
+                      <tr style="border-bottom:1px solid #e0e0e0;">
+                        <td style="color:#666; font-weight:bold;">Khởi hành:</td>
+                        <td style="text-align:right; color:#333;">$departureTime</td>
+                      </tr>
+                      ${licensePlate != null ? '''
+                      <tr style="border-bottom:1px solid #e0e0e0;">
+                        <td style="color:#666; font-weight:bold;">Biển số xe:</td>
+                        <td style="text-align:right; color:#333;">$licensePlate</td>
+                      </tr>
+                      ''' : ''}
+                      <tr style="border-bottom:1px solid #e0e0e0;">
+                        <td style="color:#666; font-weight:bold;">Số ghế:</td>
+                        <td style="text-align:right; color:#333;">$seats</td>
+                      </tr>
+                      <tr style="border-bottom:1px solid #e0e0e0;">
+                        <td style="color:#666; font-weight:bold;">Phương thức thanh toán:</td>
+                        <td style="text-align:right; color:#333;">$paymentMethod</td>
+                      </tr>
+                      <tr>
+                        <td style="color:#666; font-weight:bold; font-size:18px;">Tổng tiền:</td>
+                        <td style="text-align:right; color:#dc3545; font-weight:bold; font-size:20px;">
+                          ${totalPrice.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}₫
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              ${companyName != null ? '''
+              <!-- Company Info -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#e8f5e9; border-radius:8px; margin:20px 0;">
+                <tr>
+                  <td style="padding:20px;">
+                    <h3 style="margin:0 0 15px 0; color:#28a745; font-size:18px;">🏢 Thông tin nhà xe</h3>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        ${companyLogo != null ? '''
+                        <td style="width:80px; vertical-align:top;">
+                          <img src="$companyLogo"
+                               alt="Logo $companyName"
+                               width="60"
+                               height="60"
+                               style="border-radius:50%; object-fit:cover; border:2px solid #28a745;" />
+                        </td>
+                        ''' : ''}
+                        <td style="vertical-align:middle; padding-left:${companyLogo != null ? '15px' : '0'};">
+                          <p style="margin:0 0 8px 0; color:#333; font-weight:bold; font-size:16px;">$companyName</p>
+                          ${companyPhone != null ? '<p style="margin:0; color:#666; font-size:14px;">📞 $companyPhone</p>' : ''}
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              ''' : ''}
+              <!-- Notice -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff3cd; border-radius:8px; border-left:4px solid #ffc107; margin:20px 0;">
+                <tr>
+                  <td style="padding:15px;">
+                    <p style="margin:0; color:#856404; font-size:14px;">
+                      Nếu bạn có thắc mắc về việc huỷ vé, vui lòng liên hệ nhà xe hoặc tổng đài hỗ trợ của chúng tôi.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              <p style="font-size:14px; color:#666; margin:20px 0 0 0;">
+                Mong bạn sẽ tiếp tục sử dụng dịch vụ của chúng tôi trong tương lai!
+              </p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#f8f9fa; padding:20px; text-align:center; border-top:1px solid #e0e0e0;">
+              <p style="margin:0; color:#999; font-size:12px;">
+                Email này được gửi tự động, vui lòng không trả lời.
+              </p>
+              <p style="margin:5px 0 0 0; color:#999; font-size:12px;">
+                © 2025 Bus Ticket App. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+''';
+
+  final plainText = '''
+Xác nhận huỷ vé thành công
+
+Xin chào $userName,
+
+Mã đặt vé: $bookingCode
+Tuyến: $departure → $destination
+Thời gian khởi hành: $departureTime
+${licensePlate != null ? 'Biển số xe: $licensePlate\n' : ''}Số ghế: $seats
+Tổng tiền: ${totalPrice.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')}₫
+
+${companyName != null ? 'Nhà xe: $companyName${companyPhone != null ? '\nSĐT: $companyPhone' : ''}\n' : ''}
+Vé đã huỷ thành công.
+
+Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!
+
+---
+Email này được gửi tự động, vui lòng không trả lời.
+  ''';
+
+  await sendHtmlMail(
+    toEmail,
+    'XÁC NHẬN HUỶ VÉ',
+    htmlBody,
+    plainTextFallback: plainText,
+  );
+}
