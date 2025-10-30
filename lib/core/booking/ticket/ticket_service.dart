@@ -4,6 +4,7 @@ import 'package:bus_ticket_app/core/bus_trip/bus_trip_service.dart';
 import 'package:bus_ticket_app/core/user/user_service.dart';
 import 'package:bus_ticket_app/models/ticket_model.dart';
 import 'package:bus_ticket_app/models/booking_model.dart';
+import 'package:bus_ticket_app/core/booking/booking_service.dart';
 
 class TicketService {
   Future<MTicket> fetchFullTicketInfo(MBooking booking) async {
@@ -17,6 +18,10 @@ class TicketService {
     final bus = await busService.getBusById(trip.busId!);
     final company = await userService.getUserbyId(trip.companyId!);
     final user = await userService.getUserbyId(booking.userId!);
+    if (booking.status == 'completed') {
+      final bookingService = BookingService();
+      await bookingService.handleAfterBooking(booking.id!);
+    }
     return MTicket(
       booking: booking,
       trip: trip,

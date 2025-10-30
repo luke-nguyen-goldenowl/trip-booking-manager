@@ -74,6 +74,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
               },
             );
           } else if (state is BookingPending) {
+            context.go(
+              '/user/booking-pending',
+              extra: {
+                'booking': state.booking,
+                'route': widget.route,
+                'bus': widget.bus,
+                'trip': widget.trip,
+              },
+            );
           } else if (state is BookingError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
