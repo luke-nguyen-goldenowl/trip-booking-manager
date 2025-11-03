@@ -249,7 +249,8 @@ class BookingService {
       final response = await _supabase
           .from('bookings')
           .select()
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .order('created_at', ascending: false);
       return (response as List)
           .map((booking) => MBooking.fromMap(booking))
           .toList();

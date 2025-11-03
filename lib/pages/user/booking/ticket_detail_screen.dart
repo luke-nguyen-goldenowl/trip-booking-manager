@@ -286,6 +286,19 @@ class TicketDetailScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: _infoColumn(
+                                'Thời gian dặt vé',
+                                FormatHelper.formatDateTime(
+                                  info.booking.createdAt!.toString(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _infoColumn(
                                 'Phương thức thanh toán',
                                 BookingHelper.getPaymentMethodText(
                                   info.booking.paymentMethod!,
