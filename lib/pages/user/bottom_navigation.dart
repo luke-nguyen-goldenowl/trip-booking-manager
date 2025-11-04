@@ -12,8 +12,8 @@ class MainScaffold extends StatelessWidget {
 
     int index = 0;
     if (location.startsWith('/tickets')) index = 1;
-    if (location.startsWith('/favorite')) index = 2;
-    if (location.startsWith('/profile')) index = 3;
+    // if (location.startsWith('/favorite')) index = 2;
+    if (location.startsWith('/profile')) index = 2;
 
     return Scaffold(
       body: child,
@@ -26,7 +26,7 @@ class MainScaffold extends StatelessWidget {
         items: const [
           Icon(Icons.home, size: 25, color: Colors.white),
           Icon(Icons.confirmation_number, size: 30, color: Colors.white),
-          Icon(Icons.favorite, size: 30, color: Colors.white),
+          //Icon(Icons.favorite, size: 30, color: Colors.white),
           Icon(Icons.person, size: 25, color: Colors.white),
         ],
         onTap: (i) {
@@ -38,11 +38,11 @@ class MainScaffold extends StatelessWidget {
               context.go('/tickets');
               break;
             case 2:
-              context.go('/favorite');
-              break;
-            case 3:
               context.go('/profile');
               break;
+            // case 3:
+            //   context.go('/profile');
+            //   break;
           }
         },
       ),
