@@ -1,5 +1,7 @@
-import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
-import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
+import 'package:bus_ticket_app/core/booking/booking_local_database.dart';
+import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
+import 'package:bus_ticket_app/core/user/user_service.dart';
+import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
 import 'package:bus_ticket_app/utils/helper/format_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/models/trip_model.dart';
@@ -32,18 +34,17 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  late int userId;
+  int userId = 0;
+  bool isLoading = false;
   @override
   void initState() {
     super.initState();
     loadUser();
   }
 
-  void loadUser() {
-    final userState = context.read<UserCubit>().state;
-    if (userState is UserLoaded) {
-      userId = userState.user.id;
-    }
+  Future<void> loadUser() async {
+    UserService userService = UserService();
+    userId = (await userService.getUserIdFromLocal())!;
   }
 
   BookingPaymentMethod _selectedPaymentMethod = BookingPaymentMethod.cash;
@@ -94,6 +95,40 @@ class _PaymentScreenState extends State<PaymentScreen> {
         },
         child: Column(
           children: [
+            BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+              builder: (context, internetState) {
+                if (internetState == InternetStatusState.disconnected) {
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
+                    ),
+                    color: Colors.orange.shade100,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.cloud_off,
+                          color: Colors.orange.shade700,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Bạn đang ở chế độ ngoại tuyến.',
+                            style: TextStyle(
+                              color: Colors.orange.shade700,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -193,7 +228,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 const SizedBox(height: 12),
                 BlocBuilder<BookingCubit, BookingState>(
                   builder: (context, state) {
-                    final isLoading = state is BookingLoading;
+                    if (state is BookingLoading) {
+                      isLoading = true;
+                    }
                     return SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -206,6 +243,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 0,
+                          disabledBackgroundColor: Colors.grey[400],
                         ),
                         child:
                             isLoading
@@ -238,7 +276,15 @@ class _PaymentScreenState extends State<PaymentScreen> {
     );
   }
 
-  void _createBooking() {
+  Future<bool> _checkConnection() async {
+    final internetState = context.read<InternetConnectionCubit>().state;
+    if (internetState == InternetStatusState.connected) {
+      return true;
+    }
+    return false;
+  }
+
+  void _createBooking() async {
     final booking = MBooking(
       userId: userId,
       tripId: widget.trip.id,
@@ -251,7 +297,37 @@ class _PaymentScreenState extends State<PaymentScreen> {
       createdAt: DateTime.now(),
       isMailSended: false,
     );
-    context.read<BookingCubit>().createBooking(booking);
+    final isOnline = await _checkConnection();
+    if (isOnline) {
+      context.read<BookingCubit>().createBooking(booking);
+    } else {
+      try {
+        setState(() {
+          isLoading = true;
+        });
+        await BookingLocalDatabase().saveOfflineBooking(booking);
+        if (!mounted) return;
+        DialogHelper.showSuccess(
+          context,
+          title: 'Đặt vé thành công',
+          message:
+              'Vé của bạn đã được lưu ngoại tuyến. Vui lòng kết nối Internet để tiếp tục thanh toán.',
+        );
+        setState(() {
+          isLoading = false;
+        });
+        Future.delayed(const Duration(seconds: 4), () {
+          context.go('/tickets');
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Lỗi khi lưu vé ngoại tuyến.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   Widget _buildPaymentOption({

@@ -1,5 +1,6 @@
 import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
+import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
 import 'package:bus_ticket_app/utils/ui/shimmer_effect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,6 +33,7 @@ class _TripSearchScreenState extends State<TripSearchScreen> {
     'Thời gian di chuyển',
   ];
   String? _selectedChip;
+  bool isOnline = false;
 
   MRoute _getRoute(List<MRoute> routes, int routeId) {
     try {
@@ -56,6 +58,10 @@ class _TripSearchScreenState extends State<TripSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final List<MTrip>? localTrips =
+        widget.searchParams['trips'] as List<MTrip>?;
+    final List<MRoute>? localRoutes =
+        widget.searchParams['routes'] as List<MRoute>?;
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -77,6 +83,44 @@ class _TripSearchScreenState extends State<TripSearchScreen> {
         ),
         body: Column(
           children: [
+            BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+              builder: (context, internetState) {
+                if (internetState == InternetStatusState.disconnected) {
+                  isOnline = false;
+                  return Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 16,
+                    ),
+                    color: Colors.orange.shade100,
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.cloud_off,
+                          color: Colors.orange.shade700,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Bạn đang ở chế độ ngoại tuyến.',
+                            style: TextStyle(
+                              color: Colors.orange.shade700,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+                if (internetState == InternetStatusState.connected) {
+                  isOnline = true;
+                }
+                return const SizedBox.shrink();
+              },
+            ),
             Container(
               padding: const EdgeInsets.all(16.0),
               decoration: BoxDecoration(
@@ -196,93 +240,139 @@ class _TripSearchScreenState extends State<TripSearchScreen> {
               ),
             ),
             Expanded(
-              child: BlocBuilder<BusTripCubit, BusTripState>(
-                builder: (context, tripState) {
-                  return BlocBuilder<BusRouteCubit, BusRouteState>(
-                    builder: (context, routeState) {
-                      if (tripState is BusTripLoading) {
-                        return buildSkeletonLoading();
-                      }
-                      if (tripState is BusTripLoaded) {
-                        trips = tripState.trips;
-                        final routes =
-                            routeState is BusRouteLoaded
-                                ? routeState.routes
-                                : <MRoute>[];
-                        _filteredTrips =
-                            trips.where((trip) {
-                              final route = _getRoute(
-                                routes,
-                                trip.routeId ?? 0,
-                              );
-                              final matchesDeparture =
-                                  route.departure ==
-                                  (widget.searchParams['departure'] as String);
-                              final matchesDestination =
-                                  route.destination ==
-                                  (widget.searchParams['destination']
-                                      as String);
-                              final matchesDate =
-                                  FormatHelper.formatDate(trip.departureTime) ==
-                                  FormatHelper.formatDate(
-                                    widget.searchParams['date'],
-                                  );
-                              final isTimeFuture = trip.departureTime!.isAfter(
-                                DateTime.now(),
-                              );
-                              final isAvailableSeats =
-                                  widget.searchParams['passengers'] <=
-                                  SeatLayoutHelper.countAvailableSeats(
-                                    trip.seatLayout,
-                                  );
-                              if (!isAvailableSeats) {
-                                return false;
-                              }
-                              return matchesDeparture &&
-                                  matchesDestination &&
-                                  matchesDate &&
-                                  isTimeFuture;
-                            }).toList();
-                        _sortTrips();
-                      }
-                      if (_filteredTrips.isEmpty) {
-                        return const Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.search_off,
-                                size: 64,
-                                color: Colors.grey,
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                'Không tìm thấy chuyến đi phù hợp.',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-                      return ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        itemCount: _filteredTrips.length,
-                        itemBuilder: (context, index) {
-                          final trip = _filteredTrips[index];
-                          return TripCardSearch(trip: trip);
-                        },
-                      );
-                    },
-                  );
-                },
-              ),
+              child:
+                  isOnline && localTrips != null && localRoutes != null
+                      ? _buildOnlineTripList()
+                      : _buildOfflineTripList(localTrips!, localRoutes!),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildOfflineTripList(
+    List<MTrip> localTrips,
+    List<MRoute> localRoutes,
+  ) {
+    _filteredTrips =
+        localTrips.where((trip) {
+          final route = _getRoute(localRoutes, trip.routeId ?? 0);
+          final matchesDeparture =
+              route.departure == (widget.searchParams['departure'] as String);
+          final matchesDestination =
+              route.destination ==
+              (widget.searchParams['destination'] as String);
+          final matchesDate =
+              FormatHelper.formatDate(trip.departureTime) ==
+              FormatHelper.formatDate(widget.searchParams['date']);
+          final isTimeFuture =
+              trip.departureTime != null
+                  ? trip.departureTime!.isAfter(DateTime.now())
+                  : true;
+          final isAvailableSeats =
+              widget.searchParams['passengers'] <=
+              SeatLayoutHelper.countAvailableSeats(trip.seatLayout);
+          if (!isAvailableSeats) return false;
+          return matchesDeparture &&
+              matchesDestination &&
+              matchesDate &&
+              isTimeFuture;
+        }).toList();
+    _sortTrips();
+
+    if (_filteredTrips.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.search_off, size: 64, color: Colors.grey),
+            SizedBox(height: 16),
+            Text(
+              'Không tìm thấy chuyến đi phù hợp.',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      itemCount: _filteredTrips.length,
+      itemBuilder: (context, index) {
+        final trip = _filteredTrips[index];
+        return TripCardSearch(trip: trip);
+      },
+    );
+  }
+
+  Widget _buildOnlineTripList() {
+    return BlocBuilder<BusTripCubit, BusTripState>(
+      builder: (context, tripState) {
+        return BlocBuilder<BusRouteCubit, BusRouteState>(
+          builder: (context, routeState) {
+            if (tripState is BusTripLoading) {
+              return buildSkeletonLoading();
+            }
+            if (tripState is BusTripLoaded) {
+              trips = tripState.trips;
+              final routes =
+                  routeState is BusRouteLoaded ? routeState.routes : <MRoute>[];
+              _filteredTrips =
+                  trips.where((trip) {
+                    final route = _getRoute(routes, trip.routeId ?? 0);
+                    final matchesDeparture =
+                        route.departure ==
+                        (widget.searchParams['departure'] as String);
+                    final matchesDestination =
+                        route.destination ==
+                        (widget.searchParams['destination'] as String);
+                    final matchesDate =
+                        FormatHelper.formatDate(trip.departureTime) ==
+                        FormatHelper.formatDate(widget.searchParams['date']);
+                    final isTimeFuture = trip.departureTime!.isAfter(
+                      DateTime.now(),
+                    );
+                    final isAvailableSeats =
+                        widget.searchParams['passengers'] <=
+                        SeatLayoutHelper.countAvailableSeats(trip.seatLayout);
+                    if (!isAvailableSeats) {
+                      return false;
+                    }
+                    return matchesDeparture &&
+                        matchesDestination &&
+                        matchesDate &&
+                        isTimeFuture;
+                  }).toList();
+              _sortTrips();
+            }
+            if (_filteredTrips.isEmpty) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.search_off, size: 64, color: Colors.grey),
+                    SizedBox(height: 16),
+                    Text(
+                      'Không tìm thấy chuyến đi phù hợp.',
+                      style: TextStyle(fontSize: 18, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _filteredTrips.length,
+              itemBuilder: (context, index) {
+                final trip = _filteredTrips[index];
+                return TripCardSearch(trip: trip);
+              },
+            );
+          },
+        );
+      },
     );
   }
 

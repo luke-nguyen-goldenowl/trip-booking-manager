@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
 import 'package:bus_ticket_app/utils/helper/pick_image.dart';
 import 'package:bus_ticket_app/widgets/logout_button.dart';
 import 'package:flutter/material.dart';
@@ -202,6 +203,41 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
                       ),
                     ),
                   ),
+                ),
+
+                BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+                  builder: (context, internetState) {
+                    if (internetState == InternetStatusState.disconnected) {
+                      return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                        color: Colors.orange.shade100,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.cloud_off,
+                              color: Colors.orange.shade700,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Bạn đang ở chế độ ngoại tuyến.',
+                                style: TextStyle(
+                                  color: Colors.orange.shade700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
                 ),
 
                 const SizedBox(height: 30),

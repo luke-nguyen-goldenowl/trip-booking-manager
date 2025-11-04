@@ -1,3 +1,10 @@
+import 'package:bus_ticket_app/core/bus_route/route_local_database.dart';
+import 'package:bus_ticket_app/core/bus_trip/trip_local_database.dart';
+import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
+import 'package:bus_ticket_app/core/user/user_local_database.dart';
+import 'package:bus_ticket_app/models/route_model.dart';
+import 'package:bus_ticket_app/models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +19,7 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:bus_ticket_app/widgets/trip_popular_card.dart';
 import 'package:go_router/go_router.dart';
+import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,11 +38,25 @@ class _HomeScreenState extends State<HomeScreen> {
   DateTime? _selectedDate;
   int _passengerCount = 0;
   List<MTrip> _popularTrips = [];
+  bool isLoading = false;
+  String userName = '';
+  bool isOnline = false;
+  List<MTrip> trips = [];
+  List<MRoute> routes = [];
+  List<MUser> users = [];
   @override
   void initState() {
     super.initState();
     _fetchPopularTrips();
+    _loadCurrentUser();
     _loadProvinces();
+  }
+
+  void _loadCurrentUser() {
+    final firebaseUser = FirebaseAuth.instance.currentUser;
+    if (firebaseUser != null && firebaseUser.email != null) {
+      context.read<UserCubit>().loadUser(firebaseUser.email!);
+    }
   }
 
   void _fetchPopularTrips() {
@@ -61,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Không thể tải danh sách tỉnh thành: $e'),
+            content: Text('Không thể tải danh sách tỉnh thành'),
             backgroundColor: Colors.red,
           ),
         );
@@ -71,19 +93,59 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(),
-              const SizedBox(height: 10),
-              _buildSearchSection(),
-              const SizedBox(height: 10),
-              _buildPopularDestinationsSection(),
-            ],
+    return RefreshIndicator(
+      onRefresh: () async {
+        _fetchPopularTrips();
+        _loadCurrentUser();
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(),
+                BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+                  builder: (context, internetState) {
+                    if (internetState == InternetStatusState.disconnected) {
+                      return Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 8,
+                          horizontal: 16,
+                        ),
+                        color: Colors.orange.shade100,
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.cloud_off,
+                              color: Colors.orange.shade700,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Bạn đang ở chế độ ngoại tuyến.',
+                                style: TextStyle(
+                                  color: Colors.orange.shade700,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+                const SizedBox(height: 10),
+                _buildSearchSection(),
+                const SizedBox(height: 10),
+                _buildPopularDestinationsSection(),
+              ],
+            ),
           ),
         ),
       ),
@@ -109,12 +171,9 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 child: BlocBuilder<UserCubit, UserState>(
                   builder: (context, state) {
-                    String userName = '';
-
                     if (state is UserLoaded) {
                       userName = state.user.fullName!;
                     }
-
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -366,14 +425,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                child: const Text(
-                  'Tìm chuyến xe',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                child:
+                    isLoading
+                        ? const CircularProgressIndicator()
+                        : const Text(
+                          'Tìm chuyến xe',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
               ),
             ),
           ],
@@ -409,7 +471,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      autofocus: true,
+                      autofocus: false,
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm...',
                         prefixIcon: const Icon(Icons.search),
@@ -664,9 +726,89 @@ class _HomeScreenState extends State<HomeScreen> {
     return true;
   }
 
+  Future<void> _checkConnectionAndSaveLocalDatabase() async {
+    final internetState = context.read<InternetConnectionCubit>().state;
+    bool isOnline = false;
+    if (internetState == InternetStatusState.connected) {
+      isOnline = true;
+    }
+    try {
+      if (isOnline) {
+        final busTripCubit = context.read<BusTripCubit>();
+        await busTripCubit.loadAllTrips();
+        final tripState = busTripCubit.state;
+
+        if (tripState is BusTripLoaded) {
+          trips = tripState.trips;
+          await TripLocalDatabase().saveTrips(trips);
+        }
+
+        final busRouteCubit = context.read<BusRouteCubit>();
+        await busRouteCubit.loadAllRoutes();
+        final routeState = busRouteCubit.state;
+
+        if (routeState is BusRouteLoaded) {
+          routes = routeState.routes;
+          await RouteLocalDatabase().saveRoutes(routes);
+        }
+
+        final userCubit = context.read<UserCubit>();
+        await userCubit.loadAllUser();
+        final userState = userCubit.state;
+
+        if (userState is MultiUserLoaded) {
+          users = userState.users;
+          await UserLocalDatabase().saveUsers(users);
+        }
+      } else {
+        trips = await TripLocalDatabase().getTrips();
+        routes = await RouteLocalDatabase().getRoutes();
+        users = await UserLocalDatabase().getUsers();
+        if (trips.isEmpty || routes.isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'Không có dữ liệu chuyến đi hoặc tuyến đường. '
+                  'Vui lòng kết nối internet lần đầu để đồng bộ dữ liệu.',
+                ),
+                backgroundColor: Colors.red,
+                duration: Duration(seconds: 4),
+              ),
+            );
+          }
+          return;
+        }
+      }
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi khi tìm chuyến đi'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _handleSearch() async {
+    setState(() {
+      isLoading = true;
+    });
     final isValid = await _checkValidation();
-    if (!isValid) return;
+    if (!isValid) {
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+    await _checkConnectionAndSaveLocalDatabase();
     context.push(
       '/user/trip-search',
       extra: {
@@ -674,6 +816,9 @@ class _HomeScreenState extends State<HomeScreen> {
         'destination': _selectedDestination!.name,
         'date': _selectedDate!,
         'passengers': _passengerCount,
+        'trips': trips,
+        'routes': routes,
+        'users': users,
       },
     );
   }

@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
 import 'package:bus_ticket_app/utils/helper/format_helper.dart';
 import 'package:bus_ticket_app/utils/helper/seat_layout_helper.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/models/bus_model.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SeatSelectScreen extends StatefulWidget {
   final MTrip trip;
@@ -61,6 +63,40 @@ class _SeatSelectScreenState extends State<SeatSelectScreen> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+                    builder: (context, internetState) {
+                      if (internetState == InternetStatusState.disconnected) {
+                        return Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 8,
+                            horizontal: 16,
+                          ),
+                          color: Colors.orange.shade100,
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.cloud_off,
+                                color: Colors.orange.shade700,
+                                size: 20,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Bạn đang ở chế độ ngoại tuyến.',
+                                  style: TextStyle(
+                                    color: Colors.orange.shade700,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  ),
                   Container(
                     margin: const EdgeInsets.all(16),
                     padding: const EdgeInsets.all(16),

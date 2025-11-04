@@ -15,11 +15,13 @@ class BusRouteService {
   }
 
   Future<List<MRoute>> getAllRoutes() async {
-    final response = await _supabase.from('routes').select() as List<dynamic>;
+    try {
+      final response = await _supabase.from('routes').select();
 
-    return response
-        .map((e) => MRoute.fromMap(e as Map<String, dynamic>))
-        .toList();
+      return (response as List).map((route) => MRoute.fromMap(route)).toList();
+    } catch (e) {
+      throw Exception('Không thể tải danh sách chuyến đi');
+    }
   }
 
   Future<void> createRoute(MRoute route) async {

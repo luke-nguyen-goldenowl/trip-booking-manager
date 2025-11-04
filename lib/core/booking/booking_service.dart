@@ -13,6 +13,17 @@ class BookingService {
   final SupabaseClient _supabase = Supabase.instance.client;
   Future<MBooking> createBookingbyCash(MBooking booking) async {
     try {
+      for (final seatId in booking.seats!.split(',')) {
+        final isSeatBooked = await _isSeatBooked(
+          booking.tripId!,
+          seatId.trim(),
+        );
+        if (isSeatBooked) {
+          return Future.error(
+            'Ghế $seatId đã được đặt. Vui lòng chọn ghế khác.',
+          );
+        }
+      }
       final response =
           await _supabase
               .from('bookings')
@@ -321,6 +332,37 @@ class BookingService {
       await _handleAfterCancellBooking(bookingId);
     } catch (e) {
       throw Exception('Không thể hủy booking: $e');
+    }
+  }
+
+  Future<bool> _isSeatBooked(int tripId, String seatId) async {
+    try {
+      final response =
+          await _supabase
+              .from('trips')
+              .select('seat_layout')
+              .eq('id', tripId)
+              .single();
+
+      final seatLayout = response['seat_layout'] as Map<String, dynamic>?;
+      if (seatLayout == null || seatLayout['seats'] == null) return false;
+
+      final seats = seatLayout['seats'] as List;
+
+      for (var seat in seats) {
+        if (seat is! Map<String, dynamic>) continue;
+
+        final currentSeatId = seat['id']?.toString();
+        final isBooked = seat['isBooked'] as bool? ?? false;
+
+        if (currentSeatId == seatId) {
+          return isBooked;
+        }
+      }
+
+      return false;
+    } catch (e) {
+      throw Exception('Không thể kiểm tra trạng thái ghế: $e');
     }
   }
 }
