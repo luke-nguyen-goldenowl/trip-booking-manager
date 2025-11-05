@@ -309,7 +309,6 @@ class _HomeDetailDashboardScreenState extends State<HomeDetailDashboardScreen> {
   }
 
   Widget _buildRevenueTrip(List<MTrip> dayTrips, Map<int, MRoute> routeMap) {
-    // Sắp xếp các chuyến xe theo thời gian khởi hành
     final sortedTrips = [...dayTrips]
       ..sort((a, b) => a.departureTime!.compareTo(b.departureTime!));
 
@@ -355,15 +354,9 @@ class _HomeDetailDashboardScreenState extends State<HomeDetailDashboardScreen> {
             ...sortedTrips.asMap().entries.map((entry) {
               final trip = entry.value;
               final route = routeMap[trip.routeId];
-              print(route);
-
-              // Tính doanh thu cho chuyến xe này
               final seatStats = FunctionHelper.getTripSeatStats(trip);
-              print(seatStats);
               final bookedSeats = seatStats['booked'] ?? 0;
-              print(bookedSeats);
               final tripRevenue = (trip.price ?? 0.0) * bookedSeats.toDouble();
-              print(tripRevenue);
 
               return Container(
                 width: double.infinity,
