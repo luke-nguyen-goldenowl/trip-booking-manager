@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/pages/bus_company/bus_home/detail_dashboard_screen.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
 import 'package:bus_ticket_app/pages/get_started/get_started_1.dart';
 import 'package:bus_ticket_app/pages/on_boarding/onboarding_screen.dart';
@@ -72,6 +73,13 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/home-bus-company',
       builder: (context, state) => const HomeBusCompanyScreen(),
+    ),
+    GoRoute(
+      path: '/home-bus-company/home-detail-dashboard',
+      builder: (context, state) {
+        final date = state.extra as DateTime;
+        return HomeDetailDashboardScreen(date: date);
+      },
     ),
     GoRoute(
       path: '/home-bus-company/bus-car-add',
