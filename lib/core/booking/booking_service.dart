@@ -34,7 +34,7 @@ class BookingService {
       await handleAfterBooking(bookingId);
       return MBooking.fromMap(response);
     } catch (e) {
-      throw Exception('Không thể tạo booking: $e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
@@ -51,7 +51,7 @@ class BookingService {
       await _paymentWithMomo(booking);
       return MBooking.fromMap(response);
     } catch (e) {
-      throw Exception('Không thể tạo booking: $e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
@@ -78,7 +78,7 @@ class BookingService {
         );
       }
     } catch (e) {
-      throw Exception('Không thể tạo booking: $e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
@@ -89,7 +89,7 @@ class BookingService {
           .update({'isMailSended': true})
           .eq('id', bookingId);
     } catch (e) {
-      throw Exception('Không thể đánh dấu email đã gửi: $e');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -145,7 +145,7 @@ class BookingService {
         currentSeatLayout: trip['seat_layout'],
       );
     } catch (e) {
-      throw Exception('$e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
@@ -266,7 +266,7 @@ class BookingService {
           .map((booking) => MBooking.fromMap(booking))
           .toList();
     } catch (e) {
-      throw Exception('Không thể lấy thông tin booking: $e');
+      throw Exception('Không thể lấy thông tin vé');
     }
   }
 
@@ -319,7 +319,7 @@ class BookingService {
         bookedSeatsString: fullBookingData['seats'],
       );
     } catch (e) {
-      throw Exception('$e');
+      throw Exception('Không thể hủy vé');
     }
   }
 
@@ -331,7 +331,7 @@ class BookingService {
           .eq('id', bookingId);
       await _handleAfterCancellBooking(bookingId);
     } catch (e) {
-      throw Exception('Không thể hủy booking: $e');
+      throw Exception('Không thể hủy vé');
     }
   }
 
@@ -362,7 +362,7 @@ class BookingService {
 
       return false;
     } catch (e) {
-      throw Exception('Không thể kiểm tra trạng thái ghế: $e');
+      throw Exception('Không thể kiểm tra trạng thái ghế');
     }
   }
 }

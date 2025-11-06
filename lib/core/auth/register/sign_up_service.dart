@@ -56,7 +56,7 @@ class SignUpService {
     } on firebase_auth.FirebaseAuthException catch (e) {
       return e.message ?? 'Có lỗi xảy ra';
     } catch (e) {
-      throw Exception(e);
+      throw Exception("Có lỗi xảy ra");
     }
   }
 }
