@@ -4,6 +4,8 @@ import 'package:bus_ticket_app/pages/on_boarding/onboarding_screen.dart';
 import 'package:bus_ticket_app/pages/auth/login_screen.dart';
 import 'package:bus_ticket_app/pages/auth/register_screen.dart';
 import 'package:bus_ticket_app/pages/auth/forgot_password_screen.dart';
+import 'package:bus_ticket_app/pages/user/bottom_navigation.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/pages/user/home.dart';
 import 'package:bus_ticket_app/pages/admin/home.dart';
@@ -21,8 +23,19 @@ import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_add_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_detail_screen.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_edit_screen.dart';
-import 'package:bus_ticket_app/pages/user/trip_search_screen.dart';
+import 'package:bus_ticket_app/pages/user/booking/trip_search_screen.dart';
+import 'package:bus_ticket_app/pages/user/booking/trip_detail_screen.dart';
+import 'package:bus_ticket_app/pages/user/booking/seat_select_screen.dart';
+import 'package:bus_ticket_app/pages/user/booking/payment_screen.dart';
+import 'package:bus_ticket_app/pages/user/booking/success_booking_screen.dart';
+import 'package:bus_ticket_app/models/booking_model.dart';
+import 'package:bus_ticket_app/pages/user/ticket_screen.dart';
+import 'package:bus_ticket_app/pages/user/home_screen.dart';
+import 'package:bus_ticket_app/pages/user/favorite_screen.dart';
+import 'package:bus_ticket_app/pages/user/profile_screen.dart';
 
+final GlobalKey<NavigatorState> _shellNavigatorKey =
+    GlobalKey<NavigatorState>();
 final GoRouter router = GoRouter(
   initialLocation: '/',
   routes: [
@@ -117,6 +130,75 @@ final GoRouter router = GoRouter(
         final searchParams = state.extra as Map<String, dynamic>;
         return TripSearchScreen(searchParams: searchParams);
       },
+    ),
+    GoRoute(
+      path: '/user/trip-detail',
+      builder: (context, state) {
+        final params = state.extra as Map<String, dynamic>;
+        return TripDetailScreen(
+          trip: params['trip'] as MTrip,
+          route: params['route'] as MRoute,
+          bus: params['bus'] as MBus,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/user/seat-select',
+      builder: (context, state) {
+        final params = state.extra as Map<String, dynamic>;
+        return SeatSelectScreen(
+          trip: params['trip'] as MTrip,
+          route: params['route'] as MRoute,
+          bus: params['bus'] as MBus,
+          companyName: params['companyName'] as String?,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/user/payment-method',
+      builder: (context, state) {
+        final params = state.extra as Map<String, dynamic>;
+        return PaymentScreen(
+          trip: params['trip'] as MTrip,
+          route: params['route'] as MRoute,
+          bus: params['bus'] as MBus,
+          selectedSeats: List<String>.from(params['selectedSeats'] as List),
+          totalPrice: params['totalPrice'] as int,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/user/booking-success',
+      builder: (context, state) {
+        final params = state.extra as Map<String, dynamic>;
+        return SuccessBookingScreen(
+          booking: params['booking'] as MBooking,
+          trip: params['trip'] as MTrip,
+          route: params['route'] as MRoute,
+          bus: params['bus'] as MBus,
+        );
+      },
+    ),
+    ShellRoute(
+      navigatorKey: _shellNavigatorKey,
+      builder: (context, state, child) {
+        return MainScaffold(child: child);
+      },
+      routes: [
+        GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
+        GoRoute(
+          path: '/tickets',
+          builder: (context, state) => const MyTicketScreen(),
+        ),
+        GoRoute(
+          path: '/favorite',
+          builder: (context, state) => const MyFavoriteScreen(),
+        ),
+        GoRoute(
+          path: '/profile',
+          builder: (context, state) => const ProfileUserScreen(),
+        ),
+      ],
     ),
   ],
 );

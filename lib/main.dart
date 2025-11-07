@@ -1,3 +1,5 @@
+import 'package:bus_ticket_app/core/booking/cubit/booking_cubit.dart';
+import 'package:bus_ticket_app/core/company/cubit/company_cubit.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -19,6 +21,7 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/core/bus_route/bus_route_service.dart';
 import 'package:bus_ticket_app/core/bus_trip/cubit/bus_trip_cubit.dart';
 import 'package:bus_ticket_app/core/bus_trip/bus_trip_service.dart';
+import 'package:bus_ticket_app/core/booking/booking_service.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() async {
@@ -37,9 +40,11 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => UserCubit(UserService())),
+        BlocProvider(create: (context) => CompanyCubit(UserService())),
         BlocProvider(create: (context) => BusCubit(BusService())),
         BlocProvider(create: (context) => BusRouteCubit(BusRouteService())),
         BlocProvider(create: (context) => BusTripCubit(BusTripService())),
+        BlocProvider(create: (context) => BookingCubit(BookingService())),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,

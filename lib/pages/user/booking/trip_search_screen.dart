@@ -11,6 +11,7 @@ import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/widgets/trip_card_search.dart';
 import 'package:bus_ticket_app/utils/helper/seat_layout_helper.dart';
+import 'package:intl/intl.dart';
 
 class TripSearchScreen extends StatefulWidget {
   const TripSearchScreen({super.key, required this.searchParams});
@@ -162,7 +163,10 @@ class _TripSearchScreenState extends State<TripSearchScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        FormatHelper.formatDate(widget.searchParams['date']),
+                        DateFormat(
+                          'EEEE, dd/MM/yyyy',
+                          'vi_VN',
+                        ).format(widget.searchParams['date']),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -223,6 +227,9 @@ class _TripSearchScreenState extends State<TripSearchScreen> {
                                   FormatHelper.formatDate(
                                     widget.searchParams['date'],
                                   );
+                              final isTimeFuture = trip.departureTime!.isAfter(
+                                DateTime.now(),
+                              );
                               final isAvailableSeats =
                                   widget.searchParams['passengers'] <=
                                   SeatLayoutHelper.countAvailableSeats(
@@ -233,7 +240,8 @@ class _TripSearchScreenState extends State<TripSearchScreen> {
                               }
                               return matchesDeparture &&
                                   matchesDestination &&
-                                  matchesDate;
+                                  matchesDate &&
+                                  isTimeFuture;
                             }).toList();
                         _sortTrips();
                       }

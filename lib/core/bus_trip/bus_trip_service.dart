@@ -83,13 +83,15 @@ class BusTripService {
 
   Future<List<MTrip>> getRandomTrips(int limit) async {
     try {
+      final now = DateTime.now().toIso8601String();
       final response = await _supabase
           .from('trips')
           .select(
-            'id, status, route_id, bus_id,company_id, departure_time, arrival_time,price, routes:route_id(id, departure, destination), buses:bus_id(id, company_id, bus_number, type, seat_count, user:company_id(full_name, email, phone)))',
+            'id, status, route_id, bus_id,company_id, departure_time, arrival_time,price, seat_layout, routes:route_id(id, departure, destination), buses:bus_id(id, company_id, bus_number, type, seat_count, user:company_id(full_name, email, phone)))',
           )
           .eq('status', 'scheduled')
-          .gt('departure_time', DateTime.now().toIso8601String())
+          .gt('departure_time', now)
+          .order('departure_time', ascending: true)
           .limit(limit);
       return (response as List).map((trip) => MTrip.fromMap(trip)).toList();
     } catch (e) {
