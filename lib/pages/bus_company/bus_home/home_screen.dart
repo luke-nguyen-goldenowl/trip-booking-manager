@@ -13,7 +13,7 @@ import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:bus_ticket_app/pages/bus_company/bus_home/function_helper/function_helper.dart';
 import 'package:bus_ticket_app/utils/helper/format_helper.dart';
-//import 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -140,7 +140,7 @@ Widget _buildHeader(BuildContext context) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Dashboard',
+              'Bảng Thống Kê',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
@@ -154,10 +154,10 @@ Widget _buildHeader(BuildContext context) {
         icon: Icon(Icons.chevron_right_rounded, color: Colors.orange[700]),
         onPressed:
             () => {
-              // context.push(
-              //   '/home-bus-company/home-detail',
-              //   extra: DateTime.now(),
-              // ),
+              context.push(
+                '/home-bus-company/home-detail-dashboard',
+                extra: DateTime.now(),
+              ),
             },
         tooltip: 'Xem chi tiết hôm nay',
         iconSize: 40,
