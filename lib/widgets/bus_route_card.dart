@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/utils/helper/format_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/models/route_model.dart';
 import 'package:bus_ticket_app/utils/helper/bus_helper.dart';
@@ -61,7 +62,7 @@ class BusRouteCard extends StatelessWidget {
                   _buildInfo(
                     Icons.route,
                     'Khoảng cách',
-                    '${route.distance ?? 0} km',
+                    '${FormatHelper.formatCurrency(route.distance!.toDouble())} km',
                   ),
                 ],
               ),
