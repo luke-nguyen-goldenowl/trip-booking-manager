@@ -1,5 +1,8 @@
+import 'package:bus_ticket_app/utils/helper/booking_helper.dart';
+import 'package:bus_ticket_app/utils/helper/format_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bus_ticket_app/models/booking_model.dart';
+import 'package:bus_ticket_app/core/email/email_service.dart';
 
 class BookingService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -38,8 +41,31 @@ class BookingService {
           ''')
               .eq('id', bookingId)
               .single();
-
       final trip = fullBookingData['trip'];
+      final user = fullBookingData['user'];
+      final route = trip['route'];
+      final bus = trip['bus'];
+      final company = trip['company'];
+
+      await sendBookingConfirmationEmail(
+        toEmail: user['email'],
+        userName: user['full_name'] ?? 'Quý khách',
+        bookingCode: fullBookingData['booking_code'],
+        departure: route['departure'],
+        destination: route['destination'],
+        departureTime: FormatHelper.formatDateTime(trip['departure_time']),
+        seats: fullBookingData['seats'],
+        createdAt: FormatHelper.formatDateTime(fullBookingData['created_at']),
+        totalPrice: fullBookingData['total_price'],
+        companyName: company['full_name'],
+        companyPhone: company['phone'],
+        licensePlate: bus['bus_number'],
+        companyLogo: company['avatar_url'],
+        paymentMethod: BookingHelper.getPaymentMethodText(
+          fullBookingData['payment_method'],
+        ),
+      );
+
       await _updateSeatLayout(
         tripId: trip['id'],
         bookedSeatsString: fullBookingData['seats'],

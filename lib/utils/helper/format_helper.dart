@@ -15,4 +15,10 @@ class FormatHelper {
     if (dateTime == null) return 'N/A';
     return DateFormat('HH:mm').format(dateTime);
   }
+
+  static String formatDateTime(String isoDateTime) {
+    final dateTime = DateTime.parse(isoDateTime);
+    final formatter = DateFormat('HH:mm dd/MM/yyyy');
+    return formatter.format(dateTime);
+  }
 }
