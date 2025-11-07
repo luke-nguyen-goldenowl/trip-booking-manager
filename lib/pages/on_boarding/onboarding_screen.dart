@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/pages/on_boarding/on_boarding_4.dart';
 import 'package:flutter/material.dart';
 import 'package:bus_ticket_app/pages/on_boarding/on_boarding_1.dart';
 import 'package:bus_ticket_app/pages/on_boarding/on_boarding_2.dart';
@@ -30,7 +31,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _nextPage() {
-    if (_currentIndex < 2) {
+    if (_currentIndex < 3) {
       _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
@@ -84,6 +85,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     const OnBoarding1Page(),
                     const OnBoarding2Page(),
                     const OnBoarding3Page(),
+                    const OnBoarding4Page(),
                   ],
                 ),
               ),
@@ -103,7 +105,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         onPressed: _nextPage,
                         child: Text(
-                          _currentIndex == 2 ? 'Bắt đầu' : 'Tiếp',
+                          _currentIndex == 3 ? 'Bắt đầu' : 'Tiếp',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -115,7 +117,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     const SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(3, (index) {
+                      children: List.generate(4, (index) {
                         return Container(
                           margin: const EdgeInsets.symmetric(horizontal: 4),
                           width: 24,

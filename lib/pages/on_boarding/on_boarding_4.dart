@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class OnBoarding2Page extends StatelessWidget {
-  const OnBoarding2Page({super.key});
+class OnBoarding4Page extends StatelessWidget {
+  const OnBoarding4Page({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +11,7 @@ class OnBoarding2Page extends StatelessWidget {
         child: Column(
           children: [
             const Text(
-              'Đa dạng sự lựa chọn chuyến đi với nhiều nhà xe uy tín',
+              'Cho phép lưu vé ngay cả khi bạn không có kết nối mạng',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
@@ -35,8 +35,8 @@ class OnBoarding2Page extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(32),
                 child: Image.asset(
-                  'assets/images/on_boarding/list_trip.png',
-                  height: 500,
+                  'assets/images/on_boarding/offline_ticket.png',
+                  height: 400,
                   width: double.infinity,
                   fit: BoxFit.cover,
                 ),
