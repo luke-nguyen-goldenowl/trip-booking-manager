@@ -108,4 +108,15 @@ class BusTripService {
       throw Exception('Không thể tải danh sách chuyến đi');
     }
   }
+
+  Future<MTrip?> getTripById(int tripId) async {
+    try {
+      final response =
+          await _supabase.from('trips').select().eq('id', tripId).single();
+
+      return MTrip.fromMap(response);
+    } catch (e) {
+      return null;
+    }
+  }
 }

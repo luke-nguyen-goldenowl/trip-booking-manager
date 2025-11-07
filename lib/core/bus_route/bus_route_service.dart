@@ -33,4 +33,15 @@ class BusRouteService {
   Future<void> deleteRoute(int routeId) async {
     await _supabase.from('routes').delete().eq('id', routeId);
   }
+
+  Future<MRoute?> getRouteById(int routeId) async {
+    try {
+      final response =
+          await _supabase.from('routes').select().eq('id', routeId).single();
+
+      return MRoute.fromMap(response);
+    } catch (e) {
+      return null;
+    }
+  }
 }

@@ -33,6 +33,8 @@ import 'package:bus_ticket_app/pages/user/ticket_screen.dart';
 import 'package:bus_ticket_app/pages/user/home_screen.dart';
 import 'package:bus_ticket_app/pages/user/favorite_screen.dart';
 import 'package:bus_ticket_app/pages/user/profile_screen.dart';
+import 'package:bus_ticket_app/pages/user/booking/ticket_detail_screen.dart';
+import 'package:bus_ticket_app/models/ticket_model.dart';
 
 final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>();
@@ -199,6 +201,13 @@ final GoRouter router = GoRouter(
           builder: (context, state) => const ProfileUserScreen(),
         ),
       ],
+    ),
+    GoRoute(
+      path: '/user/ticket-detail',
+      builder: (context, state) {
+        final ticket = state.extra as MTicket;
+        return TicketDetailScreen(info: ticket);
+      },
     ),
   ],
 );
