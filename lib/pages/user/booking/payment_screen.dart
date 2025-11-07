@@ -289,7 +289,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
       userId: userId,
       tripId: widget.trip.id,
       totalPrice: widget.totalPrice,
-      status: BookingStatus.pending.value,
+      status: BookingStatus.completed.value,
+      paymentStatus: BookingPaymentStatus.pending.value,
       paymentMethod: _selectedPaymentMethod.value,
       seats: widget.selectedSeats.join(','),
       bookingCode:
@@ -321,8 +322,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
         });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Lỗi khi lưu vé ngoại tuyến.'),
+          SnackBar(
+            content: Text('Lỗi khi lưu vé ngoại tuyến $e'),
             backgroundColor: Colors.red,
           ),
         );

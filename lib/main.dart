@@ -1,9 +1,11 @@
 import 'dart:io';
+import 'dart:ui';
 import 'package:bus_ticket_app/core/booking/cubit/booking_cubit.dart';
 import 'package:bus_ticket_app/core/company/cubit/company_cubit.dart';
 import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
 import 'package:bus_ticket_app/core/network/internet_connection_listener.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,6 +33,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  FlutterError.onError = (errorDetail) {
+    FirebaseCrashlytics.instance.recordFlutterError(errorDetail);
+  };
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
   await initializeSupabase();
   await initializeDateFormatting('vi', null);
   HttpOverrides.global = MyHttpOverrides();

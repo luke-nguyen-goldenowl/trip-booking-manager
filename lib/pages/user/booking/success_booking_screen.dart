@@ -122,14 +122,14 @@ class _SuccessBookingScreenState extends State<SuccessBookingScreen> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: BookingHelper.getStatusColor(
-                                    widget.booking.status ?? 'pending',
+                                  color: BookingHelper.getPaymentStatusColor(
+                                    widget.booking.paymentStatus ?? 'pending',
                                   ),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  BookingHelper.getStatusText(
-                                    widget.booking.status ?? 'pending',
+                                  BookingHelper.getPaymentStatusText(
+                                    widget.booking.paymentStatus ?? 'pending',
                                   ),
                                   style: const TextStyle(
                                     color: Colors.white,

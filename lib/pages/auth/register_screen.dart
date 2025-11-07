@@ -25,7 +25,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _agreeToTerms = false;
   String? _selectedRole;
   bool _isLoading = false;
-  final List<String> _roles = ['Khách hàng', 'Nhà xe', 'Admin'];
 
   @override
   void dispose() {
@@ -102,9 +101,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.phone,
                     keyboardType: TextInputType.phone,
                   ),
-                  const SizedBox(height: 16),
-
-                  _buildRoleDropdown(),
                   const SizedBox(height: 16),
 
                   _buildInputField(
@@ -260,96 +256,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildRoleDropdown() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Vai trò',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
-          ),
-          child: DropdownButtonFormField<String>(
-            value: _selectedRole,
-            decoration: InputDecoration(
-              hintStyle: const TextStyle(color: Colors.white),
-              prefixIcon: const Icon(Icons.work, color: Colors.white),
-              filled: true,
-              fillColor: Colors.white.withOpacity(0.1),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.orange),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red),
-              ),
-            ),
-            dropdownColor: const Color(0xFF013E46),
-            style: const TextStyle(color: Colors.white),
-            icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
-            items:
-                _roles.map<DropdownMenuItem<String>>((String role) {
-                  return DropdownMenuItem<String>(
-                    value: role,
-                    child: Row(
-                      children: [
-                        Icon(
-                          _getRoleIcon(role),
-                          color: Colors.orange,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(role, style: const TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  );
-                }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedRole = newValue;
-              });
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  IconData _getRoleIcon(String role) {
-    switch (role) {
-      case 'Admin':
-        return Icons.admin_panel_settings;
-      case 'Nhà xe':
-        return Icons.directions_bus;
-      case 'Người dùng':
-        return Icons.person;
-      default:
-        return Icons.person;
-    }
   }
 
   Widget _buildInputField({

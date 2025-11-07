@@ -31,6 +31,7 @@ class BookingLocalDatabase {
               trip_id INTEGER NOT NULL,
               total_price INTEGER NOT NULL,
               status TEXT NOT NULL,
+              payment_status TEXT NOT NULL,
               payment_method TEXT NOT NULL,
               seats TEXT NOT NULL,
               booking_code TEXT NOT NULL,

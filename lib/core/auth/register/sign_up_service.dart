@@ -48,7 +48,7 @@ class SignUpService {
         'email': userCredential.user?.email,
         'full_name': fullName.trim(),
         'phone': phoneNumber.trim(),
-        'role': role.trim(),
+        'role': 'Khách hàng',
         'created_at': DateTime.now().toIso8601String(),
       });
 
