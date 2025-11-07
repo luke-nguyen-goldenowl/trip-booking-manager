@@ -3,6 +3,11 @@ import 'package:bus_ticket_app/utils/helper/format_helper.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bus_ticket_app/models/booking_model.dart';
 import 'package:bus_ticket_app/core/email/email_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:bus_ticket_app/constants/payment_url.dart';
+// ignore: depend_on_referenced_packages
+import 'package:url_launcher/url_launcher.dart';
 
 class BookingService {
   final SupabaseClient _supabase = Supabase.instance.client;
@@ -19,6 +24,61 @@ class BookingService {
       return MBooking.fromMap(response);
     } catch (e) {
       throw Exception('Không thể tạo booking: $e');
+    }
+  }
+
+  Future<MBooking?> createBookingbyMomo(MBooking booking) async {
+    try {
+      final bookingData = booking.toMap();
+      bookingData.remove('id');
+      final response =
+          await _supabase
+              .from('bookings')
+              .insert(bookingData)
+              .select()
+              .single();
+      await _paymentWithMomo(booking);
+      return MBooking.fromMap(response);
+    } catch (e) {
+      throw Exception('Không thể tạo booking: $e');
+    }
+  }
+
+  Future<void> _paymentWithMomo(MBooking booking) async {
+    try {
+      final bookingData = booking.toMap();
+      bookingData.remove('id');
+      final momoResponse = await http.post(
+        Uri.parse(MOMO_URL),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'orderId': bookingData['booking_code'],
+          'amount': booking.totalPrice,
+          'orderInfo':
+              'Thanh toán đơn hàng vé xe khách ${bookingData['booking_code']}',
+        }),
+      );
+
+      final data = jsonDecode(momoResponse.body);
+      if (data != null && data['payUrl'] != null) {
+        await launchUrl(
+          Uri.parse(data['payUrl']),
+          mode: LaunchMode.externalApplication,
+        );
+      }
+    } catch (e) {
+      throw Exception('Không thể tạo booking: $e');
+    }
+  }
+
+  Future<void> markEmailSent(int bookingId) async {
+    try {
+      await _supabase
+          .from('bookings')
+          .update({'isMailSended': true})
+          .eq('id', bookingId);
+    } catch (e) {
+      throw Exception('Không thể đánh dấu email đã gửi: $e');
     }
   }
 
@@ -46,7 +106,9 @@ class BookingService {
       final route = trip['route'];
       final bus = trip['bus'];
       final company = trip['company'];
-
+      if (fullBookingData['isMailSended'] == true) {
+        return;
+      }
       await sendBookingConfirmationEmail(
         toEmail: user['email'],
         userName: user['full_name'] ?? 'Quý khách',
@@ -65,7 +127,7 @@ class BookingService {
           fullBookingData['payment_method'],
         ),
       );
-
+      await markEmailSent(bookingId);
       await _updateSeatLayout(
         tripId: trip['id'],
         bookedSeatsString: fullBookingData['seats'],
@@ -187,7 +249,8 @@ class BookingService {
       final response = await _supabase
           .from('bookings')
           .select()
-          .eq('user_id', userId);
+          .eq('user_id', userId)
+          .order('created_at', ascending: false);
       return (response as List)
           .map((booking) => MBooking.fromMap(booking))
           .toList();

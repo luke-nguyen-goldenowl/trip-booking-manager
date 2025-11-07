@@ -15,6 +15,11 @@ class BookingCubit extends Cubit<BookingState> {
           booking,
         );
         emit(BookingSuccess(createdBooking));
+      } else if (booking.paymentMethod == 'momo') {
+        final createdBooking = await _bookingService.createBookingbyMomo(
+          booking,
+        );
+        emit(BookingPending(createdBooking!));
       } else {
         emit(BookingError('Không thể tạo booking'));
       }

@@ -35,6 +35,7 @@ import 'package:bus_ticket_app/pages/user/favorite_screen.dart';
 import 'package:bus_ticket_app/pages/user/profile_screen.dart';
 import 'package:bus_ticket_app/pages/user/booking/ticket_detail_screen.dart';
 import 'package:bus_ticket_app/models/ticket_model.dart';
+import 'package:bus_ticket_app/pages/user/booking/pending_payment_screen.dart';
 
 final GlobalKey<NavigatorState> _shellNavigatorKey =
     GlobalKey<NavigatorState>();
@@ -174,6 +175,18 @@ final GoRouter router = GoRouter(
       builder: (context, state) {
         final params = state.extra as Map<String, dynamic>;
         return SuccessBookingScreen(
+          booking: params['booking'] as MBooking,
+          trip: params['trip'] as MTrip,
+          route: params['route'] as MRoute,
+          bus: params['bus'] as MBus,
+        );
+      },
+    ),
+    GoRoute(
+      path: '/user/booking-pending',
+      builder: (context, state) {
+        final params = state.extra as Map<String, dynamic>;
+        return PendingPaymentScreen(
           booking: params['booking'] as MBooking,
           trip: params['trip'] as MTrip,
           route: params['route'] as MRoute,

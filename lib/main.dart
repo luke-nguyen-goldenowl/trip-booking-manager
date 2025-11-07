@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:bus_ticket_app/core/booking/cubit/booking_cubit.dart';
 import 'package:bus_ticket_app/core/company/cubit/company_cubit.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
@@ -29,6 +30,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await initializeSupabase();
   await initializeDateFormatting('vi', null);
+  HttpOverrides.global = MyHttpOverrides();
   runApp(const MyApp());
 }
 
@@ -112,5 +114,14 @@ class AuthWrapper extends StatelessWidget {
       default:
         return const HomeUserScreen();
     }
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
