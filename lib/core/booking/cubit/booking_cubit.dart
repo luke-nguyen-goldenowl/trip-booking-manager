@@ -24,7 +24,7 @@ class BookingCubit extends Cubit<BookingState> {
         emit(BookingError('Không thể tạo booking'));
       }
     } catch (e) {
-      emit(BookingError('Lỗi: $e'));
+      emit(BookingError(e.toString()));
     }
   }
 

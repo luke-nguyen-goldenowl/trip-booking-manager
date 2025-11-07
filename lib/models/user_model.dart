@@ -50,6 +50,18 @@ class MUser {
     };
   }
 
+  Map<String, dynamic> toMapLocaldb() {
+    return <String, dynamic>{
+      'id': id,
+      'email': email,
+      'full_name': fullName,
+      'phone': phone,
+      'role': role,
+      'created_at': createdAt?.millisecondsSinceEpoch,
+      'avatar_url': avatarUrl,
+    };
+  }
+
   factory MUser.fromMap(Map<String, dynamic> map) {
     return MUser(
       id: map['id'] as int,
@@ -62,6 +74,21 @@ class MUser {
               ? DateTime.parse(map['created_at'] as String)
               : null,
       avatarUrl: map['avatar_url'] != null ? map['avatar_url'] as String : null,
+    );
+  }
+
+  factory MUser.fromMapLocaldb(Map<String, dynamic> map) {
+    return MUser(
+      id: map['id'] as int,
+      email: map['email'] != null ? map['email'] as String : null,
+      fullName: map['full_name'] != null ? map['full_name'] as String : null,
+      phone: map['phone'] != null ? map['phone'] as String : null,
+      role: map['role'] != null ? map['role'] as String : null,
+      createdAt:
+          map['createdAt'] != null
+              ? DateTime.parse(map['createdAt'] as String)
+              : null,
+      avatarUrl: map['avatarUrl'] != null ? map['avatarUrl'] as String : null,
     );
   }
 

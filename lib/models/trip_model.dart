@@ -59,6 +59,20 @@ class MTrip {
     };
   }
 
+  Map<String, dynamic> toMapLocaldb() {
+    return <String, dynamic>{
+      'id': id,
+      'route_id': routeId,
+      'bus_id': busId,
+      'company_id': companyId,
+      'price': price,
+      'departure_time': departureTime?.toIso8601String(),
+      'arrival_time': arrivalTime?.toIso8601String(),
+      'status': status.value,
+      'seat_layout': seatLayout,
+    };
+  }
+
   factory MTrip.fromMap(Map<String, dynamic> map) {
     return MTrip(
       id: map['id'] != null ? map['id'] as int : null,

@@ -3,6 +3,7 @@ import 'package:bus_ticket_app/utils/helper/validation_email.dart';
 import 'package:bus_ticket_app/models/user_model.dart' as user_model;
 import 'package:bus_ticket_app/core/user/user_service.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginService {
@@ -29,6 +30,8 @@ class LoginService {
       );
 
       user_model.MUser? user = await userService.getUserInfo(email.trim());
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('userId', user?.id ?? 0);
 
       return {'success': true, 'user': user};
     } on firebase_auth.FirebaseAuthException catch (e) {
@@ -60,6 +63,17 @@ class LoginService {
           'role': 'Khách hàng',
           'created_at': DateTime.now().toIso8601String(),
         });
+        final newUser = await userService.getUserInfo(email);
+        if (newUser != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('userId', newUser.id);
+        }
+      } else {
+        final existingUser = await userService.getUserInfo(email);
+        if (existingUser != null) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setInt('userId', existingUser.id);
+        }
       }
       return userCredential;
     } catch (e) {

@@ -44,6 +44,17 @@ class MRoute {
     };
   }
 
+  Map<String, dynamic> toMapLocaldb() {
+    return <String, dynamic>{
+      'id': id,
+      'company_id': companyId,
+      'departure': departure,
+      'destination': destination,
+      'distance_km': distance,
+      'status': status.value,
+    };
+  }
+
   static BusRouteStatus _parseBusRouteStatus(dynamic value) {
     if (value == null) return BusRouteStatus.active;
 

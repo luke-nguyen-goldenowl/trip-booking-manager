@@ -1,3 +1,4 @@
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bus_ticket_app/models/user_model.dart' as user_model;
 import 'dart:typed_data';
@@ -14,6 +15,18 @@ class UserService {
     final response =
         await _supabase.from('user').select().eq('id', id).single();
     return user_model.MUser.fromMap(response);
+  }
+
+  Future<List<user_model.MUser>> getAllUsers() async {
+    try {
+      final response = await _supabase.from('user').select();
+
+      return (response as List)
+          .map((user) => user_model.MUser.fromMap(user))
+          .toList();
+    } catch (e) {
+      throw Exception('Không thể tải danh sách người dùng');
+    }
   }
 
   Future<void> updateUserProfile(
@@ -48,5 +61,10 @@ class UserService {
     } catch (e) {
       throw Exception('Không thể tải ảnh lên: ${e.toString()}');
     }
+  }
+
+  Future<int?> getUserIdFromLocal() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('userId');
   }
 }

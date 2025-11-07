@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:bus_ticket_app/core/booking/cubit/booking_cubit.dart';
 import 'package:bus_ticket_app/core/company/cubit/company_cubit.dart';
+import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
+import 'package:bus_ticket_app/core/network/internet_connection_listener.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -47,6 +49,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => BusRouteCubit(BusRouteService())),
         BlocProvider(create: (context) => BusTripCubit(BusTripService())),
         BlocProvider(create: (context) => BookingCubit(BookingService())),
+        BlocProvider(create: (context) => InternetConnectionCubit()),
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
@@ -105,15 +108,19 @@ class AuthWrapper extends StatelessWidget {
   }
 
   Widget _getHomeScreenByRole(String role) {
+    Widget screen;
     switch (role.toLowerCase()) {
       case 'admin':
-        return const HomeAdminScreen();
+        screen = const HomeAdminScreen();
+        break;
       case 'nhà xe':
-        return const HomeBusCompanyScreen();
+        screen = const HomeBusCompanyScreen();
+        break;
       case 'khách hàng':
       default:
-        return const HomeUserScreen();
+        screen = const HomeUserScreen();
     }
+    return InternetListener(child: screen);
   }
 }
 

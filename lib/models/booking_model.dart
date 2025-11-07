@@ -64,6 +64,20 @@ class MBooking {
     };
   }
 
+  Map<String, dynamic> toMapLocaldb() {
+    return <String, dynamic>{
+      'user_id': userId,
+      'trip_id': tripId,
+      'total_price': totalPrice,
+      'status': status,
+      'payment_method': paymentMethod,
+      'created_at': createdAt?.toIso8601String(),
+      'seats': seats,
+      'booking_code': bookingCode,
+      'is_mail_sended': (isMailSended ?? false) ? 1 : 0,
+    };
+  }
+
   factory MBooking.fromMap(Map<String, dynamic> map) {
     return MBooking(
       id: map['id'] != null ? map['id'] as int : null,

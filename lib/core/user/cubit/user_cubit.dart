@@ -22,6 +22,16 @@ class UserCubit extends Cubit<UserState> {
     }
   }
 
+  Future<void> loadAllUser() async {
+    try {
+      emit(UserLoading());
+      final users = await _userService.getAllUsers();
+      emit(MultiUserLoaded(users));
+    } catch (e) {
+      emit(UserError(e.toString()));
+    }
+  }
+
   Future<void> updateUserProfile(Map<String, dynamic> data) async {
     if (state is UserLoaded) {
       final currentUser = (state as UserLoaded).user;

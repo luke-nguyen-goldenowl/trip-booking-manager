@@ -1,5 +1,7 @@
 import 'package:bus_ticket_app/core/company/cubit/company_cubit.dart';
+import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
+import 'package:bus_ticket_app/core/user/user_local_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:bus_ticket_app/models/trip_model.dart';
@@ -27,17 +29,36 @@ class TripDetailScreen extends StatefulWidget {
 }
 
 class _TripDetailScreenState extends State<TripDetailScreen> {
+  String companyName = '';
+  String companyEmail = '';
+  String companyPhone = '';
+  bool isOnline = false;
   @override
   void initState() {
     super.initState();
     _loadCompanyInfo();
   }
 
-  void _loadCompanyInfo() {
+  Future<void> _loadCompanyInfo() async {
     try {
-      context.read<CompanyCubit>().loadCompanyById(widget.bus.companyId!);
+      final internetState = context.read<InternetConnectionCubit>().state;
+      if (internetState == InternetStatusState.connected) {
+        isOnline = true;
+      }
+      if (isOnline) {
+        context.read<CompanyCubit>().loadCompanyById(widget.bus.companyId!);
+      } else {
+        final companyUser = await UserLocalDatabase().getCompanyUserById(
+          widget.bus.companyId!,
+        );
+        setState(() {
+          companyName = companyUser?.fullName ?? '';
+          companyEmail = companyUser?.email ?? '';
+          companyPhone = companyUser?.phone ?? '';
+        });
+      }
     } catch (e) {
-      throw Exception(e);
+      throw Exception('Lỗi khi tải thông tin nhà xe');
     }
   }
 
@@ -54,13 +75,14 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
             : 'N/A';
     return BlocBuilder<CompanyCubit, UserState>(
       builder: (context, state) {
-        String companyName = '';
-        String companyEmail = '';
-        String companyPhone = '';
-        if (state is UserLoaded) {
-          companyName = state.user.fullName!;
-          companyEmail = state.user.email!;
-          companyPhone = state.user.phone!;
+        if (isOnline && state is UserLoaded) {
+          companyName = state.user.fullName ?? 'N/A';
+          companyEmail = state.user.email ?? 'N/A';
+          companyPhone = state.user.phone ?? 'N/A';
+        } else if (!isOnline && state is UserLoaded) {
+          companyName = companyName;
+          companyEmail = companyEmail;
+          companyPhone = companyPhone;
         }
         return Scaffold(
           backgroundColor: Colors.grey.shade50,
@@ -155,6 +177,40 @@ class _TripDetailScreenState extends State<TripDetailScreen> {
               SliverToBoxAdapter(
                 child: Column(
                   children: [
+                    BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+                      builder: (context, internetState) {
+                        if (internetState == InternetStatusState.disconnected) {
+                          return Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 16,
+                            ),
+                            color: Colors.orange.shade100,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.cloud_off,
+                                  color: Colors.orange.shade700,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    'Bạn đang ở chế độ ngoại tuyến.',
+                                    style: TextStyle(
+                                      color: Colors.orange.shade700,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                     const SizedBox(height: 16),
                     Container(
                       margin: const EdgeInsets.symmetric(
