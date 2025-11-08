@@ -4,12 +4,15 @@ import 'package:bus_ticket_app/core/booking/cubit/booking_cubit.dart';
 import 'package:bus_ticket_app/core/company/cubit/company_cubit.dart';
 import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
 import 'package:bus_ticket_app/core/network/internet_connection_listener.dart';
+import 'package:bus_ticket_app/core/notification/device_token_service.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'firebase_options.dart';
 import 'config/db/supabase.dart';
 import 'package:bus_ticket_app/routes/route.dart';
@@ -43,6 +46,14 @@ void main() async {
   await initializeSupabase();
   await initializeDateFormatting('vi', null);
   HttpOverrides.global = MyHttpOverrides();
+  DeviceTokenService tokenService = DeviceTokenService();
+  FirebaseMessaging.instance.onTokenRefresh.listen((token) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getInt("userId");
+    if (userId != null) {
+      await tokenService.saveDeviceToken(userId);
+    }
+  });
   runApp(const MyApp());
 }
 

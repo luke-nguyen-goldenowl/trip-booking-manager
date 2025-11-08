@@ -300,7 +300,7 @@ class _ProfileUserScreenState extends State<ProfileUserScreen> {
                       ).redacted(context: context, redact: isLoading),
                       const SizedBox(height: 30),
 
-                      const LogoutButton(),
+                      LogoutButton(),
                     ],
                   ),
                 ),

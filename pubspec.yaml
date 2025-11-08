@@ -57,11 +57,12 @@ dependencies:
   sqflite_common_ffi: ^2.3.6
   flutter_launcher_icons: ^0.14.4
   firebase_crashlytics: ^5.0.4
+  firebase_messaging: ^16.0.4
 
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/logo.jpg"
 
 dev_dependencies:
   flutter_test:

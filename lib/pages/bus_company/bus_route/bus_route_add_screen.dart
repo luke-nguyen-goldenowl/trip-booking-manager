@@ -316,7 +316,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      autofocus: true,
+                      autofocus: false,
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm...',
                         prefixIcon: const Icon(Icons.search),
@@ -498,11 +498,13 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
           children: [
             Icon(icon, color: isSelected ? color : Colors.grey, size: 20),
             const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? color : Colors.grey[700],
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? color : Colors.grey[700],
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           ],

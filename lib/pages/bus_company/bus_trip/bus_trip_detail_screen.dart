@@ -66,6 +66,8 @@ class _BusTripDetailScreenState extends State<BusTripDetailScreen> {
           const SizedBox(height: 16),
           TripRevenueCard(trip: widget.trip),
           const SizedBox(height: 16),
+          _buildBookedUsersButton(),
+          const SizedBox(height: 16),
           _buildSeatMapSection(),
           const SizedBox(height: 16),
         ],
@@ -117,6 +119,55 @@ class _BusTripDetailScreenState extends State<BusTripDetailScreen> {
                 'Không có sơ đồ ghế',
                 style: TextStyle(fontSize: 16, color: Colors.grey[600]),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBookedUsersButton() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: InkWell(
+        onTap: () {
+          context.push(
+            '/home-bus-company/bus-trip-detail/bus-trip-booked-users',
+            extra: widget.trip,
+          );
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.orange[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.people, color: Colors.orange[800], size: 28),
+              ),
+              const SizedBox(width: 16),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Danh sách khách hàng',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF00424B),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.arrow_forward_ios, color: Colors.grey[400], size: 20),
             ],
           ),
         ),

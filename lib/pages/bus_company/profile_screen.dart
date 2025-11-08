@@ -265,7 +265,7 @@ class _ProfileBusCompanyScreenState extends State<ProfileBusCompanyScreen> {
                       ).redacted(context: context, redact: isLoading),
                       const SizedBox(height: 30),
 
-                      const LogoutButton(),
+                      LogoutButton(),
                     ],
                   ),
                 ),
@@ -388,6 +388,13 @@ class _ProfileBusCompanyScreenState extends State<ProfileBusCompanyScreen> {
                     const SnackBar(
                       content: Text('Cập nhật thông tin thành công!'),
                       backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Giá trị không được để trống!'),
+                      backgroundColor: Colors.red,
                     ),
                   );
                 }

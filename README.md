@@ -93,6 +93,10 @@
   - Common widget start with `X`: XButton, XText, XAppbar... - These widgets under folder `lib/widgets/`
   - App Constants class or service start with `Add`: AppStyles, AppColor, AppRouter, AppCoordinator,.. and UserPrefs
 
+## Architecture diagram
+
+![Diagram](resources/images/diagram/architecture_diagram.png)
+
 ## Database diagram
 
 ![Diagram](resources/images/diagram/db_diagram.png)
