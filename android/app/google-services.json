@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:530949737565:android:ab4dadb168c3f7ec0751b4",
         "android_client_info": {
-          "package_name": "com.example.bus_ticket_app"
+          "package_name": "com.felix.bus_ticket_app"
         }
       },
       "oauth_client": [
