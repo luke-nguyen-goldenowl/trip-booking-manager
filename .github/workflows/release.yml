@@ -37,6 +37,10 @@ jobs:
 
       - name: Download pub dependencies
         run: flutter pub get
+
+      - name: Create empty .env for analyzer
+        run: echo "" > .env
+
       - name: Run analyzer
         run: flutter analyze
 
