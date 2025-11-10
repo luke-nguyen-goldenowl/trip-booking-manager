@@ -42,6 +42,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
     loadUser();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   Future<void> loadUser() async {
     UserService userService = UserService();
     userId = (await userService.getUserIdFromLocal())!;
@@ -85,12 +90,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
               },
             );
           } else if (state is BookingError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: Colors.red,
-              ),
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
           }
         },
         child: Column(
@@ -303,10 +310,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
       context.read<BookingCubit>().createBooking(booking);
     } else {
       try {
+        if (!mounted) return;
         setState(() {
           isLoading = true;
         });
         await BookingLocalDatabase().saveOfflineBooking(booking);
+
         if (!mounted) return;
         DialogHelper.showSuccess(
           context,
@@ -314,19 +323,26 @@ class _PaymentScreenState extends State<PaymentScreen> {
           message:
               'Vé của bạn đã được lưu ngoại tuyến. Vui lòng kết nối Internet để tiếp tục thanh toán.',
         );
+        if (!mounted) return;
         setState(() {
           isLoading = false;
         });
-        Future.delayed(const Duration(seconds: 4), () {
-          context.go('/tickets');
-        });
+        await Future.delayed(const Duration(seconds: 4));
+        if (!mounted) return;
+
+        context.go('/tickets');
       } catch (e) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Lỗi khi lưu vé ngoại tuyến $e'),
             backgroundColor: Colors.red,
           ),
         );
+        if (!mounted) return;
+        setState(() {
+          isLoading = false;
+        });
       }
     }
   }
