@@ -100,52 +100,50 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: SafeArea(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(),
-                BlocBuilder<InternetConnectionCubit, InternetStatusState>(
-                  builder: (context, internetState) {
-                    if (internetState == InternetStatusState.disconnected) {
-                      return Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ),
-                        color: Colors.orange.shade100,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.cloud_off,
-                              color: Colors.orange.shade700,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Bạn đang ở chế độ ngoại tuyến.',
-                                style: TextStyle(
-                                  color: Colors.orange.shade700,
-                                  fontSize: 13,
-                                ),
+        body: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+                builder: (context, internetState) {
+                  if (internetState == InternetStatusState.disconnected) {
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      color: Colors.orange.shade100,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.cloud_off,
+                            color: Colors.orange.shade700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Bạn đang ở chế độ ngoại tuyến.',
+                              style: TextStyle(
+                                color: Colors.orange.shade700,
+                                fontSize: 13,
                               ),
                             ),
-                          ],
-                        ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
-                const SizedBox(height: 10),
-                _buildSearchSection(),
-                const SizedBox(height: 10),
-                _buildPopularDestinationsSection(),
-              ],
-            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+              const SizedBox(height: 10),
+              _buildSearchSection(),
+              const SizedBox(height: 10),
+              _buildPopularDestinationsSection(),
+            ],
           ),
         ),
       ),

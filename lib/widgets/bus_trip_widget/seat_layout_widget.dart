@@ -147,7 +147,7 @@ class _SeatLayoutWidgetState extends State<SeatLayoutWidget> {
 
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.grey.shade300, width: 2),
           borderRadius: BorderRadius.circular(12),

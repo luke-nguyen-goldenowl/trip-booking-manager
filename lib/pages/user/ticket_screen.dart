@@ -74,260 +74,258 @@ class _MyTicketScreenState extends State<MyTicketScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Vé Của Tôi',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-          backgroundColor: Color(0xFF004049),
-          bottom: TabBar(
-            controller: _tabController,
-            indicatorColor: Colors.white,
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            tabs: const [
-              Tab(text: 'Vé đã đặt'),
-              Tab(text: 'Đã thanh toán'),
-              Tab(text: 'Vé đã hủy'),
-            ],
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Vé Của Tôi',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
-        body: BlocConsumer<BookingCubit, BookingState>(
-          listener: (context, state) {
-            if (state is BookingSuccess) {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder:
-                    (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade50,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.check_circle,
-                              color: Colors.green.shade600,
-                              size: 48,
-                            ),
+        centerTitle: true,
+        backgroundColor: Color(0xFF004049),
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: Colors.white,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          tabs: const [
+            Tab(text: 'Vé đã đặt'),
+            Tab(text: 'Đã thanh toán'),
+            Tab(text: 'Vé đã hủy'),
+          ],
+        ),
+      ),
+      body: BlocConsumer<BookingCubit, BookingState>(
+        listener: (context, state) {
+          if (state is BookingSuccess) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder:
+                  (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade50,
+                            shape: BoxShape.circle,
                           ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Đặt vé thành công!',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.green.shade600,
+                            size: 48,
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Vé của bạn đã được xác nhận',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Đặt vé thành công!',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
-                        ],
-                      ),
-                      actions: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _loadTickets();
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green.shade600,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'OK',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Vé của bạn đã được xác nhận',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       ],
                     ),
-              );
-            }
-            if (state is BookingError) {
-              showDialog(
-                context: context,
-                builder:
-                    (context) => AlertDialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Colors.red.shade50,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.error_outline,
-                              color: Colors.red.shade600,
-                              size: 48,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Thất bại',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            state.message,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                      actions: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red.shade600,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            child: const Text(
-                              'Đóng',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-              );
-            }
-          },
-          builder: (context, state) {
-            return Column(
-              children: [
-                BlocBuilder<InternetConnectionCubit, InternetStatusState>(
-                  builder: (context, internetState) {
-                    if (internetState == InternetStatusState.disconnected) {
-                      return Container(
+                    actions: [
+                      SizedBox(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 8,
-                          horizontal: 16,
-                        ),
-                        color: Colors.orange.shade100,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.cloud_off,
-                              color: Colors.orange.shade700,
-                              size: 20,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _loadTickets();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green.shade600,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                'Bạn đang ở chế độ ngoại tuyến',
-                                style: TextStyle(
-                                  color: Colors.orange.shade700,
-                                  fontSize: 13,
-                                ),
+                          ),
+                          child: const Text(
+                            'OK',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+            );
+          }
+          if (state is BookingError) {
+            showDialog(
+              context: context,
+              builder:
+                  (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.error_outline,
+                            color: Colors.red.shade600,
+                            size: 48,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Thất bại',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          state.message,
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red.shade600,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: const Text(
+                            'Đóng',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+            );
+          }
+        },
+        builder: (context, state) {
+          return Column(
+            children: [
+              BlocBuilder<InternetConnectionCubit, InternetStatusState>(
+                builder: (context, internetState) {
+                  if (internetState == InternetStatusState.disconnected) {
+                    return Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 16,
+                      ),
+                      color: Colors.orange.shade100,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.cloud_off,
+                            color: Colors.orange.shade700,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Bạn đang ở chế độ ngoại tuyến',
+                              style: TextStyle(
+                                color: Colors.orange.shade700,
+                                fontSize: 13,
                               ),
                             ),
-                          ],
-                        ),
-                      );
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+              Expanded(
+                child: BlocBuilder<BookingCubit, BookingState>(
+                  builder: (context, state) {
+                    if (state is BookingLoading) {
+                      return buildSkeletonLoading();
                     }
-                    return const SizedBox.shrink();
+                    if (state is BookingListLoaded) {
+                      onlineTickets = state.bookings;
+                    }
+
+                    final allBookings = [...offlineTickets, ...onlineTickets];
+
+                    final activeTickets =
+                        allBookings
+                            .where(
+                              (booking) =>
+                                  booking.status == 'completed' &&
+                                  booking.paymentStatus == 'pending',
+                            )
+                            .toList();
+                    final completedTickets =
+                        allBookings
+                            .where(
+                              (booking) =>
+                                  booking.status == 'completed' &&
+                                  booking.paymentStatus == 'completed',
+                            )
+                            .toList();
+
+                    final cancelledTickets =
+                        allBookings
+                            .where((booking) => booking.status == 'cancelled')
+                            .toList();
+
+                    return TabBarView(
+                      controller: _tabController,
+                      children: [
+                        _buildListTickets(activeTickets),
+                        _buildListTickets(completedTickets),
+                        _buildListTickets(cancelledTickets),
+                      ],
+                    );
                   },
                 ),
-                Expanded(
-                  child: BlocBuilder<BookingCubit, BookingState>(
-                    builder: (context, state) {
-                      if (state is BookingLoading) {
-                        return buildSkeletonLoading();
-                      }
-                      if (state is BookingListLoaded) {
-                        onlineTickets = state.bookings;
-                      }
-
-                      final allBookings = [...offlineTickets, ...onlineTickets];
-
-                      final activeTickets =
-                          allBookings
-                              .where(
-                                (booking) =>
-                                    booking.status == 'completed' &&
-                                    booking.paymentStatus == 'pending',
-                              )
-                              .toList();
-                      final completedTickets =
-                          allBookings
-                              .where(
-                                (booking) =>
-                                    booking.status == 'completed' &&
-                                    booking.paymentStatus == 'completed',
-                              )
-                              .toList();
-
-                      final cancelledTickets =
-                          allBookings
-                              .where((booking) => booking.status == 'cancelled')
-                              .toList();
-
-                      return TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildListTickets(activeTickets),
-                          _buildListTickets(completedTickets),
-                          _buildListTickets(cancelledTickets),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
