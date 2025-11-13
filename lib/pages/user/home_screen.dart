@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -300,116 +300,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
             ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                const Icon(Icons.people, color: Colors.purple, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Số hành khách',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color:
-                              _passengerCount > 0 ? Colors.black : Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                if (_passengerCount > 0) {
-                                  _passengerCount--;
-                                }
-                              });
-                            },
-                            child: Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color:
-                                    _passengerCount > 0
-                                        ? Colors.orange
-                                        : Colors.grey.shade300,
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    blurRadius: 2,
-                                    offset: const Offset(0, 1),
-                                  ),
-                                ],
-                              ),
-                              child: Icon(
-                                Icons.remove,
-                                color:
-                                    _passengerCount > 0
-                                        ? Colors.white
-                                        : Colors.grey,
-                                size: 18,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: 50,
-                            height: 32,
-                            margin: const EdgeInsets.symmetric(horizontal: 8),
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade50,
-                              border: Border.all(color: Colors.grey.shade300),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Center(
-                              child: Text(
-                                '$_passengerCount',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _passengerCount++;
-                              });
-                            },
-                            child: Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                color: Colors.orange,
-                                borderRadius: BorderRadius.circular(8),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.orange.withOpacity(0.3),
-                                    blurRadius: 3,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.add,
-                                color: Colors.white,
-                                size: 18,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
             const SizedBox(height: 16),
+            _buildPassengerCountSelector(
+              label: 'Số hành khách',
+              icon: Icons.people,
+              onSelect: (count) {
+                setState(() {
+                  _passengerCount = count;
+                });
+              },
+            ),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -425,7 +326,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child:
                     isLoading
-                        ? const CircularProgressIndicator()
+                        ? SizedBox(
+                          width: 23,
+                          height: 23,
+                          child: const CircularProgressIndicator(),
+                        )
                         : const Text(
                           'Tìm chuyến xe',
                           style: TextStyle(
@@ -588,10 +493,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: InputDecorator(
         decoration: InputDecoration(
           labelText: label,
-          prefixIcon: Icon(
-            icon,
-            color: label == 'Điểm đi' ? Colors.green : Colors.red,
-          ),
+          prefixIcon: Icon(icon, color: Colors.blue),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
           filled: true,
           fillColor: Colors.grey[50],
@@ -620,6 +522,88 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Widget _buildPassengerCountSelector({
+    required String label,
+    required IconData icon,
+    required Function(int) onSelect,
+  }) {
+    return InputDecorator(
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon, color: Colors.purple),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        filled: true,
+        fillColor: Colors.grey[50],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 50,
+            height: 32,
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              border: Border.all(color: Colors.grey.shade300),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                '$_passengerCount',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          GestureDetector(
+            onTap: () {
+              if (_passengerCount >= 1) {
+                setState(() {
+                  _passengerCount--;
+                });
+                onSelect(_passengerCount);
+              }
+            },
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color:
+                    _passengerCount > 0 ? Colors.orange : Colors.grey.shade300,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                Icons.remove,
+                color: _passengerCount > 0 ? Colors.white : Colors.grey,
+                size: 18,
+              ),
+            ),
+          ),
+          const SizedBox(width: 20),
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                _passengerCount++;
+              });
+              onSelect(_passengerCount);
+            },
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.add, color: Colors.white, size: 18),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildPopularDestinationsSection() {
     return BlocBuilder<BusTripCubit, BusTripState>(
       builder: (context, state) {
@@ -631,7 +615,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         }
-        if (state is BusTripLoaded) {
+        if (state is PopularTripLoaded) {
           _popularTrips = state.trips;
         }
         return Padding(

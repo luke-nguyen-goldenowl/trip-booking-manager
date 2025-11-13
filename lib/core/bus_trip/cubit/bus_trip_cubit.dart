@@ -14,7 +14,7 @@ class BusTripCubit extends Cubit<BusTripState> {
       final trips = await _busTripService.getTripsByCompany(companyId);
       emit(BusTripLoaded(trips));
     } catch (e) {
-      emit(BusTripError(e.toString()));
+      emit(BusTripError('Không thể tải danh sách chuyến đi'));
     }
   }
 
@@ -24,7 +24,7 @@ class BusTripCubit extends Cubit<BusTripState> {
       final trips = await _busTripService.getAllTrips();
       emit(BusTripLoaded(trips));
     } catch (e) {
-      emit(BusTripError(e.toString()));
+      emit(BusTripError('Không thể tải danh sách tất cả chuyến đi'));
     }
   }
 
@@ -38,7 +38,7 @@ class BusTripCubit extends Cubit<BusTripState> {
         emit(BusTripLoaded([]));
       }
     } catch (e) {
-      emit(BusTripError(e.toString()));
+      emit(BusTripError('Không thể tạo chuyến đi'));
     }
   }
 
@@ -52,7 +52,7 @@ class BusTripCubit extends Cubit<BusTripState> {
         emit(BusTripLoaded([]));
       }
     } catch (e) {
-      emit(BusTripError(e.toString()));
+      emit(BusTripError('Không thể cập nhật chuyến đi'));
     }
   }
 
@@ -63,7 +63,7 @@ class BusTripCubit extends Cubit<BusTripState> {
       emit(BusTripDeleted([]));
       await loadTrips(companyId);
     } catch (e) {
-      emit(BusTripError(e.toString()));
+      emit(BusTripError('Không thể xóa chuyến đi'));
     }
   }
 
@@ -80,7 +80,7 @@ class BusTripCubit extends Cubit<BusTripState> {
         arrivalTime: arrivalTime,
       );
     } catch (e) {
-      emit(BusTripError(e.toString()));
+      emit(BusTripError('Không thể kiểm tra tình trạng xe'));
       return false;
     }
   }
@@ -89,9 +89,9 @@ class BusTripCubit extends Cubit<BusTripState> {
     try {
       emit(BusTripLoading());
       final trips = await _busTripService.getRandomTrips(limit);
-      emit(BusTripLoaded(trips));
+      emit(PopularTripLoaded(trips));
     } catch (e) {
-      emit(BusTripError(e.toString()));
+      emit(BusTripError('Không thể tải danh sách chuyến đi'));
     }
   }
 
@@ -101,7 +101,7 @@ class BusTripCubit extends Cubit<BusTripState> {
       final users = await _busTripService.fetchBookedUsers(tripId);
       emit(BookedUsersLoaded(users));
     } catch (e) {
-      emit(BookedUsersError(e.toString()));
+      emit(BookedUsersError('Không thể tải danh sách người dùng đã đặt'));
     }
   }
 }

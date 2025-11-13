@@ -10,38 +10,13 @@ class GetStartedV1 extends StatefulWidget {
   static final List<SocialLoginOption> _socialLoginOptions = [
     SocialLoginOption(
       id: 'google',
-      label: 'Google',
+      label: 'Đăng nhập với Google',
       icon: Image.asset(
         'assets/images/google.png',
         width: 24,
         height: 24,
         fit: BoxFit.cover,
       ),
-    ),
-    SocialLoginOption(
-      id: 'facebook',
-      label: 'Facebook',
-      icon: Image.asset(
-        'assets/images/facebook.png',
-        width: 24,
-        height: 24,
-        fit: BoxFit.cover,
-      ),
-    ),
-    SocialLoginOption(
-      id: 'apple',
-      label: 'Apple',
-      icon: Image.asset(
-        'assets/images/apple-logo.png',
-        width: 24,
-        height: 24,
-        fit: BoxFit.cover,
-      ),
-    ),
-    const SocialLoginOption(
-      id: 'phone',
-      label: 'Phone',
-      icon: Icon(Icons.smartphone, color: Colors.black, size: 24),
     ),
   ];
 
@@ -130,7 +105,7 @@ class _GetStartedV1State extends State<GetStartedV1> {
                       ),
                     ),
                     child: const Text(
-                      'Đăng Nhập',
+                      'Bắt Đầu',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -140,7 +115,7 @@ class _GetStartedV1State extends State<GetStartedV1> {
                   ),
                   const SizedBox(height: 12.0),
                   const Text(
-                    'hoặc đăng nhập bằng',
+                    'hoặc',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white54, fontSize: 14),
                   ),

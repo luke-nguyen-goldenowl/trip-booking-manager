@@ -61,6 +61,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           'Phương thức thanh toán',
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
+        centerTitle: true,
         backgroundColor: Color(0xFF00424B),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),

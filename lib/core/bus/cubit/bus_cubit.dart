@@ -14,7 +14,7 @@ class BusCubit extends Cubit<BusState> {
       final buses = await _busService.getBusesByCompany(companyId);
       emit(BusLoaded(buses));
     } catch (e) {
-      emit(BusError(e.toString()));
+      emit(BusError('Không thể tải danh sách xe'));
     }
   }
 
@@ -24,7 +24,7 @@ class BusCubit extends Cubit<BusState> {
       final buses = await _busService.getAllBuses();
       emit(BusLoaded(buses));
     } catch (e) {
-      emit(BusError(e.toString()));
+      emit(BusError('Không thể tải danh sách xe'));
     }
   }
 
@@ -34,7 +34,7 @@ class BusCubit extends Cubit<BusState> {
       await _busService.createBus(bus);
       await loadBuses(bus.companyId!);
     } catch (e) {
-      emit(BusError(e.toString()));
+      emit(BusError('Không thể tạo xe'));
     }
   }
 
@@ -44,7 +44,7 @@ class BusCubit extends Cubit<BusState> {
       await _busService.updateBus(busId, bus);
       await loadBuses(bus.companyId!);
     } catch (e) {
-      emit(BusError(e.toString()));
+      emit(BusError('Không thể cập nhật xe'));
     }
   }
 
@@ -55,7 +55,7 @@ class BusCubit extends Cubit<BusState> {
       final buses = await _busService.getBusesByCompany(companyId);
       emit(BusDeleted(buses));
     } catch (e) {
-      emit(BusError(e.toString()));
+      emit(BusError('Không thể xóa xe'));
     }
   }
 

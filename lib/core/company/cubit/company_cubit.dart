@@ -13,7 +13,7 @@ class CompanyCubit extends Cubit<UserState> {
       final company = await _userService.getUserbyId(companyId);
       emit(UserLoaded(company!));
     } catch (e) {
-      emit(UserError(e.toString()));
+      emit(UserError('Lỗi'));
     }
   }
 }

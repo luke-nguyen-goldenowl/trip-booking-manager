@@ -14,7 +14,7 @@ class BusRouteCubit extends Cubit<BusRouteState> {
       final routes = await _busRouteService.getRoutesByCompany(companyId);
       emit(BusRouteLoaded(routes));
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể tải danh sách tuyến đường'));
     }
   }
 
@@ -24,7 +24,7 @@ class BusRouteCubit extends Cubit<BusRouteState> {
       final routes = await _busRouteService.getAllRoutes();
       emit(BusRouteLoaded(routes));
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể tải danh sách tất cả tuyến đường'));
     }
   }
 
@@ -34,7 +34,7 @@ class BusRouteCubit extends Cubit<BusRouteState> {
       await _busRouteService.createRoute(route);
       await loadRoutes(route.companyId!);
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể tạo tuyến đường'));
     }
   }
 
@@ -44,7 +44,7 @@ class BusRouteCubit extends Cubit<BusRouteState> {
       await _busRouteService.updateRoute(routeId, route);
       await loadRoutes(route.companyId!);
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể cập nhật tuyến đường'));
     }
   }
 
@@ -55,7 +55,7 @@ class BusRouteCubit extends Cubit<BusRouteState> {
       final routes = await _busRouteService.getRoutesByCompany(companyId);
       emit(BusRouteDeleted(routes));
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError("Không thể xóa tuyến đường"));
     }
   }
 

@@ -8,6 +8,7 @@ import 'package:bus_ticket_app/core/notification/device_token_service.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -54,6 +55,12 @@ void main() async {
       await tokenService.saveDeviceToken(userId);
     }
   });
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    if (message.data['route'] == '/tickets') {
+      router.go('/tickets');
+    }
+  });
+
   runApp(const MyApp());
 }
 
@@ -74,7 +81,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
-        title: 'Bus Ticket App',
+        title: 'GoBus',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00424B)),
         ),

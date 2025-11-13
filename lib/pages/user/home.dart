@@ -7,6 +7,6 @@ class HomeUserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(child: Scaffold(body: MainScaffold(child: HomeScreen())));
+    return Scaffold(body: MainScaffold(child: HomeScreen()));
   }
 }

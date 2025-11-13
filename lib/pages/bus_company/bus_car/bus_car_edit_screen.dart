@@ -102,6 +102,9 @@ class _BusCarEditScreenState extends State<BusCarEditScreen> {
           duration: Duration(seconds: 2),
         ),
       );
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.pop();
+      });
     }
 
     if (state is BusError) {

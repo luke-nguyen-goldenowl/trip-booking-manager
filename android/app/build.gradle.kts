@@ -18,7 +18,7 @@ plugins {
 }
 
 android {
-    namespace = "com.felix.bus_ticket_app"
+    namespace = "com.example.bus_ticket_app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -33,13 +33,13 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.felix.bus_ticket_app"
+        applicationId = "com.example.bus_ticket_app"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = 23
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.1"
+        versionCode = 4
+        versionName = "1.0.2"
     }
 
     signingConfigs {

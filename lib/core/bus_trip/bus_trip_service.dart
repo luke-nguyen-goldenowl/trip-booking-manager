@@ -131,7 +131,7 @@ class BusTripService {
           .map((booking) => booking as Map<String, dynamic>)
           .toList();
     } catch (e) {
-      throw Exception('Không thể tải danh sách khách hàng: ${e.toString()}');
+      throw Exception('Không thể tải danh sách khách hàng');
     }
   }
 }

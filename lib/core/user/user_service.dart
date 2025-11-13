@@ -1,3 +1,4 @@
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bus_ticket_app/models/user_model.dart' as user_model;
@@ -38,6 +39,16 @@ class UserService {
 
   Future<String?> uploadAvatar(String email, Uint8List imageBytes) async {
     try {
+      final Uint8List resizedBytes =
+          await FlutterImageCompress.compressWithList(
+            imageBytes,
+            minWidth: 512,
+            minHeight: 512,
+            quality: 85,
+            format: CompressFormat.jpeg,
+            keepExif: false,
+            autoCorrectionAngle: true,
+          );
       final String fileName =
           'avatar_${email.replaceAll('@', '_').replaceAll('.', '_')}_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final String path = fileName;
@@ -45,7 +56,7 @@ class UserService {
           .from('avatar')
           .uploadBinary(
             path,
-            imageBytes,
+            resizedBytes,
             fileOptions: const FileOptions(
               cacheControl: '3600',
               upsert: true,

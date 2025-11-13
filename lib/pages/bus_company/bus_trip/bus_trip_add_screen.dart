@@ -34,11 +34,11 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
   TimeOfDay? _departureTime;
   DateTime? _arrivalDate;
   TimeOfDay? _arrivalTime;
-  BusTripStatus _selectedStatus = BusTripStatus.scheduled;
   List<MRoute> _activeRoutes = [];
   List<MBus> _activeBuses = [];
   final _priceController = TextEditingController();
   int? price;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -88,6 +88,9 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
           duration: Duration(seconds: 2),
         ),
       );
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.pop();
+      });
     } else if (state is BusTripError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -154,8 +157,6 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
           _buildDateTimeCard(),
           const SizedBox(height: 16),
           _buildCardPrice(),
-          const SizedBox(height: 10),
-          _buildStatusCard(),
           const SizedBox(height: 24),
           _buildActionButtons(user.id),
         ],
@@ -492,72 +493,6 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
     );
   }
 
-  Widget _buildStatusCard() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.info, color: Colors.orange),
-                const SizedBox(width: 8),
-                const Text(
-                  'Trạng thái',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF00424B),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<BusTripStatus>(
-              value: _selectedStatus,
-              decoration: InputDecoration(
-                labelText: 'Trạng thái chuyến đi *',
-                prefixIcon: const Icon(Icons.flag),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
-              ),
-              items:
-                  BusTripStatus.values.map((status) {
-                    return DropdownMenuItem(
-                      value: status,
-                      child: Row(
-                        children: [
-                          Icon(
-                            BusHelper.getTripStatusIcon(status),
-                            size: 20,
-                            color: BusHelper.getTripStatusColor(status),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(BusHelper.getTripStatusName(status)),
-                        ],
-                      ),
-                    );
-                  }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedStatus = value;
-                  });
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildActionButtons(int companyId) {
     return Row(
       children: [
@@ -589,10 +524,20 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              'Thêm chuyến đi',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
+            child:
+                _isLoading
+                    ? SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: const CircularProgressIndicator(),
+                    )
+                    : Text(
+                      'Thêm chuyến đi',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
           ),
         ),
       ],
@@ -621,10 +566,19 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isDeparture) async {
+    final DateTime firstDate =
+        isDeparture ? DateTime.now() : (_departureDate ?? DateTime.now());
+    final DateTime initial =
+        isDeparture
+            ? (_departureDate ?? DateTime.now())
+            : (_arrivalDate != null && _arrivalDate!.isAfter(firstDate)
+                ? _arrivalDate!
+                : firstDate);
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      initialDate: initial,
+      firstDate: firstDate,
       lastDate: DateTime.now().add(const Duration(days: 60)),
     );
     if (picked != null) {
@@ -675,7 +629,7 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
         companyId: companyId,
         departureTime: departureDateTime,
         arrivalTime: arrivalDateTime,
-        status: _selectedStatus,
+        status: BusTripStatus.scheduled,
         seatLayout: seatLayout,
         price: price!,
       );
@@ -700,7 +654,6 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
       _departureTime = null;
       _arrivalDate = null;
       _arrivalTime = null;
-      _selectedStatus = BusTripStatus.scheduled;
     });
     _formKey.currentState?.reset();
   }
@@ -769,13 +722,30 @@ class _BusTripAddScreenState extends State<BusTripAddScreen> {
   }
 
   void _submitForm(int companyId) async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
     final isValid = await _checkValidation(companyId);
-    if (!isValid) return;
+    if (!isValid) {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+      return;
+    }
     await _loadSeatLayoutAndCreateTrip(
       _departureDateTime,
       _arrivalDateTime,
       companyId,
     );
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   DateTime _buildDateTime(DateTime date, TimeOfDay time) {

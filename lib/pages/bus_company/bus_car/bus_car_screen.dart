@@ -104,11 +104,11 @@ class _BusCarScreenState extends State<BusCarScreen> {
             controller: _searchController,
             inputFormatters: [UpperCaseTextFormatter()],
             onChanged: (value) => setState(() {}),
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.black),
             decoration: InputDecoration(
               hintText: 'Tìm kiếm biển số xe...',
-              hintStyle: const TextStyle(color: Colors.white70),
-              prefixIcon: const Icon(Icons.search, color: Colors.white),
+              hintStyle: const TextStyle(color: Colors.black),
+              prefixIcon: const Icon(Icons.search, color: Colors.black),
               suffixIcon:
                   _searchController.text.isNotEmpty
                       ? IconButton(
@@ -121,10 +121,10 @@ class _BusCarScreenState extends State<BusCarScreen> {
                       )
                       : null,
               filled: true,
-              fillColor: Colors.grey[600],
+              fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               contentPadding: const EdgeInsets.symmetric(vertical: 0),
             ),

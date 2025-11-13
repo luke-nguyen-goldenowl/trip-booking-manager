@@ -60,7 +60,7 @@ class SignUpService {
       }
       return e.message ?? 'Có lỗi xảy ra';
     } catch (e) {
-      return 'Có lỗi xảy ra: ${e.toString()}';
+      return 'Có lỗi xảy ra';
     }
   }
 
@@ -78,7 +78,7 @@ class SignUpService {
       }
       return e.message ?? 'Có lỗi xảy ra';
     } catch (e) {
-      return 'Có lỗi xảy ra: ${e.toString()}';
+      return 'Có lỗi xảy ra';
     }
   }
 }

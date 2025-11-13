@@ -130,6 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: _loginWithFirebase,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange,
+                      disabledBackgroundColor: Colors.grey,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -137,7 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child:
                         _isLoading
-                            ? CircularProgressIndicator()
+                            ? SizedBox(
+                              width: 23,
+                              height: 23,
+                              child: CircularProgressIndicator(),
+                            )
                             : Text(
                               'Đăng Nhập',
                               style: TextStyle(
@@ -157,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'hoặc tiếp tục với',
+                          'hoặc',
                           style: TextStyle(color: Colors.white54, fontSize: 14),
                         ),
                       ),
@@ -168,38 +173,31 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildSocialButton('assets/images/google.png', () {
-                        _auth
-                            .signInWithGoogle()
-                            .then((user) {
-                              if (user != null) {
-                                SnackBar(
-                                  content: Text(
-                                    'Chào mừng ${user.user?.displayName}!',
-                                  ),
-                                  backgroundColor: Colors.green,
-                                );
-                                context.go('/home-user');
-                              }
-                            })
-                            .catchError((error) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Đăng nhập Google thất bại: $error',
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            });
-                      }),
-                      _buildSocialButton('assets/images/facebook.png', () {}),
-                      _buildSocialButton('assets/images/apple-logo.png', () {}),
-                    ],
-                  ),
+                  _buildSocialButton('assets/images/google.png', () {
+                    _auth
+                        .signInWithGoogle()
+                        .then((user) {
+                          if (user != null) {
+                            SnackBar(
+                              content: Text(
+                                'Chào mừng ${user.user?.displayName}!',
+                              ),
+                              backgroundColor: Colors.green,
+                            );
+                            context.go('/home-user');
+                          }
+                        })
+                        .catchError((error) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                'Đăng nhập Google thất bại: $error',
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        });
+                  }),
                   const SizedBox(height: 40),
 
                   RichText(
@@ -301,24 +299,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildSocialButton(String imagePath, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 60,
-        height: 60,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Image.asset(
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      onPressed: onTap,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
             imagePath,
             width: 24,
             height: 24,
@@ -327,7 +318,17 @@ class _LoginScreenState extends State<LoginScreen> {
               return const Icon(Icons.image, size: 24, color: Colors.grey);
             },
           ),
-        ),
+          const SizedBox(width: 12),
+          Text(
+            'Đăng nhập với Google',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -366,7 +367,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (result['error'] != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(result['error'] as String),
+            content: Text("Email hoặc mật khẩu không đúng. Vui lòng thử lại."),
             backgroundColor: Colors.red,
           ),
         );

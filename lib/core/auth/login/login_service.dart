@@ -51,7 +51,7 @@ class LoginService {
     } on firebase_auth.FirebaseAuthException catch (e) {
       return {'error': e.message ?? 'Có lỗi xảy ra'};
     } catch (e) {
-      return {'error': 'Có lỗi xảy ra: ${e.toString()}'};
+      return {'error': 'Có lỗi xảy ra'};
     }
   }
 
@@ -80,7 +80,7 @@ class LoginService {
       }
       return {'error': e.message ?? 'Có lỗi xảy ra'};
     } catch (e) {
-      return {'error': 'Có lỗi xảy ra: ${e.toString()}'};
+      return {'error': 'Có lỗi xảy ra'};
     }
   }
 

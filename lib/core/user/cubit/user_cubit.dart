@@ -18,7 +18,7 @@ class UserCubit extends Cubit<UserState> {
         emit(const UserError('Không tìm thấy thông tin người dùng'));
       }
     } catch (e) {
-      emit(UserError('Lỗi: ${e.toString()}'));
+      emit(UserError('Không thể tải thông tin người dùng'));
     }
   }
 
@@ -28,7 +28,7 @@ class UserCubit extends Cubit<UserState> {
       final users = await _userService.getAllUsers();
       emit(MultiUserLoaded(users));
     } catch (e) {
-      emit(UserError(e.toString()));
+      emit(UserError('Không thể tải danh sách người dùng'));
     }
   }
 
@@ -49,7 +49,7 @@ class UserCubit extends Cubit<UserState> {
           );
         }
       } catch (e) {
-        emit(UserError('Lỗi khi cập nhật: ${e.toString()}'));
+        emit(UserError('Không thể cập nhật thông tin người dùng'));
       }
     }
   }
@@ -71,14 +71,12 @@ class UserCubit extends Cubit<UserState> {
           await loadUser(currentEmail);
         }
       } catch (e) {
-        emit(UserError('Lỗi khi tải ảnh lên: ${e.toString()}'));
+        emit(UserError('Không thể tải ảnh lên'));
         try {
           await loadUser(currentEmail);
         } catch (reloadError) {
           emit(
-            UserError(
-              'Lỗi khi tải ảnh lên và tải lại thông tin người dùng: ${reloadError.toString()}',
-            ),
+            UserError('Không thể tải ảnh lên và tải lại thông tin người dùng'),
           );
         }
       }

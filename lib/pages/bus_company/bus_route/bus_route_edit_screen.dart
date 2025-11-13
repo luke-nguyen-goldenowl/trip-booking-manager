@@ -122,6 +122,9 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
           duration: Duration(seconds: 2),
         ),
       );
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.pop();
+      });
     }
 
     if (state is BusRouteError) {

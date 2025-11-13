@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/utils/helper/validation_email.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
@@ -92,6 +93,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     icon: Icons.email,
                     keyboardType: TextInputType.emailAddress,
                     inputFormatters: [LowerCaseTextFormatter()],
+                    validator: (value) {
+                      if (isValidEmail(value?.trim() ?? '')) {
+                        return null;
+                      } else {
+                        return 'Vui lòng nhập địa chỉ email hợp lệ';
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
                   _buildInputField(
@@ -122,6 +130,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: Colors.white70,
                       ),
                     ),
+                    validator: (value) {
+                      if (value != null && value.length >= 6) {
+                        return null;
+                      } else {
+                        return 'Mật khẩu phải có ít nhất 6 ký tự';
+                      }
+                    },
                   ),
                   const SizedBox(height: 16),
 
@@ -144,11 +159,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         color: Colors.white70,
                       ),
                     ),
+                    validator: (value) {
+                      if (value == _passwordController.text) {
+                        return null;
+                      } else {
+                        return 'Mật khẩu xác nhận không khớp';
+                      }
+                    },
                   ),
                   const SizedBox(height: 24),
 
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Checkbox(
                         value: _agreeToTerms,
@@ -207,9 +229,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     child:
                         _isLoading
-                            ? CircularProgressIndicator(
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.white,
+                            ? SizedBox(
+                              width: 23,
+                              height: 23,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
                               ),
                             )
                             : Text(
@@ -267,6 +293,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     bool obscureText = false,
     Widget? suffixIcon,
     List<TextInputFormatter>? inputFormatters,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -286,6 +313,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
           obscureText: obscureText,
           inputFormatters: inputFormatters,
           style: const TextStyle(color: Colors.white),
+          validator: validator,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          onChanged: (value) => setState(() {}),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.white54),

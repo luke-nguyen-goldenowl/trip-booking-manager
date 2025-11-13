@@ -100,7 +100,7 @@ class BookingService {
           .update({'isMailSended': true})
           .eq('id', bookingId);
     } catch (e) {
-      throw Exception('Something went wrong');
+      throw Exception('Lỗi');
     }
   }
 

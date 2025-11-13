@@ -24,7 +24,7 @@ class BookingCubit extends Cubit<BookingState> {
         emit(BookingError('Không thể tạo booking'));
       }
     } catch (e) {
-      emit(BookingError(e.toString()));
+      emit(BookingError('Không thể tạo booking'));
     }
   }
 
@@ -34,7 +34,7 @@ class BookingCubit extends Cubit<BookingState> {
       final bookings = await _bookingService.getBookingbyUserId(userId);
       emit(BookingListLoaded(bookings));
     } catch (e) {
-      emit(BookingError('Lỗi: $e'));
+      emit(BookingError('Không thể tải danh sách đặt chỗ'));
     }
   }
 
@@ -44,7 +44,7 @@ class BookingCubit extends Cubit<BookingState> {
       await _bookingService.cancelBooking(bookingId);
       emit(BookingInitial());
     } catch (e) {
-      emit(BookingError(e.toString()));
+      emit(BookingError('Không thể hủy đặt chỗ'));
     }
   }
 }
