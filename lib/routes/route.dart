@@ -1,4 +1,5 @@
 import 'package:bus_ticket_app/pages/bus_company/bus_home/detail_dashboard_screen.dart';
+import 'package:bus_ticket_app/pages/bus_company/bus_trip/bus_trip_booked_user_screen.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
 import 'package:bus_ticket_app/pages/get_started/get_started_1.dart';
 import 'package:bus_ticket_app/pages/on_boarding/onboarding_screen.dart';
@@ -127,6 +128,11 @@ final GoRouter router = GoRouter(
         final trip = state.extra as MTrip;
         return BusTripDetailScreen(trip: trip);
       },
+    ),
+    GoRoute(
+      path: '/home-bus-company/bus-trip-detail/bus-trip-booked-users',
+      builder:
+          (context, state) => BookedUsersScreen(trip: state.extra as MTrip),
     ),
     GoRoute(
       path: '/home-bus-company/bus-trip-edit',

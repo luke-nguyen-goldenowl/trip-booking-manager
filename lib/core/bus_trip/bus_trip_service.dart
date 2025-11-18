@@ -119,4 +119,19 @@ class BusTripService {
       return null;
     }
   }
+
+  Future<List<Map<String, dynamic>>> fetchBookedUsers(int tripId) async {
+    try {
+      final response = await _supabase
+          .from('bookings')
+          .select('user_id, seats, user:user_id(full_name, email, phone)')
+          .eq('trip_id', tripId);
+
+      return (response as List)
+          .map((booking) => booking as Map<String, dynamic>)
+          .toList();
+    } catch (e) {
+      throw Exception('Không thể tải danh sách khách hàng: ${e.toString()}');
+    }
+  }
 }

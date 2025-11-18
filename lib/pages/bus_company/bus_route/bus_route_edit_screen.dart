@@ -37,6 +37,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
     super.initState();
     _selectedStatus = widget.route.status;
     _distanceController.text = widget.route.distance?.toString() ?? '';
+    distance = widget.route.distance;
     _loadProvinces();
   }
 
@@ -338,7 +339,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
                 const Icon(Icons.local_atm, color: Colors.orange, size: 24),
                 const SizedBox(width: 8),
                 const Text(
-                  'Giá Vé & Khoảng Cách',
+                  'Khoảng Cách',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

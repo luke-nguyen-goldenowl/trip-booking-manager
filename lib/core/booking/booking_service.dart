@@ -352,8 +352,8 @@ class BookingService {
               .single();
       final departureTime = DateTime.parse(trip['departure_time']);
       final currentTime = DateTime.now();
-      if (departureTime.difference(currentTime).inHours < 12) {
-        throw ('Chỉ có thể hủy vé trước giờ khởi hành 12 tiếng');
+      if (departureTime.difference(currentTime).inHours < 3) {
+        throw ('Chỉ có thể hủy vé trước giờ khởi hành 3 tiếng');
       }
       await _supabase
           .from('bookings')
@@ -362,7 +362,7 @@ class BookingService {
       await _handleAfterCancellBooking(bookingId);
     } catch (e) {
       if (e.toString().contains(
-        'Chỉ có thể hủy vé trước giờ khởi hành 12 tiếng',
+        'Chỉ có thể hủy vé trước giờ khởi hành 3 tiếng',
       )) {
         rethrow;
       }

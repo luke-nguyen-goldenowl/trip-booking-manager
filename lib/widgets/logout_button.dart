@@ -1,9 +1,11 @@
+import 'package:bus_ticket_app/core/auth/logout/log_out_service.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
+// ignore: must_be_immutable
 class LogoutButton extends StatelessWidget {
-  const LogoutButton({super.key});
+  LogOutService logOutService = LogOutService();
+  LogoutButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +43,7 @@ class LogoutButton extends StatelessWidget {
           );
 
           if (shouldLogout == true) {
-            await FirebaseAuth.instance.signOut();
+            await logOutService.logout();
             if (context.mounted) {
               context.go('/getstarted');
             }

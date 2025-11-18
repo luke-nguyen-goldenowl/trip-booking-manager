@@ -20,3 +20,15 @@ class BusTripError extends BusTripState {
   final String message;
   BusTripError(this.message);
 }
+
+class BookedUsersLoading extends BusTripState {}
+
+class BookedUsersLoaded extends BusTripState {
+  final List<Map<String, dynamic>> users;
+  BookedUsersLoaded(this.users);
+}
+
+class BookedUsersError extends BusTripState {
+  final String message;
+  BookedUsersError(this.message);
+}
