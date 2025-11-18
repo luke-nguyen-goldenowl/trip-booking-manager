@@ -264,7 +264,7 @@ class _ProfileAdminScreenState extends State<ProfileAdminScreen> {
                       ).redacted(context: context, redact: isLoading),
                       const SizedBox(height: 30),
 
-                      const LogoutButton(),
+                      LogoutButton(),
                     ],
                   ),
                 ),
@@ -387,6 +387,13 @@ class _ProfileAdminScreenState extends State<ProfileAdminScreen> {
                     const SnackBar(
                       content: Text('Cập nhật thông tin thành công!'),
                       backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Giá trị không được để trống!'),
+                      backgroundColor: Colors.red,
                     ),
                   );
                 }

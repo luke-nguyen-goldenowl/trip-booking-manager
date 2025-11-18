@@ -59,7 +59,7 @@ class UserService {
 
       return publicUrl;
     } catch (e) {
-      throw Exception('Không thể tải ảnh lên: ${e.toString()}');
+      throw Exception('Không thể tải ảnh lên');
     }
   }
 

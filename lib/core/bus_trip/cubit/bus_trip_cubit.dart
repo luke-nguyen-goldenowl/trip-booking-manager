@@ -94,4 +94,14 @@ class BusTripCubit extends Cubit<BusTripState> {
       emit(BusTripError(e.toString()));
     }
   }
+
+  Future<void> loadBookedUsers(int tripId) async {
+    try {
+      emit(BookedUsersLoading());
+      final users = await _busTripService.fetchBookedUsers(tripId);
+      emit(BookedUsersLoaded(users));
+    } catch (e) {
+      emit(BookedUsersError(e.toString()));
+    }
+  }
 }

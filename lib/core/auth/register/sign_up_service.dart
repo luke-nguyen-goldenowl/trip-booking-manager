@@ -43,20 +43,42 @@ class SignUpService {
           );
       await userCredential.user?.updateDisplayName(fullName.trim());
       await userCredential.user?.reload();
+      await userCredential.user?.sendEmailVerification();
 
       await _supabase.from('user').insert({
         'email': userCredential.user?.email,
         'full_name': fullName.trim(),
         'phone': phoneNumber.trim(),
-        'role': role.trim(),
+        'role': 'Khách hàng',
         'created_at': DateTime.now().toIso8601String(),
       });
 
       return null;
     } on firebase_auth.FirebaseAuthException catch (e) {
+      if (e.code == 'email-already-in-use') {
+        return 'Email này đã được sử dụng';
+      }
       return e.message ?? 'Có lỗi xảy ra';
     } catch (e) {
-      throw Exception(e);
+      return 'Có lỗi xảy ra: ${e.toString()}';
+    }
+  }
+
+  Future<String?> resendVerificationEmail() async {
+    try {
+      firebase_auth.User? user = _auth.currentUser;
+      if (user != null && !user.emailVerified) {
+        await user.sendEmailVerification();
+        return null;
+      }
+      return 'Không thể gửi email xác nhận';
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      if (e.code == 'too-many-requests') {
+        return 'Quá nhiều yêu cầu. Vui lòng thử lại sau';
+      }
+      return e.message ?? 'Có lỗi xảy ra';
+    } catch (e) {
+      return 'Có lỗi xảy ra: ${e.toString()}';
     }
   }
 }

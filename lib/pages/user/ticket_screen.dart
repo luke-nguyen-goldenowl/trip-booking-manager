@@ -34,7 +34,7 @@ class _MyTicketScreenState extends State<MyTicketScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadTickets();
   }
 
@@ -88,7 +88,11 @@ class _MyTicketScreenState extends State<MyTicketScreen>
             indicatorColor: Colors.white,
             labelColor: Colors.white,
             unselectedLabelColor: Colors.white70,
-            tabs: const [Tab(text: 'Vé đã đặt'), Tab(text: 'Vé đã hủy')],
+            tabs: const [
+              Tab(text: 'Vé đã đặt'),
+              Tab(text: 'Đã thanh toán'),
+              Tab(text: 'Vé đã hủy'),
+            ],
           ),
         ),
         body: BlocConsumer<BookingCubit, BookingState>(
@@ -191,7 +195,7 @@ class _MyTicketScreenState extends State<MyTicketScreen>
                           ),
                           const SizedBox(height: 16),
                           const Text(
-                            'Đặt vé thất bại',
+                            'Thất bại',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -289,7 +293,19 @@ class _MyTicketScreenState extends State<MyTicketScreen>
 
                       final activeTickets =
                           allBookings
-                              .where((booking) => booking.status != 'cancelled')
+                              .where(
+                                (booking) =>
+                                    booking.status == 'completed' &&
+                                    booking.paymentStatus == 'pending',
+                              )
+                              .toList();
+                      final completedTickets =
+                          allBookings
+                              .where(
+                                (booking) =>
+                                    booking.status == 'completed' &&
+                                    booking.paymentStatus == 'completed',
+                              )
                               .toList();
 
                       final cancelledTickets =
@@ -301,6 +317,7 @@ class _MyTicketScreenState extends State<MyTicketScreen>
                         controller: _tabController,
                         children: [
                           _buildListTickets(activeTickets),
+                          _buildListTickets(completedTickets),
                           _buildListTickets(cancelledTickets),
                         ],
                       );

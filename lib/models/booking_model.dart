@@ -6,6 +6,7 @@ class MBooking {
   final int? tripId;
   final int? totalPrice;
   final String? status;
+  final String? paymentStatus;
   final String? paymentMethod;
   final DateTime? createdAt;
   final String? seats;
@@ -17,6 +18,7 @@ class MBooking {
     this.tripId,
     this.totalPrice,
     this.status,
+    this.paymentStatus,
     this.paymentMethod,
     this.createdAt,
     this.seats,
@@ -30,6 +32,7 @@ class MBooking {
     int? tripId,
     int? totalPrice,
     String? status,
+    String? paymentStatus,
     String? paymentMethod,
     DateTime? createdAt,
     String? seats,
@@ -42,6 +45,7 @@ class MBooking {
       tripId: tripId ?? this.tripId,
       totalPrice: totalPrice ?? this.totalPrice,
       status: status ?? this.status,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
       paymentMethod: paymentMethod ?? this.paymentMethod,
       createdAt: createdAt ?? this.createdAt,
       seats: seats ?? this.seats,
@@ -56,6 +60,7 @@ class MBooking {
       'trip_id': tripId,
       'total_price': totalPrice,
       'status': status,
+      'payment_status': paymentStatus,
       'payment_method': paymentMethod,
       'created_at': createdAt?.toIso8601String(),
       'seats': seats,
@@ -70,6 +75,7 @@ class MBooking {
       'trip_id': tripId,
       'total_price': totalPrice,
       'status': status,
+      'payment_status': paymentStatus,
       'payment_method': paymentMethod,
       'created_at': createdAt?.toIso8601String(),
       'seats': seats,
@@ -85,6 +91,10 @@ class MBooking {
       tripId: map['trip_id'] != null ? map['trip_id'] as int : null,
       totalPrice: map['total_price'] != null ? map['total_price'] as int : null,
       status: map['status'] != null ? map['status'] as String : null,
+      paymentStatus:
+          map['payment_status'] != null
+              ? map['payment_status'] as String
+              : null,
       paymentMethod:
           map['payment_method'] != null
               ? map['payment_method'] as String
@@ -108,7 +118,7 @@ class MBooking {
 
   @override
   String toString() {
-    return 'MBooking(id: $id, userId: $userId, tripId: $tripId, totalPrice: $totalPrice, status: $status, paymentMethod: $paymentMethod, createdAt: $createdAt, seats: $seats, bookingCode: $bookingCode, isMailSended: $isMailSended)';
+    return 'MBooking(id: $id, userId: $userId, tripId: $tripId, totalPrice: $totalPrice, status: $status, paymentStatus: $paymentStatus, paymentMethod: $paymentMethod, createdAt: $createdAt, seats: $seats, bookingCode: $bookingCode, isMailSended: $isMailSended)';
   }
 
   @override
@@ -120,6 +130,7 @@ class MBooking {
         other.tripId == tripId &&
         other.totalPrice == totalPrice &&
         other.status == status &&
+        other.paymentStatus == paymentStatus &&
         other.paymentMethod == paymentMethod &&
         other.createdAt == createdAt &&
         other.seats == seats &&
@@ -134,6 +145,7 @@ class MBooking {
         tripId.hashCode ^
         totalPrice.hashCode ^
         status.hashCode ^
+        paymentStatus.hashCode ^
         paymentMethod.hashCode ^
         createdAt.hashCode ^
         seats.hashCode ^
@@ -156,6 +168,21 @@ enum BookingStatus {
   factory BookingStatus.fromMap(Map<String, dynamic> map) {
     final v = map['value'] as String;
     return BookingStatus.values.firstWhere((e) => e.value == v);
+  }
+}
+
+enum BookingPaymentStatus {
+  pending('pending'),
+  completed('completed');
+
+  final String value;
+  const BookingPaymentStatus(this.value);
+
+  Map<String, dynamic> toMap() => {'value': value};
+
+  factory BookingPaymentStatus.fromMap(Map<String, dynamic> map) {
+    final v = map['value'] as String;
+    return BookingPaymentStatus.values.firstWhere((e) => e.value == v);
   }
 }
 

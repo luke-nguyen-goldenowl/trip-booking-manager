@@ -18,7 +18,7 @@ class TicketService {
     final bus = await busService.getBusById(trip.busId!);
     final company = await userService.getUserbyId(trip.companyId!);
     final user = await userService.getUserbyId(booking.userId!);
-    if (booking.status == 'completed') {
+    if (booking.paymentStatus == 'completed') {
       final bookingService = BookingService();
       await bookingService.handleAfterBooking(booking.id!);
     }

@@ -194,7 +194,7 @@ class _BusTripEditScreenState extends State<BusTripEditScreen> {
           ),
           validator: (value) {
             if (value?.trim().isEmpty ?? true) {
-              return 'Vui lòng nhập khoảng cách';
+              return 'Vui lòng nhập giá vé';
             }
             price = int.tryParse(value!.replaceAll(RegExp(r'[^0-9]'), ''));
             if (price == null || price! <= 0) {

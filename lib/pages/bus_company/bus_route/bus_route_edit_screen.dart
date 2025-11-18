@@ -1,4 +1,5 @@
-import 'package:bus_ticket_app/utils/helper/vietnamese_format_unit.dart';
+import 'package:bus_ticket_app/core/province/list_province_service.dart';
+import 'package:bus_ticket_app/utils/helper/distance_caculator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,9 +7,7 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
-import 'package:bus_ticket_app/core/province/province_service.dart';
 import 'package:bus_ticket_app/models/route_model.dart';
-import 'package:bus_ticket_app/models/province_model.dart';
 import 'package:bus_ticket_app/utils/helper/dialog_helper.dart';
 import 'package:diacritic/diacritic.dart';
 
@@ -24,12 +23,12 @@ class BusRouteEditScreen extends StatefulWidget {
 class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final _distanceController = TextEditingController();
-  final _provinceService = ProvinceService();
+  final _provinceService = ListProvinceService();
 
-  Province? _selectedDeparture;
-  Province? _selectedDestination;
+  ListProvince? _selectedDeparture;
+  ListProvince? _selectedDestination;
   late BusRouteStatus _selectedStatus;
-  List<Province> _provinces = [];
+  List<ListProvince> _provinces = [];
   bool _isLoadingProvinces = true;
   int? distance;
 
@@ -38,6 +37,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
     super.initState();
     _selectedStatus = widget.route.status;
     _distanceController.text = widget.route.distance?.toString() ?? '';
+    distance = widget.route.distance;
     _loadProvinces();
   }
 
@@ -88,7 +88,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
               context,
               title: 'Thông Báo',
               message:
-                  'Bạn chắn chắn với sự thay đổi và muốn quay lại trang trước?',
+                  'Bạn chắc chắn với sự thay đổi và muốn quay lại trang trước?',
               icon: Icons.cancel,
               iconColor: Colors.red,
               confirmColor: Colors.red,
@@ -234,6 +234,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
                     title: 'Chọn điểm đi',
                     onSelect: (province) {
                       setState(() => _selectedDeparture = province);
+                      _updateDistance();
                     },
                   ),
             ),
@@ -260,6 +261,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
                     title: 'Chọn điểm đến',
                     onSelect: (province) {
                       setState(() => _selectedDestination = province);
+                      _updateDistance();
                     },
                   ),
             ),
@@ -337,7 +339,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
                 const Icon(Icons.local_atm, color: Colors.orange, size: 24),
                 const SizedBox(width: 8),
                 const Text(
-                  'Giá Vé & Khoảng Cách',
+                  'Khoảng Cách',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -347,42 +349,23 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            TextFormField(
-              controller: _distanceController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [VietnameseThousandsFormatter()],
+            InputDecorator(
               decoration: InputDecoration(
                 labelText: 'Khoảng cách',
-                hintText: 'Nhập khoảng cách',
-                prefixIcon: const Icon(
-                  Icons.social_distance,
-                  color: Colors.orange,
-                ),
+                helperText: 'Khoảng cách tính theo đường chim bay',
+                helperStyle: TextStyle(color: Colors.blue[700], fontSize: 12),
+                prefixIcon: const Icon(Icons.straighten),
                 suffixText: 'km',
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: const BorderSide(color: Colors.orange, width: 2),
-                ),
+                filled: true,
+                fillColor: Colors.grey[50],
               ),
-              validator: (value) {
-                if (value?.trim().isEmpty ?? true) {
-                  return 'Vui lòng nhập khoảng cách';
-                }
-                distance = int.tryParse(
-                  value!.replaceAll(RegExp(r'[^0-9]'), ''),
-                );
-                if (distance == null || distance! <= 0) {
-                  return 'Khoảng cách phải lớn hơn 0';
-                }
-                return null;
-              },
+              child: Text(
+                distance != null ? distance.toString() : '',
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+              ),
             ),
           ],
         ),
@@ -535,6 +518,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
       _selectedDeparture = _selectedDestination;
       _selectedDestination = temp;
     });
+    _updateDistance();
   }
 
   Future<bool> _checkValidation(int companyId) async {
@@ -609,10 +593,10 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
 
   Future<void> _showProvinceDialog({
     required String title,
-    required Function(Province) onSelect,
+    required Function(ListProvince) onSelect,
   }) async {
     final searchController = TextEditingController();
-    List<Province> filteredProvinces = List.from(_provinces);
+    List<ListProvince> filteredProvinces = List.from(_provinces);
 
     await showDialog(
       context: context,
@@ -658,7 +642,7 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
                         itemBuilder: (context, index) {
                           final province = filteredProvinces[index];
                           return ListTile(
-                            leading: Icon(
+                            leading: const Icon(
                               Icons.location_city,
                               color: Colors.orange,
                             ),
@@ -685,5 +669,21 @@ class _BusRouteEditScreenState extends State<BusRouteEditScreen> {
         );
       },
     );
+  }
+
+  void _updateDistance() {
+    if (_selectedDeparture != null && _selectedDestination != null) {
+      final calculatedDistance = DistanceCalculator.calculateDistance(
+        _selectedDeparture!.lat,
+        _selectedDeparture!.lon,
+        _selectedDestination!.lat,
+        _selectedDestination!.lon,
+      );
+
+      setState(() {
+        distance = calculatedDistance.round();
+        _distanceController.text = distance.toString();
+      });
+    }
   }
 }

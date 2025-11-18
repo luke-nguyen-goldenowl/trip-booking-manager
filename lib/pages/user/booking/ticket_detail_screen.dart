@@ -16,7 +16,8 @@ class TicketDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final paymentStatus = info.booking.status;
+    final paymentStatus = info.booking.paymentStatus;
+    final status = info.booking.status;
     final qrData = jsonEncode({
       'bookingCode': info.booking.bookingCode,
       'userId': info.user.id,
@@ -27,10 +28,9 @@ class TicketDetailScreen extends StatelessWidget {
       'routeDestination': info.route.destination,
       'busNumber': info.bus.busNumber,
       'seats': info.booking.seats,
-      'paymentMethod': BookingHelper.getPaymentMethodText(
-        info.booking.paymentMethod!,
-      ),
-      'statusPayment': info.booking.status!,
+      'paymentMethod': info.booking.paymentMethod!,
+      'statusPayment': info.booking.paymentStatus!,
+      'statusBooking': info.booking.status!,
     });
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -51,18 +51,31 @@ class TicketDetailScreen extends StatelessWidget {
       body: BlocConsumer<BookingCubit, BookingState>(
         listener: (context, state) {
           if (state is BookingLoading) {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder:
+                  (context) => Center(
+                    child: CircularProgressIndicator(color: Colors.orange[300]),
+                  ),
+            );
+          } else if (state is BookingInitial) {
+            Navigator.of(context).pop();
+
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.white),
-                    SizedBox(width: 12),
-                    Text('Huỷ vé thành công!'),
-                  ],
-                ),
+                content: Text('Hủy vé thành công'),
                 backgroundColor: Colors.green,
                 duration: Duration(seconds: 2),
               ),
+            );
+            context.pop();
+          } else if (state is BookingError) {
+            Navigator.of(context).pop();
+            DialogHelper.showError(
+              context,
+              title: 'Huỷ vé thất bại',
+              message: state.message,
             );
           }
         },
@@ -312,9 +325,22 @@ class TicketDetailScreen extends StatelessWidget {
                           children: [
                             Expanded(
                               child: _infoColumn(
-                                'Trạng thái thanh toán',
+                                'Trạng thái vé',
                                 BookingHelper.getStatusText(
                                   info.booking.status!,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _infoColumn(
+                                'Trạng thái thanh toán',
+                                BookingHelper.getPaymentStatusText(
+                                  info.booking.paymentStatus!,
                                 ),
                               ),
                             ),
@@ -365,7 +391,7 @@ class TicketDetailScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  paymentStatus != 'cancelled'
+                  paymentStatus == 'pending' && status != "cancelled"
                       ? SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(

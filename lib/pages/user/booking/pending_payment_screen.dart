@@ -122,14 +122,14 @@ class _PendingPaymentScreenState extends State<PendingPaymentScreen> {
                                   vertical: 6,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: BookingHelper.getStatusColor(
-                                    widget.booking.status ?? 'pending',
+                                  color: BookingHelper.getPaymentStatusColor(
+                                    widget.booking.paymentStatus ?? 'pending',
                                   ),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Text(
-                                  BookingHelper.getStatusText(
-                                    widget.booking.status ?? 'pending',
+                                  BookingHelper.getPaymentStatusText(
+                                    widget.booking.paymentStatus ?? 'pending',
                                   ),
                                   style: const TextStyle(
                                     color: Colors.white,
@@ -261,7 +261,7 @@ class _PendingPaymentScreenState extends State<PendingPaymentScreen> {
                                       ),
                                     )
                                     : Text(
-                                      'Thanh toán của bạn đã được xử lý thành công.',
+                                      'Thanh toán của bạn đang được xử lý.',
                                       style: TextStyle(
                                         fontSize: 14,
                                         color: Colors.blue.shade700,

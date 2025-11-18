@@ -1,4 +1,5 @@
-import 'package:bus_ticket_app/utils/helper/vietnamese_format_unit.dart';
+import 'package:bus_ticket_app/core/province/list_province_service.dart';
+import 'package:bus_ticket_app/utils/helper/distance_caculator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,9 +7,7 @@ import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_cubit.dart';
 import 'package:bus_ticket_app/core/bus_route/cubit/bus_route_state.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
-import 'package:bus_ticket_app/core/province/province_service.dart';
 import 'package:bus_ticket_app/models/route_model.dart';
-import 'package:bus_ticket_app/models/province_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:diacritic/diacritic.dart';
 
@@ -22,12 +21,12 @@ class BusRouteAddScreen extends StatefulWidget {
 class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
   final _formKey = GlobalKey<FormState>();
   final _distanceController = TextEditingController();
-  final _provinceService = ProvinceService();
+  final _listProvinceService = ListProvinceService();
 
-  Province? _selectedDeparture;
-  Province? _selectedDestination;
+  ListProvince? _selectedDeparture;
+  ListProvince? _selectedDestination;
   BusRouteStatus _selectedStatus = BusRouteStatus.active;
-  List<Province> _provinces = [];
+  List<ListProvince> _provinces = [];
   bool _isLoadingProvinces = true;
   int? distance;
 
@@ -39,7 +38,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
 
   Future<void> _loadProvinces() async {
     try {
-      final provinces = await _provinceService.getProvinces();
+      final provinces = await _listProvinceService.getProvinces();
       setState(() {
         _provinces = provinces;
         _isLoadingProvinces = false;
@@ -202,6 +201,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                 setState(() {
                   _selectedDeparture = province;
                 });
+                _updateDistance();
               },
             ),
 
@@ -230,6 +230,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                 setState(() {
                   _selectedDestination = province;
                 });
+                _updateDistance();
               },
             ),
           ],
@@ -241,8 +242,8 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
   Widget _buildProvinceSelector({
     required String label,
     required IconData icon,
-    required Province? selectedProvince,
-    required Function(Province) onSelect,
+    required ListProvince? selectedProvince,
+    required Function(ListProvince) onSelect,
   }) {
     return InkWell(
       onTap: () => _showProvinceDialog(onSelect),
@@ -264,6 +265,8 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                         } else {
                           _selectedDestination = null;
                         }
+                        _distanceController.clear();
+                        distance = null;
                       });
                     },
                   )
@@ -280,7 +283,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
     );
   }
 
-  void _showProvinceDialog(Function(Province) onSelect) {
+  void _showProvinceDialog(Function(ListProvince) onSelect) {
     if (_isLoadingProvinces) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -313,7 +316,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     TextField(
-                      autofocus: true,
+                      autofocus: false,
                       decoration: InputDecoration(
                         hintText: 'Tìm kiếm...',
                         prefixIcon: const Icon(Icons.search),
@@ -389,12 +392,11 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
             ),
             const SizedBox(height: 16),
 
-            TextFormField(
-              controller: _distanceController,
-              keyboardType: TextInputType.number,
-              inputFormatters: [VietnameseThousandsFormatter()],
+            InputDecorator(
               decoration: InputDecoration(
                 labelText: 'Khoảng cách',
+                helperText: 'Khoảng cách tính theo đường chim bay',
+                helperStyle: TextStyle(color: Colors.blue[700], fontSize: 12),
                 prefixIcon: const Icon(Icons.straighten),
                 suffixText: 'km',
                 border: OutlineInputBorder(
@@ -403,18 +405,10 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
                 filled: true,
                 fillColor: Colors.grey[50],
               ),
-              validator: (value) {
-                if (value?.trim().isEmpty ?? true) {
-                  return 'Vui lòng nhập khoảng cách';
-                }
-                distance = int.tryParse(
-                  value!.replaceAll(RegExp(r'[^0-9]'), ''),
-                );
-                if (distance == null || distance! <= 0) {
-                  return 'Khoảng cách phải lớn hơn 0';
-                }
-                return null;
-              },
+              child: Text(
+                distance != null ? distance.toString() : '',
+                style: const TextStyle(fontSize: 16, color: Colors.black87),
+              ),
             ),
           ],
         ),
@@ -504,11 +498,13 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
           children: [
             Icon(icon, color: isSelected ? color : Colors.grey, size: 20),
             const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? color : Colors.grey[700],
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: isSelected ? color : Colors.grey[700],
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                ),
               ),
             ),
           ],
@@ -599,12 +595,29 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
     );
   }
 
+  void _updateDistance() {
+    if (_selectedDeparture != null && _selectedDestination != null) {
+      final calculatedDistance = DistanceCalculator.calculateDistance(
+        _selectedDeparture!.lat,
+        _selectedDeparture!.lon,
+        _selectedDestination!.lat,
+        _selectedDestination!.lon,
+      );
+
+      setState(() {
+        distance = calculatedDistance.round();
+        _distanceController.text = distance.toString();
+      });
+    }
+  }
+
   void _swapLocations() {
     setState(() {
       final temp = _selectedDeparture;
       _selectedDeparture = _selectedDestination;
       _selectedDestination = temp;
     });
+    _updateDistance();
   }
 
   void _resetForm() {
@@ -613,6 +626,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
       _selectedDeparture = null;
       _selectedDestination = null;
       _selectedStatus = BusRouteStatus.active;
+      distance = null;
     });
   }
 

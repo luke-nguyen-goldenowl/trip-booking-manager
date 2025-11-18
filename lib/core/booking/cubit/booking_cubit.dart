@@ -44,7 +44,7 @@ class BookingCubit extends Cubit<BookingState> {
       await _bookingService.cancelBooking(bookingId);
       emit(BookingInitial());
     } catch (e) {
-      emit(BookingError('Lỗi: $e'));
+      emit(BookingError(e.toString()));
     }
   }
 }

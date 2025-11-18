@@ -357,6 +357,10 @@ class _LoginScreenState extends State<LoginScreen> {
         );
         return;
       }
+      if (result['needVerification'] == true) {
+        _showEmailVerificationDialog(result['email'] as String);
+        return;
+      }
       if (result['error'] != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -379,6 +383,108 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showEmailVerificationDialog(String email) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.email, color: Colors.orange),
+              SizedBox(width: 10),
+              Text('Xác nhận Email'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Email của bạn chưa được xác nhận.',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Vui lòng kiểm tra hộp thư của bạn tại:\n$email',
+                style: const TextStyle(fontSize: 14),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                'Nếu bạn chưa nhận được email, hãy nhấn nút bên dưới để gửi lại.',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Đóng'),
+            ),
+            ElevatedButton.icon(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await _resendVerificationEmail(email);
+              },
+              icon: const Icon(Icons.send, size: 18),
+              label: const Text('Gửi lại Email'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.orange,
+                foregroundColor: Colors.white,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _resendVerificationEmail(String email) async {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final result = await _auth.resendVerificationEmail(
+        email,
+        _passwordController.text,
+      );
+
+      Navigator.of(context).pop();
+
+      if (result['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Email xác nhận đã được gửi! Vui lòng kiểm tra hộp thư.',
+            ),
+            backgroundColor: Colors.green,
+            duration: Duration(seconds: 4),
+          ),
+        );
+      } else if (result['error'] != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['error'] as String),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Lỗi: ${e.toString()}'),

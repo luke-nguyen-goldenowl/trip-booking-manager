@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 
 class BookingHelper {
-  static Color getStatusColor(String status) {
+  static Color getPaymentStatusColor(String status) {
     switch (status.toLowerCase()) {
-      case 'confirmed':
-      case 'paid':
+      case 'completed':
         return Colors.green;
       case 'pending':
         return Colors.orange;
-      case 'cancelled':
-        return Colors.red;
       default:
         return Colors.grey;
     }
@@ -21,11 +18,20 @@ class BookingHelper {
       case 'confirmed':
         return 'Đã xác nhận';
       case 'completed':
-        return 'Đã thanh toán';
-      case 'pending':
-        return 'Chờ xử lý';
+        return 'Đã đặt';
       case 'cancelled':
         return 'Đã hủy';
+      default:
+        return status;
+    }
+  }
+
+  static String getPaymentStatusText(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Chờ thanh toán';
+      case 'completed':
+        return 'Đã thanh toán';
       default:
         return status;
     }

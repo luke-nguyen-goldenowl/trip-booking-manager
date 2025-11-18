@@ -34,12 +34,23 @@ class BookingService {
       await handleAfterBooking(bookingId);
       return MBooking.fromMap(response);
     } catch (e) {
-      throw Exception('Không thể tạo booking: $e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
   Future<MBooking?> createBookingbyMomo(MBooking booking) async {
     try {
+      for (final seatId in booking.seats!.split(',')) {
+        final isSeatBooked = await _isSeatBooked(
+          booking.tripId!,
+          seatId.trim(),
+        );
+        if (isSeatBooked) {
+          return Future.error(
+            'Ghế $seatId đã được đặt. Vui lòng chọn ghế khác.',
+          );
+        }
+      }
       final bookingData = booking.toMap();
       bookingData.remove('id');
       final response =
@@ -51,7 +62,7 @@ class BookingService {
       await _paymentWithMomo(booking);
       return MBooking.fromMap(response);
     } catch (e) {
-      throw Exception('Không thể tạo booking: $e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
@@ -78,7 +89,7 @@ class BookingService {
         );
       }
     } catch (e) {
-      throw Exception('Không thể tạo booking: $e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
@@ -89,7 +100,7 @@ class BookingService {
           .update({'isMailSended': true})
           .eq('id', bookingId);
     } catch (e) {
-      throw Exception('Không thể đánh dấu email đã gửi: $e');
+      throw Exception('Something went wrong');
     }
   }
 
@@ -145,7 +156,7 @@ class BookingService {
         currentSeatLayout: trip['seat_layout'],
       );
     } catch (e) {
-      throw Exception('$e');
+      throw Exception('Không thể tạo vé');
     }
   }
 
@@ -266,7 +277,7 @@ class BookingService {
           .map((booking) => MBooking.fromMap(booking))
           .toList();
     } catch (e) {
-      throw Exception('Không thể lấy thông tin booking: $e');
+      throw Exception('Không thể lấy thông tin vé');
     }
   }
 
@@ -319,19 +330,43 @@ class BookingService {
         bookedSeatsString: fullBookingData['seats'],
       );
     } catch (e) {
-      throw Exception('$e');
+      throw Exception('Không thể hủy vé');
     }
   }
 
   Future<void> cancelBooking(int bookingId) async {
     try {
+      final booking =
+          await _supabase
+              .from('bookings')
+              .select('trip_id')
+              .eq('id', bookingId)
+              .single();
+
+      final tripId = booking['trip_id'];
+      final trip =
+          await _supabase
+              .from('trips')
+              .select('departure_time')
+              .eq('id', tripId)
+              .single();
+      final departureTime = DateTime.parse(trip['departure_time']);
+      final currentTime = DateTime.now();
+      if (departureTime.difference(currentTime).inHours < 3) {
+        throw ('Chỉ có thể hủy vé trước giờ khởi hành 3 tiếng');
+      }
       await _supabase
           .from('bookings')
           .update({'status': 'cancelled'})
           .eq('id', bookingId);
       await _handleAfterCancellBooking(bookingId);
     } catch (e) {
-      throw Exception('Không thể hủy booking: $e');
+      if (e.toString().contains(
+        'Chỉ có thể hủy vé trước giờ khởi hành 3 tiếng',
+      )) {
+        rethrow;
+      }
+      throw ('Không thể hủy vé');
     }
   }
 
@@ -362,7 +397,7 @@ class BookingService {
 
       return false;
     } catch (e) {
-      throw Exception('Không thể kiểm tra trạng thái ghế: $e');
+      throw Exception('Không thể kiểm tra trạng thái ghế');
     }
   }
 }
