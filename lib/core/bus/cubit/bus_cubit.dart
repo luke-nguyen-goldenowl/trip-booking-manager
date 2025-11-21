@@ -11,8 +11,12 @@ class BusCubit extends Cubit<BusState> {
   Future<void> loadBuses(int companyId) async {
     try {
       emit(BusLoading());
-      final buses = await _busService.getBusesByCompany(companyId);
-      emit(BusLoaded(buses));
+      final result = await _busService.getBusesByCompany(companyId);
+      if (result.isSuccess) {
+        emit(BusLoaded(result.data!));
+      } else {
+        emit(BusError(result.error ?? 'Không thể tải danh sách xe'));
+      }
     } catch (e) {
       emit(BusError('Không thể tải danh sách xe'));
     }
@@ -21,8 +25,12 @@ class BusCubit extends Cubit<BusState> {
   Future<void> loadAllBuses() async {
     try {
       emit(BusLoading());
-      final buses = await _busService.getAllBuses();
-      emit(BusLoaded(buses));
+      final result = await _busService.getAllBuses();
+      if (result.isSuccess) {
+        emit(BusLoaded(result.data!));
+      } else {
+        emit(BusError(result.error ?? 'Không thể tải danh sách xe'));
+      }
     } catch (e) {
       emit(BusError('Không thể tải danh sách xe'));
     }
@@ -31,8 +39,12 @@ class BusCubit extends Cubit<BusState> {
   Future<void> createBus(MBus bus) async {
     try {
       emit(BusLoading());
-      await _busService.createBus(bus);
-      await loadBuses(bus.companyId!);
+      final result = await _busService.createBus(bus);
+      if (result.isSuccess) {
+        await loadBuses(bus.companyId!);
+      } else {
+        emit(BusError(result.error ?? 'Không thể tạo xe'));
+      }
     } catch (e) {
       emit(BusError('Không thể tạo xe'));
     }
@@ -41,8 +53,12 @@ class BusCubit extends Cubit<BusState> {
   Future<void> updateBus(int busId, MBus bus) async {
     try {
       emit(BusLoading());
-      await _busService.updateBus(busId, bus);
-      await loadBuses(bus.companyId!);
+      final result = await _busService.updateBus(busId, bus);
+      if (result.isSuccess) {
+        await loadBuses(bus.companyId!);
+      } else {
+        emit(BusError(result.error ?? 'Không thể cập nhật xe'));
+      }
     } catch (e) {
       emit(BusError('Không thể cập nhật xe'));
     }
@@ -51,9 +67,17 @@ class BusCubit extends Cubit<BusState> {
   Future<void> deleteBus(int busId, int companyId) async {
     try {
       emit(BusLoading());
-      await _busService.deleteBus(busId);
-      final buses = await _busService.getBusesByCompany(companyId);
-      emit(BusDeleted(buses));
+      final result = await _busService.deleteBus(busId);
+      if (result.isSuccess) {
+        final loadResult = await _busService.getBusesByCompany(companyId);
+        if (loadResult.isSuccess) {
+          emit(BusDeleted(loadResult.data!));
+        } else {
+          emit(BusError(loadResult.error ?? 'Không thể tải lại danh sách xe'));
+        }
+      } else {
+        emit(BusError(result.error ?? 'Không thể xóa xe'));
+      }
     } catch (e) {
       emit(BusError('Không thể xóa xe'));
     }
@@ -63,15 +87,17 @@ class BusCubit extends Cubit<BusState> {
     String busNumber,
     int companyId,
   ) async {
-    try {
-      final buses = await _busService.getBusesByCompany(companyId);
-      return buses.any(
-        (bus) =>
-            bus.busNumber?.trim().toUpperCase() ==
-            busNumber.trim().toUpperCase(),
-      );
-    } catch (e) {
+    final result = await _busService.getBusesByCompany(companyId);
+
+    if (result.isError) {
       return false;
     }
+
+    final buses = result.data!;
+
+    return buses.any(
+      (bus) =>
+          bus.busNumber?.trim().toUpperCase() == busNumber.trim().toUpperCase(),
+    );
   }
 }

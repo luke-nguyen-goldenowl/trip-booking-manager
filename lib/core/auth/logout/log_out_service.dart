@@ -1,6 +1,7 @@
 import 'package:bus_ticket_app/core/notification/device_token_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LogOutService {
@@ -14,6 +15,11 @@ class LogOutService {
       await tokenService.removeToken(userId);
     }
     await prefs.remove("userId");
+    final googleSignIn = GoogleSignIn();
+    final isGoogleSignedIn = await googleSignIn.isSignedIn();
     await FirebaseAuth.instance.signOut();
+    if (isGoogleSignedIn) {
+      await googleSignIn.signOut();
+    }
   }
 }

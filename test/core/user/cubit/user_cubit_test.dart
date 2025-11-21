@@ -3,11 +3,11 @@ import 'package:bus_ticket_app/core/user/cubit/user_cubit.dart';
 import 'package:bus_ticket_app/core/user/cubit/user_state.dart';
 import 'package:bus_ticket_app/core/user/user_service.dart';
 import 'package:bus_ticket_app/models/user_model.dart';
+import 'package:bus_ticket_app/models/result_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'dart:typed_data';
-
 import 'user_cubit_test.mocks.dart';
 
 @GenerateNiceMocks([MockSpec<UserService>()])
@@ -54,7 +54,7 @@ void main() {
       build: () {
         when(
           mockUserService.getUserInfo(any),
-        ).thenAnswer((_) async => testUser);
+        ).thenAnswer((_) async => MResult.success(testUser));
         return userCubit;
       },
       act: (cubit) => cubit.loadUser('test@example.com'),
@@ -77,7 +77,9 @@ void main() {
     blocTest<UserCubit, UserState>(
       'emits [UserLoading, UserError] when user not found',
       build: () {
-        when(mockUserService.getUserInfo(any)).thenAnswer((_) async => null);
+        when(mockUserService.getUserInfo(any)).thenAnswer(
+          (_) async => MResult.error('Không tìm thấy thông tin người dùng'),
+        );
         return userCubit;
       },
       act: (cubit) => cubit.loadUser('notfound@example.com'),
@@ -95,9 +97,9 @@ void main() {
     blocTest<UserCubit, UserState>(
       'emits [UserLoading, UserError] when service throws exception',
       build: () {
-        when(
-          mockUserService.getUserInfo(any),
-        ).thenThrow(Exception('Network error'));
+        when(mockUserService.getUserInfo(any)).thenAnswer(
+          (_) async => MResult.exception(Exception('Network error')),
+        );
         return userCubit;
       },
       act: (cubit) => cubit.loadUser('test@example.com'),
@@ -107,7 +109,7 @@ void main() {
             isA<UserError>().having(
               (state) => state.message,
               'message',
-              contains('Exception: Network error'),
+              contains('Network error'),
             ),
           ],
     );
@@ -129,7 +131,9 @@ void main() {
     blocTest<UserCubit, UserState>(
       'emits [UserLoading, MultiUserLoaded] when loadAllUser is successful',
       build: () {
-        when(mockUserService.getAllUsers()).thenAnswer((_) async => testUsers);
+        when(
+          mockUserService.getAllUsers(),
+        ).thenAnswer((_) async => MResult.success(testUsers));
         return userCubit;
       },
       act: (cubit) => cubit.loadAllUser(),
@@ -152,9 +156,9 @@ void main() {
     blocTest<UserCubit, UserState>(
       'emits [UserLoading, UserError] when loadAllUser fails',
       build: () {
-        when(
-          mockUserService.getAllUsers(),
-        ).thenThrow(Exception('Failed to load users'));
+        when(mockUserService.getAllUsers()).thenAnswer(
+          (_) async => MResult.exception(Exception('Failed to load users')),
+        );
         return userCubit;
       },
       act: (cubit) => cubit.loadAllUser(),
@@ -164,7 +168,7 @@ void main() {
             isA<UserError>().having(
               (state) => state.message,
               'message',
-              contains('Exception: Failed to load users'),
+              contains('Failed to load users'),
             ),
           ],
     );
@@ -188,10 +192,10 @@ void main() {
       build: () {
         when(
           mockUserService.getUserInfo(any),
-        ).thenAnswer((_) async => updatedUser);
+        ).thenAnswer((_) async => MResult.success(updatedUser));
         when(
           mockUserService.updateUserProfile(any, any),
-        ).thenAnswer((_) async => Future.value());
+        ).thenAnswer((_) async => MResult.success(null));
         return userCubit;
       },
       seed: () => UserLoaded(testUser),
@@ -218,9 +222,9 @@ void main() {
     blocTest<UserCubit, UserState>(
       'emits UserError when update fails',
       build: () {
-        when(
-          mockUserService.updateUserProfile(any, any),
-        ).thenThrow(Exception('Update failed'));
+        when(mockUserService.updateUserProfile(any, any)).thenAnswer(
+          (_) async => MResult.exception(Exception('Update failed')),
+        );
         return userCubit;
       },
       seed: () => UserLoaded(testUser),
@@ -241,10 +245,10 @@ void main() {
       build: () {
         when(
           mockUserService.updateUserProfile(any, any),
-        ).thenAnswer((_) async => Future.value());
+        ).thenAnswer((_) async => MResult.success(null));
         when(
           mockUserService.getUserInfo(any),
-        ).thenAnswer((_) async => testUser);
+        ).thenAnswer((_) async => MResult.success(testUser));
         return userCubit;
       },
       seed: () => UserLoaded(testUser),
@@ -283,10 +287,11 @@ void main() {
       build: () {
         when(
           mockUserService.uploadAvatar(any, any),
-        ).thenAnswer((_) async => newAvatarUrl);
-        when(
-          mockUserService.getUserInfo(any),
-        ).thenAnswer((_) async => testUser.copyWith(avatarUrl: newAvatarUrl));
+        ).thenAnswer((_) async => MResult.success(newAvatarUrl));
+        when(mockUserService.getUserInfo(any)).thenAnswer(
+          (_) async =>
+              MResult.success(testUser.copyWith(avatarUrl: newAvatarUrl)),
+        );
         return userCubit;
       },
       seed: () => UserLoaded(testUser),
@@ -312,12 +317,12 @@ void main() {
     blocTest<UserCubit, UserState>(
       'emits error then reloads user when upload fails',
       build: () {
-        when(
-          mockUserService.uploadAvatar(any, any),
-        ).thenThrow(Exception('Upload failed'));
+        when(mockUserService.uploadAvatar(any, any)).thenAnswer(
+          (_) async => MResult.exception(Exception('Upload failed')),
+        );
         when(
           mockUserService.getUserInfo(any),
-        ).thenAnswer((_) async => testUser);
+        ).thenAnswer((_) async => MResult.success(testUser));
         return userCubit;
       },
       seed: () => UserLoaded(testUser),
@@ -339,32 +344,14 @@ void main() {
     );
 
     blocTest<UserCubit, UserState>(
-      'does not reload when uploadAvatar returns null',
-      build: () {
-        when(
-          mockUserService.uploadAvatar(any, any),
-        ).thenAnswer((_) async => null);
-        return userCubit;
-      },
-      seed: () => UserLoaded(testUser),
-      act: (cubit) => cubit.uploadAvatar(imageBytes),
-      expect: () => [isA<UserLoading>()],
-      verify: (_) {
-        verify(
-          mockUserService.uploadAvatar(testUser.email!, imageBytes),
-        ).called(1);
-        verifyNever(mockUserService.getUserInfo(any));
-      },
-    );
-    blocTest<UserCubit, UserState>(
       'emits specific error when both upload and reload fail',
       build: () {
-        when(
-          mockUserService.uploadAvatar(any, any),
-        ).thenThrow(Exception('Upload failed'));
-        when(
-          mockUserService.getUserInfo(any),
-        ).thenThrow(Exception('Reload failed'));
+        when(mockUserService.uploadAvatar(any, any)).thenAnswer(
+          (_) async => MResult.exception(Exception('Upload failed')),
+        );
+        when(mockUserService.getUserInfo(any)).thenAnswer(
+          (_) async => MResult.exception(Exception('Reload failed')),
+        );
         return userCubit;
       },
       seed: () => UserLoaded(testUser),
@@ -393,7 +380,7 @@ void main() {
       build: () {
         when(
           mockUserService.getUserInfo(any),
-        ).thenAnswer((_) async => testUser);
+        ).thenAnswer((_) async => MResult.success(testUser));
         return userCubit;
       },
       act: (cubit) async {
@@ -414,10 +401,10 @@ void main() {
       build: () {
         when(
           mockUserService.updateUserProfile(any, any),
-        ).thenAnswer((_) async => Future.value());
+        ).thenAnswer((_) async => MResult.success(null));
         when(
           mockUserService.getUserInfo(any),
-        ).thenAnswer((_) async => testUser);
+        ).thenAnswer((_) async => MResult.success(testUser));
         return userCubit;
       },
       seed: () => UserLoaded(testUser),

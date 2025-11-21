@@ -5,6 +5,7 @@ import 'package:bus_ticket_app/models/trip_model.dart';
 import 'package:bus_ticket_app/core/bus_trip/bus_trip_service.dart';
 import 'package:bus_ticket_app/core/bus_trip/cubit/bus_trip_cubit.dart';
 import 'package:bus_ticket_app/core/bus_trip/cubit/bus_trip_state.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class BookedUsersScreen extends StatelessWidget {
   final MTrip trip;
@@ -16,7 +17,8 @@ class BookedUsersScreen extends StatelessWidget {
     return BlocProvider(
       create:
           (context) =>
-              BusTripCubit(BusTripService())..loadBookedUsers(trip.id!),
+              BusTripCubit(BusTripService(Supabase.instance.client))
+                ..loadBookedUsers(trip.id!),
       child: Scaffold(
         appBar: AppBar(
           title: Text(

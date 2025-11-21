@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/models/result_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:bus_ticket_app/models/user_model.dart';
@@ -16,13 +17,14 @@ class UserLocalDatabase {
   }
 
   Future<Database> _initDb() async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'users.db');
-    return await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
+    try {
+      final dbPath = await getDatabasesPath();
+      final path = join(dbPath, 'users.db');
+      return await openDatabase(
+        path,
+        version: 1,
+        onCreate: (db, version) async {
+          await db.execute('''
           CREATE TABLE users (
             id INTEGER PRIMARY KEY,
             email TEXT,
@@ -33,49 +35,68 @@ class UserLocalDatabase {
             avatar_url TEXT
           )
         ''');
-      },
-    );
+        },
+      );
+    } catch (e) {
+      throw MResult.exception(e);
+    }
   }
 
   Future<void> saveUsers(List<MUser> users) async {
-    final db = await database;
-    await db.delete('users');
-    for (var user in users) {
-      await db.insert('users', user.toMapLocaldb());
+    try {
+      final db = await database;
+      await db.delete('users');
+      for (var user in users) {
+        await db.insert('users', user.toMapLocaldb());
+      }
+    } catch (e) {
+      throw MResult.exception(e);
     }
   }
 
   Future<MUser?> getUserById(int id) async {
-    final db = await database;
-    final maps = await db.query(
-      'users',
-      where: 'id = ?',
-      whereArgs: [id],
-      limit: 1,
-    );
-    if (maps.isNotEmpty) {
-      return MUser.fromMapLocaldb(maps.first);
+    try {
+      final db = await database;
+      final maps = await db.query(
+        'users',
+        where: 'id = ?',
+        whereArgs: [id],
+        limit: 1,
+      );
+      if (maps.isNotEmpty) {
+        return MUser.fromMapLocaldb(maps.first);
+      }
+      return null;
+    } catch (e) {
+      throw MResult.exception(e);
     }
-    return null;
   }
 
   Future<MUser?> getCompanyUserById(int companyId) async {
-    final db = await database;
-    final maps = await db.query(
-      'users',
-      where: 'id = ? AND role = ?',
-      whereArgs: [companyId, 'Nhà xe'],
-      limit: 1,
-    );
-    if (maps.isNotEmpty) {
-      return MUser.fromMapLocaldb(maps.first);
+    try {
+      final db = await database;
+      final maps = await db.query(
+        'users',
+        where: 'id = ? AND role = ?',
+        whereArgs: [companyId, 'Nhà xe'],
+        limit: 1,
+      );
+      if (maps.isNotEmpty) {
+        return MUser.fromMapLocaldb(maps.first);
+      }
+      return null;
+    } catch (e) {
+      throw MResult.exception(e);
     }
-    return null;
   }
 
   Future<List<MUser>> getUsers() async {
-    final db = await database;
-    final maps = await db.query('users');
-    return maps.map((map) => MUser.fromMapLocaldb(map)).toList();
+    try {
+      final db = await database;
+      final maps = await db.query('users');
+      return maps.map((map) => MUser.fromMapLocaldb(map)).toList();
+    } catch (e) {
+      throw MResult.exception(e);
+    }
   }
 }

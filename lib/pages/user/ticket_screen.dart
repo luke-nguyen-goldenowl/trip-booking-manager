@@ -11,6 +11,7 @@ import 'package:bus_ticket_app/widgets/card_ticket.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/core/booking/ticket/ticket_service.dart';
 import 'package:bus_ticket_app/widgets/offline_ticket_card.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyTicketScreen extends StatefulWidget {
   const MyTicketScreen({super.key});
@@ -22,7 +23,7 @@ class MyTicketScreen extends StatefulWidget {
 class _MyTicketScreenState extends State<MyTicketScreen>
     with TickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   final TicketService ticketService = TicketService();
-  final UserService userService = UserService();
+  final UserService userService = UserService(Supabase.instance.client);
   late final TabController _tabController;
   List<MBooking> offlineTickets = [];
   List<MBooking> onlineTickets = [];
@@ -55,7 +56,7 @@ class _MyTicketScreenState extends State<MyTicketScreen>
       userId = (await userService.getUserIdFromLocal())!;
 
       if (isOnline) {
-        context.read<BookingCubit>().getBookingbyUserId(userId!);
+        context.read<BookingCubit>().getBookingByUserId(userId!);
       } else {
         final offlineBookings = await BookingLocalDatabase().getOfflineBookings(
           userId!,

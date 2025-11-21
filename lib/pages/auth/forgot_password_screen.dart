@@ -234,30 +234,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
     String email = _emailController.text.trim();
 
     setState(() {
       _isLoading = true;
     });
 
-    try {
-      await _authService.sendPasswordResetEmail(email);
-      FocusScope.of(context).unfocus();
+    final result = await _authService.sendPasswordResetEmail(email);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    FocusScope.of(context).unfocus();
+
+    if (result.isError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.error ?? 'Có lỗi xảy ra'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             'Liên kết đặt lại mật khẩu đã được gửi đến email của bạn.',
           ),
           backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
         ),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
+
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.go('/login');
       });
     }
   }

@@ -77,15 +77,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 32),
-
                   _buildInputField(
                     controller: _nameController,
                     label: 'Họ và Tên',
                     hint: 'Nhập họ và tên của bạn',
                     icon: Icons.person,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng nhập họ và tên';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
-
                   _buildInputField(
                     controller: _emailController,
                     label: 'Email',
@@ -108,9 +112,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     hint: 'Nhập số điện thoại của bạn',
                     icon: Icons.phone,
                     keyboardType: TextInputType.phone,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Vui lòng nhập số điện thoại';
+                      }
+                      return null;
+                    },
                   ),
                   const SizedBox(height: 16),
-
                   _buildInputField(
                     controller: _passwordController,
                     label: 'Mật khẩu',
@@ -139,7 +148,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
                   _buildInputField(
                     controller: _confirmPasswordController,
                     label: 'Xác nhận mật khẩu',
@@ -168,7 +176,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     },
                   ),
                   const SizedBox(height: 24),
-
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -213,7 +220,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ],
                   ),
                   const SizedBox(height: 32),
-
                   ElevatedButton(
                     onPressed:
                         _agreeToTerms && !_isLoading
@@ -229,16 +235,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     child:
                         _isLoading
-                            ? SizedBox(
+                            ? const SizedBox(
                               width: 23,
                               height: 23,
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   Colors.white,
                                 ),
+                                strokeWidth: 2,
                               ),
                             )
-                            : Text(
+                            : const Text(
                               'Đăng Ký',
                               style: TextStyle(
                                 color: Colors.white,
@@ -248,7 +255,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                   ),
                   const SizedBox(height: 24),
-
                   RichText(
                     text: TextSpan(
                       text: 'Bạn đã có tài khoản? ',
@@ -358,46 +364,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _isLoading = true;
     });
 
-    try {
-      String? errorMessage = await _auth.signUpWithEmailAndPassword(
-        _emailController.text.trim().toLowerCase(),
-        _passwordController.text.trim(),
-        _confirmPasswordController.text.trim(),
-        _phoneController.text.trim(),
-        _nameController.text.trim(),
-        _selectedRole ?? 'Khách hàng',
-      );
+    final result = await _auth.signUpWithEmailAndPassword(
+      _emailController.text.trim().toLowerCase(),
+      _passwordController.text.trim(),
+      _confirmPasswordController.text.trim(),
+      _phoneController.text.trim(),
+      _nameController.text.trim(),
+      _selectedRole ?? 'Khách hàng',
+    );
 
-      setState(() {
-        _isLoading = false;
-      });
+    setState(() {
+      _isLoading = false;
+    });
 
-      if (errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage), backgroundColor: Colors.red),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.',
-            ),
-            backgroundColor: Colors.green,
-          ),
-        );
-        context.go('/login');
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-
+    if (result.isError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Lỗi không xác định: ${e.toString()}'),
+          content: Text(result.error ?? 'Có lỗi xảy ra'),
           backgroundColor: Colors.red,
         ),
       );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.',
+          ),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
+        ),
+      );
+      if (mounted) {
+        context.go('/login');
+      }
     }
   }
 }

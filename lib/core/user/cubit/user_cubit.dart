@@ -7,15 +7,16 @@ class UserCubit extends Cubit<UserState> {
   final UserService _userService;
 
   UserCubit(this._userService) : super(UserInitial());
-
   Future<void> loadUser(String email) async {
     try {
       emit(UserLoading());
-      final user = await _userService.getUserInfo(email);
-      if (user != null) {
-        emit(UserLoaded(user));
+
+      final result = await _userService.getUserInfo(email);
+
+      if (result.isSuccess) {
+        emit(UserLoaded(result.data!));
       } else {
-        emit(const UserError('Không tìm thấy thông tin người dùng'));
+        emit(UserError(result.error ?? 'Không thể tải thông tin người dùng'));
       }
     } catch (e) {
       emit(UserError('Không thể tải thông tin người dùng'));
@@ -25,8 +26,14 @@ class UserCubit extends Cubit<UserState> {
   Future<void> loadAllUser() async {
     try {
       emit(UserLoading());
-      final users = await _userService.getAllUsers();
-      emit(MultiUserLoaded(users));
+
+      final result = await _userService.getAllUsers();
+
+      if (result.isSuccess) {
+        emit(MultiUserLoaded(result.data!));
+      } else {
+        emit(UserError(result.error ?? 'Không thể tải danh sách người dùng'));
+      }
     } catch (e) {
       emit(UserError('Không thể tải danh sách người dùng'));
     }
@@ -35,21 +42,37 @@ class UserCubit extends Cubit<UserState> {
   Future<void> updateUserProfile(Map<String, dynamic> data) async {
     if (state is UserLoaded) {
       final currentUser = (state as UserLoaded).user;
-      try {
+      if (currentUser.email == null) {
         emit(UserLoading());
-        await _userService.updateUserProfile(currentUser.email!, data);
-        final updatedUser = await _userService.getUserInfo(currentUser.email!);
-        if (updatedUser != null) {
-          emit(UserLoaded(updatedUser));
+        emit(UserError('Email không hợp lệ'));
+        return;
+      }
+
+      emit(UserLoading());
+
+      final updateResult = await _userService.updateUserProfile(
+        currentUser.email!,
+        data,
+      );
+
+      if (updateResult.isSuccess) {
+        final userResult = await _userService.getUserInfo(currentUser.email!);
+        if (userResult.isSuccess) {
+          emit(UserLoaded(userResult.data!));
         } else {
           emit(
-            const UserError(
-              'Không tìm thấy thông tin người dùng sau khi cập nhật',
+            UserError(
+              userResult.error ??
+                  'Không tìm thấy thông tin người dùng sau khi cập nhật',
             ),
           );
         }
-      } catch (e) {
-        emit(UserError('Không thể cập nhật thông tin người dùng'));
+      } else {
+        emit(
+          UserError(
+            updateResult.error ?? 'Không thể cập nhật thông tin người dùng',
+          ),
+        );
       }
     }
   }
@@ -59,26 +82,15 @@ class UserCubit extends Cubit<UserState> {
       final currentUser = (state as UserLoaded).user;
       final currentEmail = currentUser.email!;
 
-      try {
-        emit(UserLoading());
+      emit(UserLoading());
 
-        final avatarUrl = await _userService.uploadAvatar(
-          currentEmail,
-          imageBytes,
-        );
+      final result = await _userService.uploadAvatar(currentEmail, imageBytes);
 
-        if (avatarUrl != null) {
-          await loadUser(currentEmail);
-        }
-      } catch (e) {
-        emit(UserError('Không thể tải ảnh lên'));
-        try {
-          await loadUser(currentEmail);
-        } catch (reloadError) {
-          emit(
-            UserError('Không thể tải ảnh lên và tải lại thông tin người dùng'),
-          );
-        }
+      if (result.isSuccess) {
+        await loadUser(currentEmail);
+      } else {
+        emit(UserError(result.error ?? 'Không thể tải ảnh lên'));
+        await loadUser(currentEmail);
       }
     }
   }

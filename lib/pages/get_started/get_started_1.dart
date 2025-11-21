@@ -26,6 +26,7 @@ class GetStartedV1 extends StatefulWidget {
 
 class _GetStartedV1State extends State<GetStartedV1> {
   final _auth = LoginService();
+  bool _isLoading = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,57 +126,44 @@ class _GetStartedV1State extends State<GetStartedV1> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children:
-                        GetStartedV1._socialLoginOptions.asMap().entries.map<
-                          Widget
-                        >((entry) {
-                          int index = entry.key;
-                          SocialLoginOption option = entry.value;
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4.0,
-                              ),
-                              child: LoginIconButton(
-                                option: option,
-                                onPressed: () {
-                                  if (index == 0) {
-                                    _auth
-                                        .signInWithGoogle()
-                                        .then((user) {
-                                          if (user != null) {
-                                            SnackBar(
-                                              content: Text(
-                                                'Chào mừng ${user.user?.displayName}!',
-                                              ),
-                                              backgroundColor: Colors.green,
-                                            );
-                                            context.go('/home-user');
-                                          }
-                                        })
-                                        .catchError((error) {
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                'Đăng nhập Google thất bại: $error',
-                                              ),
-                                              backgroundColor: Colors.red,
-                                            ),
-                                          );
+                        GetStartedV1._socialLoginOptions
+                            .asMap()
+                            .entries
+                            .map<Widget>((entry) {
+                              int index = entry.key;
+                              SocialLoginOption option = entry.value;
+                              return Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 4.0,
+                                  ),
+                                  child: LoginIconButton(
+                                    option: option,
+                                    onPressed: () async {
+                                      if (index == 0) {
+                                        setState(() {
+                                          _isLoading = true;
                                         });
-                                  } else if (index == 1) {
-                                    //Facebook
-                                  } else if (index == 2) {
-                                    //Apple
-                                  } else if (index == 3) {
-                                    //Phone
-                                  }
-                                },
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                                        try {
+                                          await _signInWithGoogle();
+                                        } finally {
+                                          setState(() {
+                                            _isLoading = false;
+                                          });
+                                        }
+                                      } else if (index == 1) {
+                                        //Facebook
+                                      } else if (index == 2) {
+                                        //Apple
+                                      } else if (index == 3) {
+                                        //Phone
+                                      }
+                                    },
+                                  ),
+                                ),
+                              );
+                            })
+                            .toList(),
                   ),
                   const SizedBox(height: 20.0),
                   RichText(
@@ -204,8 +192,48 @@ class _GetStartedV1State extends State<GetStartedV1> {
               ),
             ),
           ),
+          if (_isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+            ),
         ],
       ),
     );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final result = await _auth.signInWithGoogle();
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (result.isError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.error ?? 'Đăng nhập Google thất bại'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final user = result.data!;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Chào mừng ${user.fullName ?? user.email}!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+    if (mounted) {
+      context.go('/');
+    }
   }
 }

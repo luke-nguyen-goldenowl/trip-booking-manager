@@ -7,12 +7,16 @@ class BusTripCubit extends Cubit<BusTripState> {
   final BusTripService _busTripService;
 
   BusTripCubit(this._busTripService) : super(BusTripInitial());
-
   Future<void> loadTrips(int companyId) async {
     try {
       emit(BusTripLoading());
-      final trips = await _busTripService.getTripsByCompany(companyId);
-      emit(BusTripLoaded(trips));
+      final result = await _busTripService.getTripsByCompany(companyId);
+
+      if (result.isSuccess) {
+        emit(BusTripLoaded(result.data!));
+      } else {
+        emit(BusTripError(result.error ?? 'Không thể tải danh sách chuyến đi'));
+      }
     } catch (e) {
       emit(BusTripError('Không thể tải danh sách chuyến đi'));
     }
@@ -21,8 +25,16 @@ class BusTripCubit extends Cubit<BusTripState> {
   Future<void> loadAllTrips() async {
     try {
       emit(BusTripLoading());
-      final trips = await _busTripService.getAllTrips();
-      emit(BusTripLoaded(trips));
+      final result = await _busTripService.getAllTrips();
+      if (result.isSuccess) {
+        emit(BusTripLoaded(result.data!));
+      } else {
+        emit(
+          BusTripError(
+            result.error ?? 'Không thể tải danh sách tất cả chuyến đi',
+          ),
+        );
+      }
     } catch (e) {
       emit(BusTripError('Không thể tải danh sách tất cả chuyến đi'));
     }
@@ -31,11 +43,11 @@ class BusTripCubit extends Cubit<BusTripState> {
   Future<void> createTrip(MTrip trip) async {
     try {
       emit(BusTripLoading());
-      await _busTripService.createTrip(trip);
-      if (trip.companyId != null) {
+      final result = await _busTripService.createTrip(trip);
+      if (result.isSuccess) {
         await loadTrips(trip.companyId!);
       } else {
-        emit(BusTripLoaded([]));
+        emit(BusTripError(result.error ?? 'Không thể tạo chuyến đi'));
       }
     } catch (e) {
       emit(BusTripError('Không thể tạo chuyến đi'));
@@ -45,11 +57,11 @@ class BusTripCubit extends Cubit<BusTripState> {
   Future<void> updateTrip(int tripId, MTrip trip) async {
     try {
       emit(BusTripLoading());
-      await _busTripService.updateTrip(tripId, trip);
-      if (trip.companyId != null) {
+      final result = await _busTripService.updateTrip(tripId, trip);
+      if (result.isSuccess) {
         await loadTrips(trip.companyId!);
       } else {
-        emit(BusTripLoaded([]));
+        emit(BusTripError(result.error ?? 'Không thể cập nhật chuyến đi'));
       }
     } catch (e) {
       emit(BusTripError('Không thể cập nhật chuyến đi'));
@@ -59,9 +71,20 @@ class BusTripCubit extends Cubit<BusTripState> {
   Future<void> deleteTrip(int tripId, int companyId) async {
     try {
       emit(BusTripLoading());
-      await _busTripService.deleteTrip(tripId);
-      emit(BusTripDeleted([]));
-      await loadTrips(companyId);
+      final result = await _busTripService.deleteTrip(tripId);
+      if (result.isSuccess) {
+        final trips = await _busTripService.getTripsByCompany(companyId);
+        if (trips.isSuccess) {
+          emit(BusTripDeleted(trips.data!));
+          await loadTrips(companyId);
+        } else {
+          emit(
+            BusTripError(trips.error ?? 'Không thể tải danh sách chuyến đi'),
+          );
+        }
+      } else {
+        emit(BusTripError(result.error ?? 'Không thể xóa chuyến đi'));
+      }
     } catch (e) {
       emit(BusTripError('Không thể xóa chuyến đi'));
     }
@@ -88,8 +111,12 @@ class BusTripCubit extends Cubit<BusTripState> {
   Future<void> getRandomTrips(int limit) async {
     try {
       emit(BusTripLoading());
-      final trips = await _busTripService.getRandomTrips(limit);
-      emit(PopularTripLoaded(trips));
+      final result = await _busTripService.getRandomTrips(limit);
+      if (result.isSuccess) {
+        emit(PopularTripLoaded(result.data!));
+      } else {
+        emit(BusTripError(result.error ?? 'Không thể tải danh sách chuyến đi'));
+      }
     } catch (e) {
       emit(BusTripError('Không thể tải danh sách chuyến đi'));
     }
@@ -98,8 +125,16 @@ class BusTripCubit extends Cubit<BusTripState> {
   Future<void> loadBookedUsers(int tripId) async {
     try {
       emit(BookedUsersLoading());
-      final users = await _busTripService.fetchBookedUsers(tripId);
-      emit(BookedUsersLoaded(users));
+      final result = await _busTripService.fetchBookedUsers(tripId);
+      if (result.isSuccess) {
+        emit(BookedUsersLoaded(result.data!));
+      } else {
+        emit(
+          BookedUsersError(
+            result.error ?? 'Không thể tải danh sách người dùng đã đặt',
+          ),
+        );
+      }
     } catch (e) {
       emit(BookedUsersError('Không thể tải danh sách người dùng đã đặt'));
     }

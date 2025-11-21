@@ -5,15 +5,17 @@ import 'package:bus_ticket_app/core/company/cubit/company_cubit.dart';
 import 'package:bus_ticket_app/core/network/cubit/internet_connection_cubit.dart';
 import 'package:bus_ticket_app/core/network/internet_connection_listener.dart';
 import 'package:bus_ticket_app/core/notification/device_token_service.dart';
+import 'package:bus_ticket_app/models/result_model.dart';
 import 'package:bus_ticket_app/pages/splash_screen/splash_screen.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'firebase_options.dart';
 import 'config/db/supabase.dart';
 import 'package:bus_ticket_app/routes/route.dart';
@@ -69,14 +71,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final supabaseClient = Supabase.instance.client;
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => UserCubit(UserService())),
-        BlocProvider(create: (context) => CompanyCubit(UserService())),
-        BlocProvider(create: (context) => BusCubit(BusService())),
-        BlocProvider(create: (context) => BusRouteCubit(BusRouteService())),
-        BlocProvider(create: (context) => BusTripCubit(BusTripService())),
-        BlocProvider(create: (context) => BookingCubit(BookingService())),
+        BlocProvider(
+          create: (context) => UserCubit(UserService(supabaseClient)),
+        ),
+        BlocProvider(
+          create: (context) => CompanyCubit(UserService(supabaseClient)),
+        ),
+        BlocProvider(create: (context) => BusCubit(BusService(supabaseClient))),
+        BlocProvider(
+          create: (context) => BusRouteCubit(BusRouteService(supabaseClient)),
+        ),
+        BlocProvider(
+          create: (context) => BusTripCubit(BusTripService(supabaseClient)),
+        ),
+        BlocProvider(
+          create: (context) => BookingCubit(BookingService(supabaseClient)),
+        ),
         BlocProvider(create: (context) => InternetConnectionCubit()),
       ],
       child: MaterialApp.router(
@@ -102,8 +115,8 @@ class AuthWrapper extends StatelessWidget {
   const AuthWrapper({super.key});
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
+    return StreamBuilder<fb_auth.User?>(
+      stream: fb_auth.FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
@@ -111,9 +124,11 @@ class AuthWrapper extends StatelessWidget {
           );
         }
         if (snapshot.hasData && snapshot.data != null) {
-          final User firebaseUser = snapshot.data!;
-          return FutureBuilder<user_model.MUser?>(
-            future: UserService().getUserInfo(firebaseUser.email!),
+          final fb_auth.User firebaseUser = snapshot.data!;
+          return FutureBuilder<MResult<user_model.MUser>>(
+            future: UserService(
+              Supabase.instance.client,
+            ).getUserInfo(firebaseUser.email!),
             builder: (context, userSnapshot) {
               if (userSnapshot.connectionState == ConnectionState.waiting) {
                 return const Scaffold(
@@ -121,18 +136,21 @@ class AuthWrapper extends StatelessWidget {
                 );
               }
               if (userSnapshot.hasError) {
-                FirebaseAuth.instance.signOut();
+                fb_auth.FirebaseAuth.instance.signOut();
               }
               if (userSnapshot.hasData && userSnapshot.data != null) {
-                final user_model.MUser user = userSnapshot.data!;
+                final result = userSnapshot.data!;
+                if (result.isSuccess) {
+                  final user_model.MUser user = result.data!;
 
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  context.read<UserCubit>().loadUser(firebaseUser.email!);
-                });
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    context.read<UserCubit>().loadUser(firebaseUser.email!);
+                  });
 
-                return _getHomeScreenByRole(user.role ?? 'Khách hàng');
+                  return _getHomeScreenByRole(user.role ?? 'Khách hàng');
+                }
               }
-              FirebaseAuth.instance.signOut();
+              fb_auth.FirebaseAuth.instance.signOut();
               return const GetStartedV1();
             },
           );

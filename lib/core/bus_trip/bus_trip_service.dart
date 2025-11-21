@@ -1,48 +1,31 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bus_ticket_app/models/trip_model.dart';
+import 'package:bus_ticket_app/models/base_collection.dart';
+import 'package:bus_ticket_app/models/result_model.dart';
 
-class BusTripService {
-  final SupabaseClient _supabase = Supabase.instance.client;
+class BusTripService extends BaseCollection<MTrip> {
+  BusTripService(SupabaseClient supabase)
+    : super(supabase: supabase, tableName: 'trips');
 
-  Future<List<MTrip>> getTripsByCompany(int companyId) async {
-    try {
-      final response = await _supabase
-          .from('trips')
-          .select()
-          .eq('company_id', companyId)
-          .order('departure_time', ascending: false);
-
-      return (response as List).map((trip) => MTrip.fromMap(trip)).toList();
-    } catch (e) {
-      throw Exception('Không thể tải danh sách chuyến đi');
-    }
+  Future<MResult<List<MTrip>>> getTripsByCompany(int companyId) async {
+    return getAll(
+      column: 'company_id',
+      value: companyId,
+      orderBy: 'departure_time',
+      ascending: false,
+    );
   }
 
-  Future<MTrip> createTrip(MTrip trip) async {
-    try {
-      final response =
-          await _supabase.from('trips').insert(trip.toMap()).select().single();
-
-      return MTrip.fromMap(response);
-    } catch (e) {
-      throw Exception('Không thể thêm chuyến đi');
-    }
+  Future<MResult<MTrip>> createTrip(MTrip trip) async {
+    return insert(trip);
   }
 
-  Future<void> updateTrip(int tripId, MTrip trip) async {
-    try {
-      await _supabase.from('trips').update(trip.toMap()).eq('id', tripId);
-    } catch (e) {
-      throw Exception('Không thể cập nhật chuyến đi');
-    }
+  Future<MResult<MTrip>> updateTrip(int tripId, MTrip trip) async {
+    return update(trip.copyWith(id: tripId));
   }
 
-  Future<void> deleteTrip(int tripId) async {
-    try {
-      await _supabase.from('trips').delete().eq('id', tripId);
-    } catch (e) {
-      throw Exception('Không thể xóa chuyến đi');
-    }
+  Future<MResult<void>> deleteTrip(int tripId) async {
+    return delete(tripId);
   }
 
   Future<bool> checkBusAvailability({
@@ -52,7 +35,7 @@ class BusTripService {
     int? excludeTripId,
   }) async {
     try {
-      var query = _supabase
+      var query = supabase
           .from('trips')
           .select()
           .eq('bus_id', busId)
@@ -77,61 +60,74 @@ class BusTripService {
       }
       return true;
     } catch (e) {
-      throw Exception('Không thể kiểm tra lịch xe');
+      return true;
     }
   }
 
-  Future<List<MTrip>> getRandomTrips(int limit) async {
+  Future<MResult<List<MTrip>>> getRandomTrips(int limit) async {
     try {
       final now = DateTime.now().toIso8601String();
-      final response = await _supabase
+      final response = await supabase
           .from('trips')
           .select(
-            'id, status, route_id, bus_id,company_id, departure_time, arrival_time,price, seat_layout, routes:route_id(id, departure, destination), buses:bus_id(id, company_id, bus_number, type, seat_count, user:company_id(full_name, email, phone)))',
+            'id, status, route_id, bus_id, company_id, departure_time, arrival_time, price, seat_layout, routes:route_id(id, departure, destination), buses:bus_id(id, company_id, bus_number, type, seat_count, user:company_id(full_name, email, phone)))',
           )
           .eq('status', 'scheduled')
           .gt('departure_time', now)
           .order('departure_time', ascending: true)
           .limit(limit);
-      return (response as List).map((trip) => MTrip.fromMap(trip)).toList();
+      final trips =
+          (response as List).map((trip) => MTrip.fromMap(trip)).toList();
+      return MResult.success(trips);
     } catch (e) {
-      return [];
+      return MResult.exception(e);
     }
   }
 
-  Future<List<MTrip>> getAllTrips() async {
-    try {
-      final response = await _supabase.from('trips').select();
-
-      return (response as List).map((trip) => MTrip.fromMap(trip)).toList();
-    } catch (e) {
-      throw Exception('Không thể tải danh sách chuyến đi');
-    }
+  Future<MResult<List<MTrip>>> getAllTrips() async {
+    return getAll();
   }
 
-  Future<MTrip?> getTripById(int tripId) async {
-    try {
-      final response =
-          await _supabase.from('trips').select().eq('id', tripId).single();
-
-      return MTrip.fromMap(response);
-    } catch (e) {
-      return null;
-    }
+  Future<MResult<MTrip>> getTripById(int tripId) async {
+    return get(tripId);
   }
 
-  Future<List<Map<String, dynamic>>> fetchBookedUsers(int tripId) async {
+  Future<MResult<List<Map<String, dynamic>>>> fetchBookedUsers(
+    int tripId,
+  ) async {
     try {
-      final response = await _supabase
+      final response = await supabase
           .from('bookings')
           .select('user_id, seats, user:user_id(full_name, email, phone)')
           .eq('trip_id', tripId);
 
-      return (response as List)
-          .map((booking) => booking as Map<String, dynamic>)
-          .toList();
+      return MResult.success(
+        (response as List)
+            .map((booking) => booking as Map<String, dynamic>)
+            .toList(),
+      );
     } catch (e) {
-      throw Exception('Không thể tải danh sách khách hàng');
+      return MResult.exception(e);
     }
+  }
+
+  @override
+  MTrip fromMap(Map<String, dynamic> map) {
+    return MTrip.fromMap(map);
+  }
+
+  @override
+  int getId(MTrip item) {
+    return item.id!;
+  }
+
+  @override
+  MTrip setId(MTrip item, int id) {
+    return item.copyWith(id: id);
+  }
+
+  @override
+  Map<String, dynamic> toMap(MTrip item) {
+    return item.toMap();
   }
 }

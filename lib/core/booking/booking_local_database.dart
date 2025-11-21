@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/models/result_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:bus_ticket_app/models/booking_model.dart';
@@ -42,7 +43,7 @@ class BookingLocalDatabase {
         },
       );
     } catch (e) {
-      throw Exception('Lỗi');
+      throw MResult.exception(e);
     }
   }
 
@@ -52,7 +53,7 @@ class BookingLocalDatabase {
       final bookingMap = booking.toMapLocaldb();
       await db.insert('bookingOffline', bookingMap);
     } catch (e) {
-      throw Exception('Lỗi');
+      throw MResult.exception(e);
     }
   }
 
@@ -75,7 +76,7 @@ class BookingLocalDatabase {
         return MBooking.fromMap(bookingMap);
       }).toList();
     } catch (e) {
-      throw Exception('Lỗi');
+      throw MResult.exception(e);
     }
   }
 
@@ -84,7 +85,7 @@ class BookingLocalDatabase {
       final db = await database;
       await db.delete('bookingOffline', where: 'id = ?', whereArgs: [id]);
     } catch (e) {
-      throw Exception('Lỗi');
+      throw MResult.exception(e);
     }
   }
 
@@ -93,7 +94,7 @@ class BookingLocalDatabase {
       final db = await database;
       await db.delete('bookingOffline');
     } catch (e) {
-      throw Exception('Lỗi');
+      throw MResult.exception(e);
     }
   }
 
@@ -117,7 +118,7 @@ class BookingLocalDatabase {
 
       return MBooking.fromMap(bookingMap);
     } catch (e) {
-      throw Exception('Lỗi');
+      throw MResult.exception(e);
     }
   }
 }

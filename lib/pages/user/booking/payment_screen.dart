@@ -12,6 +12,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bus_ticket_app/core/booking/cubit/booking_cubit.dart';
 import 'package:bus_ticket_app/core/booking/cubit/booking_state.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class PaymentScreen extends StatefulWidget {
   final MTrip trip;
@@ -48,7 +49,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Future<void> loadUser() async {
-    UserService userService = UserService();
+    UserService userService = UserService(Supabase.instance.client);
     userId = (await userService.getUserIdFromLocal())!;
   }
 
