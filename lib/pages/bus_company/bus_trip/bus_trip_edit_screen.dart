@@ -162,6 +162,9 @@ class _BusTripEditScreenState extends State<BusTripEditScreen> {
           backgroundColor: Colors.green,
         ),
       );
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.pop();
+      });
     } else if (state is BusTripError) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(state.message), backgroundColor: Colors.red),

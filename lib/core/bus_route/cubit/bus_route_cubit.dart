@@ -11,51 +11,85 @@ class BusRouteCubit extends Cubit<BusRouteState> {
   Future<void> loadRoutes(int companyId) async {
     try {
       emit(BusRouteLoading());
-      final routes = await _busRouteService.getRoutesByCompany(companyId);
-      emit(BusRouteLoaded(routes));
+      final result = await _busRouteService.getRoutesByCompany(companyId);
+      if (result.isSuccess) {
+        emit(BusRouteLoaded(result.data!));
+      } else {
+        emit(
+          BusRouteError(result.error ?? 'Không thể tải danh sách tuyến đường'),
+        );
+      }
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể tải danh sách tuyến đường'));
     }
   }
 
   Future<void> loadAllRoutes() async {
     try {
       emit(BusRouteLoading());
-      final routes = await _busRouteService.getAllRoutes();
-      emit(BusRouteLoaded(routes));
+      final result = await _busRouteService.getAllRoutes();
+      if (result.isSuccess) {
+        emit(BusRouteLoaded(result.data!));
+      } else {
+        emit(
+          BusRouteError(
+            result.error ?? 'Không thể tải danh sách tất cả tuyến đường',
+          ),
+        );
+      }
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể tải danh sách tất cả tuyến đường'));
     }
   }
 
   Future<void> createRoute(MRoute route) async {
     try {
       emit(BusRouteLoading());
-      await _busRouteService.createRoute(route);
-      await loadRoutes(route.companyId!);
+      final result = await _busRouteService.createRoute(route);
+      if (result.isSuccess) {
+        await loadRoutes(route.companyId!);
+      } else {
+        emit(BusRouteError(result.error ?? 'Không thể tạo tuyến đường'));
+      }
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể tạo tuyến đường'));
     }
   }
 
   Future<void> updateRoute(int routeId, MRoute route) async {
     try {
       emit(BusRouteLoading());
-      await _busRouteService.updateRoute(routeId, route);
-      await loadRoutes(route.companyId!);
+      final result = await _busRouteService.updateRoute(routeId, route);
+      if (result.isSuccess) {
+        await loadRoutes(route.companyId!);
+      } else {
+        emit(BusRouteError(result.error ?? 'Không thể cập nhật tuyến đường'));
+      }
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError('Không thể cập nhật tuyến đường'));
     }
   }
 
   Future<void> deleteRoute(int routeId, int companyId) async {
     try {
       emit(BusRouteLoading());
-      await _busRouteService.deleteRoute(routeId);
-      final routes = await _busRouteService.getRoutesByCompany(companyId);
-      emit(BusRouteDeleted(routes));
+      final result = await _busRouteService.deleteRoute(routeId);
+      if (result.isSuccess) {
+        final routes = await _busRouteService.getRoutesByCompany(companyId);
+        if (routes.isSuccess) {
+          emit(BusRouteDeleted(routes.data!));
+        } else {
+          emit(
+            BusRouteError(
+              routes.error ?? "Không thể tải danh sách tuyến đường",
+            ),
+          );
+        }
+      } else {
+        emit(BusRouteError(result.error ?? "Không thể xóa tuyến đường"));
+      }
     } catch (e) {
-      emit(BusRouteError(e.toString()));
+      emit(BusRouteError("Không thể xóa tuyến đường"));
     }
   }
 
@@ -65,14 +99,17 @@ class BusRouteCubit extends Cubit<BusRouteState> {
     int companyId,
   ) async {
     try {
-      final routes = await _busRouteService.getRoutesByCompany(companyId);
-      return routes.any(
-        (route) =>
-            route.departure?.trim().toUpperCase() ==
-                departure.trim().toUpperCase() &&
-            route.destination?.trim().toUpperCase() ==
-                destination.trim().toUpperCase(),
-      );
+      final result = await _busRouteService.getRoutesByCompany(companyId);
+      if (result.isSuccess) {
+        return result.data!.any(
+          (route) =>
+              route.departure?.trim().toUpperCase() ==
+                  departure.trim().toUpperCase() &&
+              route.destination?.trim().toUpperCase() ==
+                  destination.trim().toUpperCase(),
+        );
+      }
+      return false;
     } catch (e) {
       return false;
     }

@@ -1,3 +1,4 @@
+import 'package:bus_ticket_app/utils/helper/validation_email.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bus_ticket_app/core/auth/forgot_password/forgot_password_service.dart';
@@ -99,35 +100,48 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                               icon: Icons.email,
                               keyboardType: TextInputType.emailAddress,
                               inputFormatters: [LowerCaseTextFormatter()],
+                              validator: (value) {
+                                if (isValidEmail(value?.trim() ?? '')) {
+                                  return null;
+                                } else {
+                                  return 'Vui lòng nhập địa chỉ email hợp lệ';
+                                }
+                              },
                             ),
                             const SizedBox(height: 32),
-
-                            _isLoading
-                                ? const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.orange,
-                                  ),
-                                )
-                                : ElevatedButton(
-                                  onPressed: _sendPasswordResetEmail,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.orange,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 16,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Gửi liên kết đặt lại',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                            ElevatedButton(
+                              onPressed: _sendPasswordResetEmail,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                disabledBackgroundColor: Colors.grey,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
                                 ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              child:
+                                  _isLoading
+                                      ? SizedBox(
+                                        width: 23,
+                                        height: 23,
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                      : Text(
+                                        'Gửi liên kết đặt lại',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                            ),
                             const SizedBox(height: 24),
 
                             TextButton(
@@ -182,6 +196,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           validator: validator,
           inputFormatters: inputFormatters,
           style: const TextStyle(color: Colors.white),
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          onChanged: (value) => setState(() {}),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.white54),
@@ -218,30 +234,41 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
+
     String email = _emailController.text.trim();
 
     setState(() {
       _isLoading = true;
     });
 
-    try {
-      await _authService.sendPasswordResetEmail(email);
-      FocusScope.of(context).unfocus();
+    final result = await _authService.sendPasswordResetEmail(email);
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    FocusScope.of(context).unfocus();
+
+    if (result.isError) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result.error ?? 'Có lỗi xảy ra'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
             'Liên kết đặt lại mật khẩu đã được gửi đến email của bạn.',
           ),
           backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
         ),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-      );
-    } finally {
-      setState(() {
-        _isLoading = false;
+
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.go('/login');
       });
     }
   }

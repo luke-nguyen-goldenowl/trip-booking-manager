@@ -3,12 +3,15 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i3;
-import 'dart:typed_data' as _i5;
+import 'dart:async' as _i7;
+import 'dart:typed_data' as _i8;
 
-import 'package:bus_ticket_app/core/user/user_service.dart' as _i2;
+import 'package:bus_ticket_app/core/user/user_service.dart' as _i5;
+import 'package:bus_ticket_app/models/result_model.dart' as _i3;
 import 'package:bus_ticket_app/models/user_model.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
+import 'package:mockito/src/dummies.dart' as _i6;
+import 'package:supabase_flutter/supabase_flutter.dart' as _i2;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -24,66 +27,317 @@ import 'package:mockito/mockito.dart' as _i1;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
+class _FakeSupabaseClient_0 extends _i1.SmartFake
+    implements _i2.SupabaseClient {
+  _FakeSupabaseClient_0(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeMResult_1<T> extends _i1.SmartFake implements _i3.MResult<T> {
+  _FakeMResult_1(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
+class _FakeMUser_2 extends _i1.SmartFake implements _i4.MUser {
+  _FakeMUser_2(Object parent, Invocation parentInvocation)
+    : super(parent, parentInvocation);
+}
+
 /// A class which mocks [UserService].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockUserService extends _i1.Mock implements _i2.UserService {
+class MockUserService extends _i1.Mock implements _i5.UserService {
   @override
-  _i3.Future<_i4.MUser?> getUserInfo(String? email) =>
+  _i2.SupabaseClient get supabase =>
       (super.noSuchMethod(
-            Invocation.method(#getUserInfo, [email]),
-            returnValue: _i3.Future<_i4.MUser?>.value(),
-            returnValueForMissingStub: _i3.Future<_i4.MUser?>.value(),
-          )
-          as _i3.Future<_i4.MUser?>);
-
-  @override
-  _i3.Future<_i4.MUser?> getUserbyId(int? id) =>
-      (super.noSuchMethod(
-            Invocation.method(#getUserbyId, [id]),
-            returnValue: _i3.Future<_i4.MUser?>.value(),
-            returnValueForMissingStub: _i3.Future<_i4.MUser?>.value(),
-          )
-          as _i3.Future<_i4.MUser?>);
-
-  @override
-  _i3.Future<List<_i4.MUser>> getAllUsers() =>
-      (super.noSuchMethod(
-            Invocation.method(#getAllUsers, []),
-            returnValue: _i3.Future<List<_i4.MUser>>.value(<_i4.MUser>[]),
-            returnValueForMissingStub: _i3.Future<List<_i4.MUser>>.value(
-              <_i4.MUser>[],
+            Invocation.getter(#supabase),
+            returnValue: _FakeSupabaseClient_0(
+              this,
+              Invocation.getter(#supabase),
+            ),
+            returnValueForMissingStub: _FakeSupabaseClient_0(
+              this,
+              Invocation.getter(#supabase),
             ),
           )
-          as _i3.Future<List<_i4.MUser>>);
+          as _i2.SupabaseClient);
 
   @override
-  _i3.Future<void> updateUserProfile(
+  String get tableName =>
+      (super.noSuchMethod(
+            Invocation.getter(#tableName),
+            returnValue: _i6.dummyValue<String>(
+              this,
+              Invocation.getter(#tableName),
+            ),
+            returnValueForMissingStub: _i6.dummyValue<String>(
+              this,
+              Invocation.getter(#tableName),
+            ),
+          )
+          as String);
+
+  @override
+  _i7.Future<_i3.MResult<_i4.MUser>> getUserInfo(String? email) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserInfo, [email]),
+            returnValue: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#getUserInfo, [email]),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#getUserInfo, [email]),
+              ),
+            ),
+          )
+          as _i7.Future<_i3.MResult<_i4.MUser>>);
+
+  @override
+  _i7.Future<_i3.MResult<_i4.MUser>> getUserbyId(int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#getUserbyId, [id]),
+            returnValue: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#getUserbyId, [id]),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#getUserbyId, [id]),
+              ),
+            ),
+          )
+          as _i7.Future<_i3.MResult<_i4.MUser>>);
+
+  @override
+  _i7.Future<_i3.MResult<List<_i4.MUser>>> getAllUsers() =>
+      (super.noSuchMethod(
+            Invocation.method(#getAllUsers, []),
+            returnValue: _i7.Future<_i3.MResult<List<_i4.MUser>>>.value(
+              _FakeMResult_1<List<_i4.MUser>>(
+                this,
+                Invocation.method(#getAllUsers, []),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i7.Future<_i3.MResult<List<_i4.MUser>>>.value(
+                  _FakeMResult_1<List<_i4.MUser>>(
+                    this,
+                    Invocation.method(#getAllUsers, []),
+                  ),
+                ),
+          )
+          as _i7.Future<_i3.MResult<List<_i4.MUser>>>);
+
+  @override
+  _i7.Future<_i3.MResult<void>> updateUserProfile(
     String? email,
     Map<String, dynamic>? data,
   ) =>
       (super.noSuchMethod(
             Invocation.method(#updateUserProfile, [email, data]),
-            returnValue: _i3.Future<void>.value(),
-            returnValueForMissingStub: _i3.Future<void>.value(),
+            returnValue: _i7.Future<_i3.MResult<void>>.value(
+              _FakeMResult_1<void>(
+                this,
+                Invocation.method(#updateUserProfile, [email, data]),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<void>>.value(
+              _FakeMResult_1<void>(
+                this,
+                Invocation.method(#updateUserProfile, [email, data]),
+              ),
+            ),
           )
-          as _i3.Future<void>);
+          as _i7.Future<_i3.MResult<void>>);
 
   @override
-  _i3.Future<String?> uploadAvatar(String? email, _i5.Uint8List? imageBytes) =>
+  _i7.Future<_i3.MResult<String>> uploadAvatar(
+    String? email,
+    _i8.Uint8List? imageBytes,
+  ) =>
       (super.noSuchMethod(
             Invocation.method(#uploadAvatar, [email, imageBytes]),
-            returnValue: _i3.Future<String?>.value(),
-            returnValueForMissingStub: _i3.Future<String?>.value(),
+            returnValue: _i7.Future<_i3.MResult<String>>.value(
+              _FakeMResult_1<String>(
+                this,
+                Invocation.method(#uploadAvatar, [email, imageBytes]),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<String>>.value(
+              _FakeMResult_1<String>(
+                this,
+                Invocation.method(#uploadAvatar, [email, imageBytes]),
+              ),
+            ),
           )
-          as _i3.Future<String?>);
+          as _i7.Future<_i3.MResult<String>>);
 
   @override
-  _i3.Future<int?> getUserIdFromLocal() =>
+  _i7.Future<int?> getUserIdFromLocal() =>
       (super.noSuchMethod(
             Invocation.method(#getUserIdFromLocal, []),
-            returnValue: _i3.Future<int?>.value(),
-            returnValueForMissingStub: _i3.Future<int?>.value(),
+            returnValue: _i7.Future<int?>.value(),
+            returnValueForMissingStub: _i7.Future<int?>.value(),
           )
-          as _i3.Future<int?>);
+          as _i7.Future<int?>);
+
+  @override
+  _i4.MUser fromMap(Map<String, dynamic>? map) =>
+      (super.noSuchMethod(
+            Invocation.method(#fromMap, [map]),
+            returnValue: _FakeMUser_2(this, Invocation.method(#fromMap, [map])),
+            returnValueForMissingStub: _FakeMUser_2(
+              this,
+              Invocation.method(#fromMap, [map]),
+            ),
+          )
+          as _i4.MUser);
+
+  @override
+  int getId(_i4.MUser? item) =>
+      (super.noSuchMethod(
+            Invocation.method(#getId, [item]),
+            returnValue: 0,
+            returnValueForMissingStub: 0,
+          )
+          as int);
+
+  @override
+  _i4.MUser setId(_i4.MUser? item, int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#setId, [item, id]),
+            returnValue: _FakeMUser_2(
+              this,
+              Invocation.method(#setId, [item, id]),
+            ),
+            returnValueForMissingStub: _FakeMUser_2(
+              this,
+              Invocation.method(#setId, [item, id]),
+            ),
+          )
+          as _i4.MUser);
+
+  @override
+  Map<String, dynamic> toMap(_i4.MUser? item) =>
+      (super.noSuchMethod(
+            Invocation.method(#toMap, [item]),
+            returnValue: <String, dynamic>{},
+            returnValueForMissingStub: <String, dynamic>{},
+          )
+          as Map<String, dynamic>);
+
+  @override
+  _i7.Future<_i3.MResult<_i4.MUser>> get(int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#get, [id]),
+            returnValue: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(this, Invocation.method(#get, [id])),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(this, Invocation.method(#get, [id])),
+            ),
+          )
+          as _i7.Future<_i3.MResult<_i4.MUser>>);
+
+  @override
+  _i7.Future<_i3.MResult<List<_i4.MUser>>> getAll({
+    String? column,
+    dynamic value,
+    String? orderBy,
+    bool? ascending = true,
+    int? limit,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getAll, [], {
+              #column: column,
+              #value: value,
+              #orderBy: orderBy,
+              #ascending: ascending,
+              #limit: limit,
+            }),
+            returnValue: _i7.Future<_i3.MResult<List<_i4.MUser>>>.value(
+              _FakeMResult_1<List<_i4.MUser>>(
+                this,
+                Invocation.method(#getAll, [], {
+                  #column: column,
+                  #value: value,
+                  #orderBy: orderBy,
+                  #ascending: ascending,
+                  #limit: limit,
+                }),
+              ),
+            ),
+            returnValueForMissingStub:
+                _i7.Future<_i3.MResult<List<_i4.MUser>>>.value(
+                  _FakeMResult_1<List<_i4.MUser>>(
+                    this,
+                    Invocation.method(#getAll, [], {
+                      #column: column,
+                      #value: value,
+                      #orderBy: orderBy,
+                      #ascending: ascending,
+                      #limit: limit,
+                    }),
+                  ),
+                ),
+          )
+          as _i7.Future<_i3.MResult<List<_i4.MUser>>>);
+
+  @override
+  _i7.Future<_i3.MResult<_i4.MUser>> insert(_i4.MUser? item) =>
+      (super.noSuchMethod(
+            Invocation.method(#insert, [item]),
+            returnValue: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#insert, [item]),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#insert, [item]),
+              ),
+            ),
+          )
+          as _i7.Future<_i3.MResult<_i4.MUser>>);
+
+  @override
+  _i7.Future<_i3.MResult<_i4.MUser>> update(_i4.MUser? item) =>
+      (super.noSuchMethod(
+            Invocation.method(#update, [item]),
+            returnValue: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#update, [item]),
+              ),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<_i4.MUser>>.value(
+              _FakeMResult_1<_i4.MUser>(
+                this,
+                Invocation.method(#update, [item]),
+              ),
+            ),
+          )
+          as _i7.Future<_i3.MResult<_i4.MUser>>);
+
+  @override
+  _i7.Future<_i3.MResult<void>> delete(int? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#delete, [id]),
+            returnValue: _i7.Future<_i3.MResult<void>>.value(
+              _FakeMResult_1<void>(this, Invocation.method(#delete, [id])),
+            ),
+            returnValueForMissingStub: _i7.Future<_i3.MResult<void>>.value(
+              _FakeMResult_1<void>(this, Invocation.method(#delete, [id])),
+            ),
+          )
+          as _i7.Future<_i3.MResult<void>>);
 }

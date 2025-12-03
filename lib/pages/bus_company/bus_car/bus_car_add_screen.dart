@@ -21,7 +21,6 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _licensePlateController = TextEditingController();
   BusType? _selectedBusType;
-  BusStatus _selectedStatus = BusStatus.active;
   int? _selectedSeatCount;
   final Map<BusType, List<int>> _seatCountByType = {
     BusType.sleeper: [40, 34, 24, 22],
@@ -92,6 +91,9 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
           duration: Duration(seconds: 2),
         ),
       );
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.pop();
+      });
     }
 
     if (state is BusError) {
@@ -193,7 +195,6 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
             const SizedBox(height: 16),
             if (_selectedBusType != null) _buildSeatCountInfo(),
             if (_selectedBusType != null) const SizedBox(height: 16),
-            _buildStatusDropdown(),
           ],
         ),
       ),
@@ -335,43 +336,6 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
     );
   }
 
-  Widget _buildStatusDropdown() {
-    return DropdownButtonFormField<BusStatus>(
-      value: _selectedStatus,
-      decoration: InputDecoration(
-        labelText: 'Trạng thái *',
-        prefixIcon: const Icon(Icons.info),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        filled: true,
-        fillColor: Colors.grey[50],
-      ),
-      items:
-          BusStatus.values.map((status) {
-            return DropdownMenuItem(
-              value: status,
-              child: Row(
-                children: [
-                  Icon(
-                    BusHelper.getStatusIcon(status),
-                    size: 20,
-                    color: BusHelper.getStatusColor(status),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(BusHelper.getStatusName(status)),
-                ],
-              ),
-            );
-          }).toList(),
-      onChanged: (value) {
-        if (value != null) {
-          setState(() {
-            _selectedStatus = value;
-          });
-        }
-      },
-    );
-  }
-
   Widget _buildActionButtons(int companyId, BusState busState) {
     final isLoading = busState is BusLoading;
 
@@ -451,7 +415,6 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
     setState(() {
       _selectedBusType = null;
       _selectedSeatCount = null;
-      _selectedStatus = BusStatus.active;
     });
   }
 
@@ -490,7 +453,7 @@ class _BusCarAddScreenState extends State<BusCarAddScreen> {
       busNumber: _licensePlateController.text.trim(),
       type: _selectedBusType!,
       seatCount: _selectedSeatCount!,
-      status: _selectedStatus,
+      status: BusStatus.active,
       companyId: companyId,
     );
     if (!mounted) return;

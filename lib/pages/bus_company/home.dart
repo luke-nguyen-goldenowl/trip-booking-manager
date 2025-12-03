@@ -51,40 +51,38 @@ class _HomeBusCompanyScreenState extends State<HomeBusCompanyScreen> {
           _preloadAllData(state.user.id.toString());
         }
       },
-      child: SafeArea(
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(
-              _getTitle(),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            _getTitle(),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
             ),
-            centerTitle: true,
-            backgroundColor: Colors.orange[300],
           ),
-          body: _screens[_selectedIndex],
-          bottomNavigationBar: CurvedNavigationBar(
-            backgroundColor: Colors.transparent,
-            color: Colors.orange[300]!,
-            buttonBackgroundColor: Colors.orange[300],
-            height: 60,
-            index: _selectedIndex,
-            items: const [
-              Icon(Icons.home, size: 25, color: Colors.white),
-              Icon(Icons.directions_bus, size: 30, color: Colors.white),
-              Icon(Icons.route, size: 30, color: Colors.white),
-              Icon(Icons.location_on_sharp, size: 30, color: Colors.white),
-              Icon(Icons.person, size: 25, color: Colors.white),
-            ],
-            onTap: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          ),
+          centerTitle: true,
+          backgroundColor: Colors.orange[300],
+        ),
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: CurvedNavigationBar(
+          backgroundColor: Colors.transparent,
+          color: Colors.orange[300]!,
+          buttonBackgroundColor: Colors.orange[300],
+          height: 60,
+          index: _selectedIndex,
+          items: const [
+            Icon(Icons.home, size: 25, color: Colors.white),
+            Icon(Icons.directions_bus, size: 30, color: Colors.white),
+            Icon(Icons.route, size: 30, color: Colors.white),
+            Icon(Icons.location_on_sharp, size: 30, color: Colors.white),
+            Icon(Icons.person, size: 25, color: Colors.white),
+          ],
+          onTap: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
         ),
       ),
     );

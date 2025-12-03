@@ -25,7 +25,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
 
   ListProvince? _selectedDeparture;
   ListProvince? _selectedDestination;
-  BusRouteStatus _selectedStatus = BusRouteStatus.active;
   List<ListProvince> _provinces = [];
   bool _isLoadingProvinces = true;
   int? distance;
@@ -95,6 +94,9 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
           duration: Duration(seconds: 2),
         ),
       );
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) context.pop();
+      });
     }
 
     if (state is BusRouteError) {
@@ -160,8 +162,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
           const SizedBox(height: 16),
           _buildPriceDistanceCard(),
           const SizedBox(height: 16),
-          _buildStatusCard(),
-          const SizedBox(height: 24),
           _buildActionButtons(user.id, routeState),
         ],
       ),
@@ -416,103 +416,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
     );
   }
 
-  Widget _buildStatusCard() {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.toggle_on, color: Colors.orange),
-                const SizedBox(width: 8),
-                const Text(
-                  'Trạng thái tuyến đường',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF00424B),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatusOption(
-                    status: BusRouteStatus.active,
-                    icon: Icons.check_circle,
-                    color: Colors.green,
-                    label: 'Hoạt động',
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatusOption(
-                    status: BusRouteStatus.inactive,
-                    icon: Icons.cancel,
-                    color: Colors.red,
-                    label: 'Ngưng',
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusOption({
-    required BusRouteStatus status,
-    required IconData icon,
-    required Color color,
-    required String label,
-  }) {
-    final isSelected = _selectedStatus == status;
-
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _selectedStatus = status;
-        });
-      },
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.grey[100],
-          border: Border.all(
-            color: isSelected ? color : Colors.grey.shade300,
-            width: isSelected ? 2 : 1,
-          ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: isSelected ? color : Colors.grey, size: 20),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? color : Colors.grey[700],
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildActionButtons(int companyId, BusRouteState routeState) {
     final isLoading = routeState is BusRouteLoading;
 
@@ -625,7 +528,6 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
     setState(() {
       _selectedDeparture = null;
       _selectedDestination = null;
-      _selectedStatus = BusRouteStatus.active;
       distance = null;
     });
   }
@@ -689,7 +591,7 @@ class _BusRouteAddScreenState extends State<BusRouteAddScreen> {
       departure: _selectedDeparture!.name,
       destination: _selectedDestination!.name,
       distance: distance!,
-      status: _selectedStatus,
+      status: BusRouteStatus.active,
     );
     if (!mounted) return;
     context.read<BusRouteCubit>().createRoute(route);

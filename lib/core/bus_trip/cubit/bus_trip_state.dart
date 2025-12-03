@@ -11,6 +11,11 @@ class BusTripLoaded extends BusTripState {
   BusTripLoaded(this.trips);
 }
 
+class PopularTripLoaded extends BusTripState {
+  final List<MTrip> trips;
+  PopularTripLoaded(this.trips);
+}
+
 class BusTripDeleted extends BusTripState {
   final List<MTrip> trips;
   BusTripDeleted(this.trips);

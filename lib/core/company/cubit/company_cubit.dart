@@ -6,14 +6,15 @@ class CompanyCubit extends Cubit<UserState> {
   final UserService _userService;
 
   CompanyCubit(this._userService) : super(UserInitial());
-
   Future<void> loadCompanyById(int companyId) async {
     emit(UserLoading());
-    try {
-      final company = await _userService.getUserbyId(companyId);
-      emit(UserLoaded(company!));
-    } catch (e) {
-      emit(UserError(e.toString()));
+
+    final result = await _userService.getUserbyId(companyId);
+
+    if (result.isSuccess) {
+      emit(UserLoaded(result.data!));
+    } else {
+      emit(UserError(result.error ?? 'Không thể tải thông tin nhà xe'));
     }
   }
 }

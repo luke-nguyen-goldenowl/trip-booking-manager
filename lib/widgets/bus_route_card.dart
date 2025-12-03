@@ -70,67 +70,85 @@ class BusRouteCard extends StatelessWidget {
               const SizedBox(height: 12),
 
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                mainAxisSize: MainAxisSize.max,
                 children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: statusColor, width: 1.2),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(statusIcon, color: statusColor, size: 18),
-                        const SizedBox(width: 4),
-                        Text(
-                          BusHelper.getRouteStatusName(route.status),
-                          style: TextStyle(
-                            color: statusColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                  Flexible(
+                    flex: 0,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: statusColor, width: 1.2),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(statusIcon, color: statusColor, size: 18),
+                          const SizedBox(width: 4),
+                          Text(
+                            BusHelper.getRouteStatusName(route.status),
+                            style: TextStyle(
+                              color: statusColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
+
+                  const Spacer(),
+
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       if (onView != null) ...[
-                        const SizedBox(width: 4),
                         IconButton(
                           onPressed: onView,
-                          icon: const Icon(Icons.visibility),
+                          icon: const Icon(Icons.visibility, size: 20),
                           color: Colors.blue,
                           tooltip: 'Xem',
+                          padding: const EdgeInsets.all(8),
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
                           style: IconButton.styleFrom(
-                            backgroundColor: Colors.orange.withOpacity(0.1),
+                            backgroundColor: Colors.blue.withOpacity(0.1),
                           ),
                         ),
                       ],
                       if (onEdit != null) ...[
-                        const SizedBox(width: 4),
                         IconButton(
                           onPressed: onEdit,
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(Icons.edit, size: 20),
                           color: Colors.orange,
                           tooltip: 'Chỉnh sửa',
+                          padding: const EdgeInsets.all(8),
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.orange.withOpacity(0.1),
                           ),
                         ),
                       ],
                       if (onDelete != null) ...[
-                        const SizedBox(width: 4),
                         IconButton(
                           onPressed: onDelete,
-                          icon: const Icon(Icons.delete),
+                          icon: const Icon(Icons.delete, size: 20),
                           color: Colors.red,
                           tooltip: 'Xóa',
+                          padding: const EdgeInsets.all(8),
+                          constraints: const BoxConstraints(
+                            minWidth: 36,
+                            minHeight: 36,
+                          ),
                           style: IconButton.styleFrom(
                             backgroundColor: Colors.red.withOpacity(0.1),
                           ),

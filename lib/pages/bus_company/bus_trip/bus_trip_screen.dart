@@ -153,11 +153,11 @@ class _BusTripScreenState extends State<BusTripScreen> {
           TextField(
             controller: _searchController,
             onChanged: (value) => setState(() {}),
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.black),
             decoration: InputDecoration(
               hintText: 'Tìm kiếm chuyến đi...',
-              hintStyle: const TextStyle(color: Colors.white70),
-              prefixIcon: const Icon(Icons.search, color: Colors.white),
+              hintStyle: const TextStyle(color: Colors.black),
+              prefixIcon: const Icon(Icons.search, color: Colors.black),
               suffixIcon:
                   _searchController.text.isNotEmpty
                       ? IconButton(
@@ -170,10 +170,10 @@ class _BusTripScreenState extends State<BusTripScreen> {
                       )
                       : null,
               filled: true,
-              fillColor: Colors.grey[600],
+              fillColor: Colors.white,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
+                borderSide: BorderSide(color: Colors.grey.shade300),
               ),
               contentPadding: const EdgeInsets.symmetric(vertical: 0),
             ),

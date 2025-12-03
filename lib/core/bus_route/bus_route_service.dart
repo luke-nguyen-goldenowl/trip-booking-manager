@@ -1,49 +1,53 @@
+import 'package:bus_ticket_app/models/base_collection.dart';
+import 'package:bus_ticket_app/models/result_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:bus_ticket_app/models/route_model.dart';
 
-class BusRouteService {
-  final SupabaseClient _supabase = Supabase.instance.client;
+class BusRouteService extends BaseCollection<MRoute> {
+  BusRouteService(SupabaseClient supabase)
+    : super(supabase: supabase, tableName: 'routes');
 
-  Future<List<MRoute>> getRoutesByCompany(int companyId) async {
-    final response =
-        await _supabase.from('routes').select().eq('company_id', companyId)
-            as List<dynamic>;
-
-    return response
-        .map((e) => MRoute.fromMap(e as Map<String, dynamic>))
-        .toList();
+  Future<MResult<List<MRoute>>> getRoutesByCompany(int companyId) async {
+    return getAll(column: 'company_id', value: companyId);
   }
 
-  Future<List<MRoute>> getAllRoutes() async {
-    try {
-      final response = await _supabase.from('routes').select();
-
-      return (response as List).map((route) => MRoute.fromMap(route)).toList();
-    } catch (e) {
-      throw Exception('Không thể tải danh sách chuyến đi');
-    }
+  Future<MResult<List<MRoute>>> getAllRoutes() async {
+    return getAll();
   }
 
-  Future<void> createRoute(MRoute route) async {
-    await _supabase.from('routes').insert(route.toMap());
+  Future<MResult<MRoute>> createRoute(MRoute route) async {
+    return insert(route);
   }
 
-  Future<void> updateRoute(int routeId, MRoute route) async {
-    await _supabase.from('routes').update(route.toMap()).eq('id', routeId);
+  Future<MResult<MRoute>> updateRoute(int routeId, MRoute route) async {
+    return update(route.copyWith(id: routeId));
   }
 
-  Future<void> deleteRoute(int routeId) async {
-    await _supabase.from('routes').delete().eq('id', routeId);
+  Future<MResult<void>> deleteRoute(int routeId) async {
+    return delete(routeId);
   }
 
-  Future<MRoute?> getRouteById(int routeId) async {
-    try {
-      final response =
-          await _supabase.from('routes').select().eq('id', routeId).single();
+  Future<MResult<MRoute>> getRouteById(int routeId) async {
+    return get(routeId);
+  }
 
-      return MRoute.fromMap(response);
-    } catch (e) {
-      return null;
-    }
+  @override
+  MRoute fromMap(Map<String, dynamic> map) {
+    return MRoute.fromMap(map);
+  }
+
+  @override
+  int getId(MRoute item) {
+    return item.id!;
+  }
+
+  @override
+  MRoute setId(MRoute item, int id) {
+    return item.copyWith(id: id);
+  }
+
+  @override
+  Map<String, dynamic> toMap(MRoute item) {
+    return item.toMap();
   }
 }

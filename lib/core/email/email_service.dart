@@ -176,7 +176,7 @@ Future<void> sendBookingConfirmationEmail({
                   Email này được gửi tự động, vui lòng không trả lời.
                 </p>
                 <p style="margin: 5px 0 0 0; color: #999; font-size: 12px;">
-                  © 2025 Bus Ticket App. All rights reserved.
+                  © 2025 GoBus. All rights reserved.
                 </p>
               </td>
             </tr>
@@ -357,7 +357,7 @@ Future<void> sendBookingCancellationEmail({
                 Email này được gửi tự động, vui lòng không trả lời.
               </p>
               <p style="margin:5px 0 0 0; color:#999; font-size:12px;">
-                © 2025 Bus Ticket App. All rights reserved.
+                © 2025 GoBus. All rights reserved.
               </p>
             </td>
           </tr>

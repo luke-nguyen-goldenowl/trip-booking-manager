@@ -35,7 +35,17 @@ class LoginIconButton extends StatelessWidget {
         ),
         side: const BorderSide(color: Colors.white, width: 1),
       ),
-      child: option.icon,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          option.icon,
+          const SizedBox(width: 8.0),
+          Text(
+            option.label,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -32,10 +32,10 @@ class ProvinceService {
             }).toList();
         return _cachedProvinces!;
       } else {
-        throw Exception('Failed to load provinces: ${response.statusCode}');
+        throw Exception('Tải danh sách tỉnh/thành phố thất bại');
       }
     } catch (e) {
-      throw Exception('Error fetching provinces: $e');
+      throw Exception('Lỗi');
     }
   }
 

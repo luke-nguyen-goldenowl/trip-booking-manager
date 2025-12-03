@@ -14,6 +14,50 @@
       },
       "oauth_client": [
         {
+          "client_id": "530949737565-dg982ln9huneaj94p2gvo458heh5fl1c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bus_ticket_app",
+            "certificate_hash": "410471abdc830b992a7c6a9caa85cda73a522314"
+          }
+        },
+        {
+          "client_id": "530949737565-4bbij65cs3go1n9rj63guqjd6um56100.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzW0qZLtEnOtPRg_4rZob0MHuTI3AdPD8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "530949737565-4bbij65cs3go1n9rj63guqjd6um56100.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "530949737565-510bas4rt80cecq8fde11blgdg2gb6eo.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.busTicketApp"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530949737565:android:7d30a867ab0cc3560751b4",
+        "android_client_info": {
+          "package_name": "com.felix.bus_ticket_app"
+        }
+      },
+      "oauth_client": [
+        {
           "client_id": "530949737565-4bbij65cs3go1n9rj63guqjd6um56100.apps.googleusercontent.com",
           "client_type": 3
         }
